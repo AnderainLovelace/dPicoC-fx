@@ -1,0 +1,2777 @@
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE    1
+
+************ OBJECT LISTING ************
+
+FILE NAME: E:\Anderain\fx-9860\dPicoc\type.c
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+          type.c     1    #include "interpreter.h"
+          type.c     2    
+          type.c     3    /* some basic types */
+          type.c     4    struct ValueType UberType;
+          type.c     5    struct ValueType IntType;
+          type.c     6    struct ValueType ShortType;
+          type.c     7    struct ValueType CharType;
+          type.c     8    struct ValueType LongType;
+          type.c     9    struct ValueType UnsignedIntType;
+          type.c    10    struct ValueType UnsignedShortType;
+          type.c    11    struct ValueType UnsignedLongType;
+          type.c    12    #ifndef NO_FP
+          type.c    13    struct ValueType FPType;
+          type.c    14    #endif
+          type.c    15    struct ValueType VoidType;
+          type.c    16    struct ValueType TypeType;
+          type.c    17    struct ValueType FunctionType;
+          type.c    18    struct ValueType MacroType;
+          type.c    19    struct ValueType EnumType;
+          type.c    20    struct ValueType GotoLabelType;
+          type.c    21    struct ValueType *CharPtrType;
+          type.c    22    struct ValueType *CharPtrPtrType;
+          type.c    23    struct ValueType *CharArrayType;
+          type.c    24    struct ValueType *VoidPtrType;
+          type.c    25    
+          type.c    26    static int PointerAlignBytes;
+          type.c    27    static int IntAlignBytes;
+          type.c    28    
+          type.c    29    
+          type.c    30    /* add a new type to the set of types we know about */
+          type.c    31    struct ValueType *TypeAdd(struct ParseState *Parser, struct ValueType *ParentType, enum BaseType Base, int
+                         + ArraySize, const char *Identifier, int Sizeof, int AlignBytes)
+P   00000000              _TypeAdd:                        ; function: TypeAdd
+                                                           ; frame size=16
+    00000000 2FE6                   MOV.L       R14,@-R15
+    00000002 6E53                   MOV         R5,R14
+          type.c    32    {
+          type.c    33        struct ValueType *NewType = VariableAlloc(Parser, sizeof(struct ValueType), TRUE);
+    00000004 D364                   MOV.L       L786,R3    ; _VariableAlloc
+    00000006 4F22                   STS.L       PR,@-R15
+    00000008 7FF8                   ADD         #-8,R15
+    0000000A 1F61                   MOV.L       R6,@(4,R15)
+    0000000C 2F72                   MOV.L       R7,@R15
+    0000000E E601                   MOV         #1,R6
+    00000010 430B                   JSR         @R3
+    00000012 E52C                   MOV         #44,R5
+          type.c    34        NewType->Base = Base;
+    00000014 52F1                   MOV.L       @(4,R15),R2
+          type.c    35        NewType->ArraySize = ArraySize;
+          type.c    36        NewType->Sizeof = Sizeof;
+          type.c    37        NewType->AlignBytes = AlignBytes;
+          type.c    38        NewType->Identifier = Identifier;
+          type.c    39        NewType->Members = NULL;
+    00000016 E500                   MOV         #0,R5
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE    2
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000018 6403                   MOV         R0,R4
+          type.c    40        NewType->FromType = ParentType;
+          type.c    41        NewType->DerivedTypeList = NULL;
+          type.c    42        NewType->OnHeap = TRUE;
+          type.c    43        NewType->Next = ParentType->DerivedTypeList;
+          type.c    44        ParentType->DerivedTypeList = NewType;
+          type.c    45        
+          type.c    46        return NewType;
+    0000001A 6043                   MOV         R4,R0
+    0000001C 2422                   MOV.L       R2,@R4
+    0000001E 63F2                   MOV.L       @R15,R3
+    00000020 1431                   MOV.L       R3,@(4,R4)
+    00000022 52F5                   MOV.L       @(20,R15),R2
+    00000024 1422                   MOV.L       R2,@(8,R4)
+    00000026 53F6                   MOV.L       @(24,R15),R3
+    00000028 1433                   MOV.L       R3,@(12,R4)
+    0000002A E301                   MOV         #1,R3
+    0000002C 52F4                   MOV.L       @(16,R15),R2
+    0000002E 1424                   MOV.L       R2,@(16,R4)
+    00000030 1458                   MOV.L       R5,@(32,R4)
+    00000032 14E5                   MOV.L       R14,@(20,R4)
+    00000034 1456                   MOV.L       R5,@(24,R4)
+    00000036 1439                   MOV.L       R3,@(36,R4)
+    00000038 52E6                   MOV.L       @(24,R14),R2
+    0000003A 1427                   MOV.L       R2,@(28,R4)
+    0000003C 1E46                   MOV.L       R4,@(24,R14)
+          type.c    47    }
+    0000003E 7F08                   ADD         #8,R15
+    00000040 4F26                   LDS.L       @R15+,PR
+    00000042 000B                   RTS
+    00000044 6EF6                   MOV.L       @R15+,R14
+          type.c    48    
+          type.c    49    /* given a parent type, get a matching derived type and make one if necessary.
+          type.c    50     * Identifier should be registered with the shared string table. */
+          type.c    51    struct ValueType *TypeGetMatching(struct ParseState *Parser, struct ValueType *ParentType, enum BaseType B
+                         +ase, int ArraySize, const char *Identifier, int AllowDuplicates)
+    00000046              _TypeGetMatching:                ; function: TypeGetMatching
+                                                           ; frame size=40
+    00000046 2FE6                   MOV.L       R14,@-R15
+    00000048 2FD6                   MOV.L       R13,@-R15
+    0000004A 6E53                   MOV         R5,R14
+    0000004C 2FC6                   MOV.L       R12,@-R15
+    0000004E 6C63                   MOV         R6,R12
+    00000050 2FB6                   MOV.L       R11,@-R15
+    00000052 6B73                   MOV         R7,R11
+    00000054 4F22                   STS.L       PR,@-R15
+    00000056 4F12                   STS.L       MACL,@-R15
+    00000058 7FFC                   ADD         #-4,R15
+    0000005A 2F42                   MOV.L       R4,@R15
+    0000005C 5DF7                   MOV.L       @(28,R15),R13
+          type.c    52    {
+          type.c    53        int Sizeof;
+          type.c    54        int AlignBytes;
+          type.c    55        struct ValueType *ThisType = ParentType->DerivedTypeList;
+          type.c    56        while (ThisType != NULL && (ThisType->Base != Base || ThisType->ArraySize != ArraySize || ThisType->Id
+                         +entifier != Identifier))
+    0000005E A001                   BRA         L692
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE    3
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000060 54E6                   MOV.L       @(24,R14),R4
+    00000062              L693:                             
+          type.c    57            ThisType = ThisType->Next;
+    00000062 5447                   MOV.L       @(28,R4),R4
+    00000064              L692:                             
+    00000064 2448                   TST         R4,R4
+    00000066 8916                   BT          L695
+    00000068 6342                   MOV.L       @R4,R3
+    0000006A 33C0                   CMP/EQ      R12,R3
+    0000006C 8BF9                   BF          L693
+    0000006E 5141                   MOV.L       @(4,R4),R1
+    00000070 31B0                   CMP/EQ      R11,R1
+    00000072 8BF6                   BF          L693
+    00000074 5244                   MOV.L       @(16,R4),R2
+    00000076 32D0                   CMP/EQ      R13,R2
+    00000078 8BF3                   BF          L693
+          type.c    58        
+          type.c    59        if (ThisType != NULL)
+    0000007A 2448                   TST         R4,R4
+    0000007C 890B                   BT          L695
+          type.c    60        {
+          type.c    61            if (AllowDuplicates)
+    0000007E 53F8                   MOV.L       @(32,R15),R3
+    00000080 2338                   TST         R3,R3
+    00000082 8901                   BT          L696
+          type.c    62                return ThisType;
+    00000084 A02A                   BRA         L697
+    00000086 6043                   MOV         R4,R0
+    00000088              L696:                             
+          type.c    63            else
+          type.c    64                ProgramFail(Parser, "data type '%s' is already defined", Identifier);
+    00000088 2FD6                   MOV.L       R13,@-R15
+    0000008A D244                   MOV.L       L786+4,R2  ; L522
+    0000008C D344                   MOV.L       L786+8,R3  ; _ProgramFail
+    0000008E 2F26                   MOV.L       R2,@-R15
+    00000090 430B                   JSR         @R3
+    00000092 54F2                   MOV.L       @(8,R15),R4
+    00000094 7F08                   ADD         #8,R15
+    00000096              L695:                             
+          type.c    65        }
+          type.c    66            
+          type.c    67        switch (Base)
+    00000096 60C3                   MOV         R12,R0
+    00000098 880B                   CMP/EQ      #11,R0
+    0000009A 8D06                   BT/S        L655
+    0000009C E404                   MOV         #4,R4
+    0000009E 880C                   CMP/EQ      #12,R0
+    000000A0 8907                   BT          L656
+    000000A2 880F                   CMP/EQ      #15,R0
+    000000A4 890A                   BT          L657
+    000000A6 A00D                   BRA         L658
+    000000A8 0009                   NOP
+    000000AA              L655:                            ; case label 
+          type.c    68        {
+          type.c    69            case TypePointer:   Sizeof = sizeof(void *); AlignBytes = PointerAlignBytes; break;
+    000000AA 6543                   MOV         R4,R5
+    000000AC D23D                   MOV.L       L786+12,R2 ; __$PointerAlignBytes
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE    4
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000000AE A00C                   BRA         L699
+    000000B0 6422                   MOV.L       @R2,R4
+    000000B2              L656:                            ; case label 
+          type.c    70            case TypeArray:     Sizeof = ArraySize * ParentType->Sizeof; AlignBytes = ParentType->AlignBytes; 
+                         +break;
+    000000B2 55E2                   MOV.L       @(8,R14),R5
+    000000B4 0B57                   MUL.L       R5,R11
+    000000B6 051A                   STS         MACL,R5
+    000000B8 A007                   BRA         L699
+    000000BA 54E3                   MOV.L       @(12,R14),R4
+    000000BC              L657:                            ; case label 
+          type.c    71            case TypeEnum:      Sizeof = sizeof(int); AlignBytes = IntAlignBytes; break;
+    000000BC D33A                   MOV.L       L786+16,R3 ; __$IntAlignBytes
+    000000BE 6543                   MOV         R4,R5
+    000000C0 A003                   BRA         L699
+    000000C2 6432                   MOV.L       @R3,R4
+    000000C4              L658:                            ; default label 
+          type.c    72            default:            Sizeof = 0; AlignBytes = 0; break;      /* structs and unions will get bigger 
+                         +when we add members to them */
+    000000C4 E600                   MOV         #0,R6
+    000000C6 6563                   MOV         R6,R5
+    000000C8 6463                   MOV         R6,R4
+    000000CA              L699:                             
+          type.c    73        }
+          type.c    74    
+          type.c    75        return TypeAdd(Parser, ParentType, Base, ArraySize, Identifier, Sizeof, AlignBytes);
+    000000CA 67B3                   MOV         R11,R7
+    000000CC 2F46                   MOV.L       R4,@-R15
+    000000CE 66C3                   MOV         R12,R6
+    000000D0 2F56                   MOV.L       R5,@-R15
+    000000D2 65E3                   MOV         R14,R5
+    000000D4 2FD6                   MOV.L       R13,@-R15
+    000000D6 BF93                   BSR         _TypeAdd
+    000000D8 54F3                   MOV.L       @(12,R15),R4
+    000000DA 7F0C                   ADD         #12,R15
+          type.c    76    }
+    000000DC              L697:                             
+    000000DC 7F04                   ADD         #4,R15
+    000000DE 4F16                   LDS.L       @R15+,MACL
+    000000E0 4F26                   LDS.L       @R15+,PR
+    000000E2 6BF6                   MOV.L       @R15+,R11
+    000000E4 6CF6                   MOV.L       @R15+,R12
+    000000E6 6DF6                   MOV.L       @R15+,R13
+    000000E8 000B                   RTS
+    000000EA 6EF6                   MOV.L       @R15+,R14
+          type.c    77    
+          type.c    78    /* stack space used by a value */
+          type.c    79    int TypeStackSizeValue(struct Value *Val)
+    000000EC              _TypeStackSizeValue:             ; function: TypeStackSizeValue
+                                                           ; frame size=0
+          type.c    80    {
+          type.c    81        if (Val != NULL && Val->ValOnStack)
+    000000EC 2448                   TST         R4,R4
+    000000EE 8904                   BT          L700
+    000000F0 844D                   MOV.B       @(13,R4),R0
+    000000F2 2008                   TST         R0,R0
+    000000F4 8901                   BT          L700
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE    5
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+          type.c    82            return TypeSizeValue(Val, FALSE);
+    000000F6 A002                   BRA         _TypeSizeValue
+    000000F8 E500                   MOV         #0,R5
+    000000FA              L700:                             
+          type.c    83        else
+          type.c    84            return 0;
+          type.c    85    }
+    000000FA 000B                   RTS
+    000000FC E000                   MOV         #0,R0
+          type.c    86    
+          type.c    87    /* memory used by a value */
+          type.c    88    int TypeSizeValue(struct Value *Val, int Compact)
+    000000FE              _TypeSizeValue:                  ; function: TypeSizeValue
+                                                           ; frame size=8
+          type.c    89    {
+          type.c    90        if (IS_INTEGER_NUMERIC(Val) && !Compact)
+    000000FE E301                   MOV         #1,R3
+    00000100 4F12                   STS.L       MACL,@-R15
+    00000102 7FFC                   ADD         #-4,R15
+    00000104 6642                   MOV.L       @R4,R6
+    00000106 2F62                   MOV.L       R6,@R15
+    00000108 6662                   MOV.L       @R6,R6
+    0000010A 3633                   CMP/GE      R3,R6
+    0000010C 8B08                   BF          L703
+    0000010E E107                   MOV         #7,R1
+    00000110 3617                   CMP/GT      R1,R6
+    00000112 8905                   BT          L703
+    00000114 2558                   TST         R5,R5
+    00000116 8B03                   BF          L703
+          type.c    91            return sizeof(ALIGN_TYPE);     /* allow some extra room for type extension */
+    00000118 E004                   MOV         #4,R0
+    0000011A 7F04                   ADD         #4,R15
+    0000011C 000B                   RTS
+    0000011E 4F16                   LDS.L       @R15+,MACL
+    00000120              L703:                             
+          type.c    92        else if (Val->Typ->Base != TypeArray)
+    00000120 6042                   MOV.L       @R4,R0
+    00000122 6002                   MOV.L       @R0,R0
+    00000124 880C                   CMP/EQ      #12,R0
+    00000126 8904                   BT          L706
+          type.c    93            return Val->Typ->Sizeof;
+    00000128 6042                   MOV.L       @R4,R0
+    0000012A 5002                   MOV.L       @(8,R0),R0
+    0000012C 7F04                   ADD         #4,R15
+    0000012E 000B                   RTS
+    00000130 4F16                   LDS.L       @R15+,MACL
+    00000132              L706:                             
+          type.c    94        else
+          type.c    95            return Val->Typ->FromType->Sizeof * Val->Typ->ArraySize;
+    00000132 6542                   MOV.L       @R4,R5
+    00000134 5055                   MOV.L       @(20,R5),R0
+    00000136 5351                   MOV.L       @(4,R5),R3
+    00000138 5202                   MOV.L       @(8,R0),R2
+    0000013A 0237                   MUL.L       R3,R2
+    0000013C 001A                   STS         MACL,R0
+          type.c    96    }
+    0000013E              L704:                             
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE    6
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    0000013E 7F04                   ADD         #4,R15
+    00000140 000B                   RTS
+    00000142 4F16                   LDS.L       @R15+,MACL
+          type.c    97    
+          type.c    98    /* memory used by a variable given its type and array size */
+          type.c    99    int TypeSize(struct ValueType *Typ, int ArraySize, int Compact)
+    00000144              _TypeSize:                       ; function: TypeSize
+                                                           ; frame size=4
+    00000144 4F12                   STS.L       MACL,@-R15
+          type.c   100    {
+          type.c   101        if (IS_INTEGER_NUMERIC_TYPE(Typ) && !Compact)
+    00000146 E301                   MOV         #1,R3
+    00000148 6742                   MOV.L       @R4,R7
+    0000014A 3733                   CMP/GE      R3,R7
+    0000014C 8B07                   BF          L708
+    0000014E E107                   MOV         #7,R1
+    00000150 3717                   CMP/GT      R1,R7
+    00000152 8904                   BT          L708
+    00000154 2668                   TST         R6,R6
+    00000156 8B02                   BF          L708
+          type.c   102            return sizeof(ALIGN_TYPE);     /* allow some extra room for type extension */
+    00000158 E004                   MOV         #4,R0
+    0000015A 000B                   RTS
+    0000015C 4F16                   LDS.L       @R15+,MACL
+    0000015E              L708:                             
+          type.c   103        else if (Typ->Base != TypeArray)
+    0000015E 6042                   MOV.L       @R4,R0
+    00000160 880C                   CMP/EQ      #12,R0
+    00000162 8902                   BT          L711
+          type.c   104            return Typ->Sizeof;
+    00000164 5042                   MOV.L       @(8,R4),R0
+    00000166 000B                   RTS
+    00000168 4F16                   LDS.L       @R15+,MACL
+    0000016A              L711:                             
+          type.c   105        else
+          type.c   106            return Typ->FromType->Sizeof * ArraySize;
+    0000016A 5045                   MOV.L       @(20,R4),R0
+    0000016C 5002                   MOV.L       @(8,R0),R0
+    0000016E 0057                   MUL.L       R5,R0
+    00000170 001A                   STS         MACL,R0
+          type.c   107    }
+    00000172              L709:                             
+    00000172 000B                   RTS
+    00000174 4F16                   LDS.L       @R15+,MACL
+          type.c   108    
+          type.c   109    /* add a base type */
+          type.c   110    void TypeAddBaseType(struct ValueType *TypeNode, enum BaseType Base, int Sizeof, int AlignBytes)
+    00000176              _TypeAddBaseType:                ; function: TypeAddBaseType
+                                                           ; frame size=0
+          type.c   111    {
+          type.c   112        TypeNode->Base = Base;
+    00000176 2452                   MOV.L       R5,@R4
+          type.c   113        TypeNode->ArraySize = 0;
+          type.c   114        TypeNode->Sizeof = Sizeof;
+          type.c   115        TypeNode->AlignBytes = AlignBytes;
+          type.c   116        TypeNode->Identifier = StrEmpty;
+    00000178 D20C                   MOV.L       L786+20,R2 ; _StrEmpty
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE    7
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    0000017A E500                   MOV         #0,R5
+    0000017C 1451                   MOV.L       R5,@(4,R4)
+    0000017E 1462                   MOV.L       R6,@(8,R4)
+    00000180 1473                   MOV.L       R7,@(12,R4)
+    00000182 6322                   MOV.L       @R2,R3
+    00000184 1434                   MOV.L       R3,@(16,R4)
+          type.c   117        TypeNode->Members = NULL;
+    00000186 1458                   MOV.L       R5,@(32,R4)
+          type.c   118        TypeNode->FromType = NULL;
+    00000188 1455                   MOV.L       R5,@(20,R4)
+          type.c   119        TypeNode->DerivedTypeList = NULL;
+    0000018A 1456                   MOV.L       R5,@(24,R4)
+          type.c   120        TypeNode->OnHeap = FALSE;
+    0000018C 1459                   MOV.L       R5,@(36,R4)
+          type.c   121        TypeNode->Next = UberType.DerivedTypeList;
+    0000018E D508                   MOV.L       L786+24,R5 ; _UberType
+    00000190 5356                   MOV.L       @(24,R5),R3
+    00000192 1437                   MOV.L       R3,@(28,R4)
+          type.c   122        UberType.DerivedTypeList = TypeNode;
+          type.c   123    }
+    00000194 000B                   RTS
+    00000196 1546                   MOV.L       R4,@(24,R5)
+    00000198              L786:                             
+    00000198 <00000000>             .DATA.L     _VariableAlloc
+    0000019C <00000000>             .DATA.L     L522
+    000001A0 <00000000>             .DATA.L     _ProgramFail
+    000001A4 <00000000>             .DATA.L     __$PointerAlignBytes
+    000001A8 <00000000>             .DATA.L     __$IntAlignBytes
+    000001AC <00000000>             .DATA.L     _StrEmpty
+    000001B0 <00000000>             .DATA.L     _UberType
+          type.c   124    
+          type.c   125    /* initialise the type system */
+          type.c   126    void TypeInit()
+    000001B4              _TypeInit:                       ; function: TypeInit
+                                                           ; frame size=116
+                                                           ; used runtime library name:
+                                                           ; __divls
+    000001B4 2FE6                   MOV.L       R14,@-R15
+          type.c   127    {
+          type.c   128        struct IntAlign { char x; int y; } ia;
+          type.c   129        struct ShortAlign { char x; short y; } sa;
+          type.c   130        struct CharAlign { char x; char y; } ca;
+          type.c   131        struct LongAlign { char x; long y; } la;
+          type.c   132    #ifndef NO_FP
+          type.c   133        struct DoubleAlign { char x; double y; } da;
+          type.c   134    #endif
+          type.c   135        struct PointerAlign { char x; void *y; } pa;
+          type.c   136        
+          type.c   137        IntAlignBytes = (char *)&ia.y - &ia.x;
+          type.c   138        PointerAlignBytes = (char *)&pa.y - &pa.x;
+          type.c   139        
+          type.c   140        UberType.DerivedTypeList = NULL;
+          type.c   141        TypeAddBaseType(&IntType, TypeInt, sizeof(int), IntAlignBytes);
+    000001B6 E604                   MOV         #4,R6
+    000001B8 D195                   MOV.L       L787+10,R1 ; H'00000018+_UberType
+    000001BA 2FD6                   MOV.L       R13,@-R15
+    000001BC 2FC6                   MOV.L       R12,@-R15
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE    8
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000001BE 2FB6                   MOV.L       R11,@-R15
+    000001C0 2FA6                   MOV.L       R10,@-R15
+    000001C2 4F22                   STS.L       PR,@-R15
+    000001C4 DE90                   MOV.L       L787+2,R14 ; __$IntAlignBytes
+    000001C6 7FD4                   ADD         #-44,R15
+    000001C8 DC90                   MOV.L       L787+6,R12 ; __$PointerAlignBytes
+    000001CA 64F3                   MOV         R15,R4
+    000001CC 7424                   ADD         #36,R4
+    000001CE 6343                   MOV         R4,R3
+    000001D0 7304                   ADD         #4,R3
+    000001D2 3348                   SUB         R4,R3
+    000001D4 2E32                   MOV.L       R3,@R14
+    000001D6 64F3                   MOV         R15,R4
+    000001D8 6243                   MOV         R4,R2
+    000001DA 7204                   ADD         #4,R2
+    000001DC 3248                   SUB         R4,R2
+    000001DE E300                   MOV         #0,R3
+    000001E0 D48C                   MOV.L       L787+14,R4 ; _IntType
+    000001E2 2C22                   MOV.L       R2,@R12
+    000001E4 2132                   MOV.L       R3,@R1
+    000001E6 67E2                   MOV.L       @R14,R7
+    000001E8 BFC5                   BSR         _TypeAddBaseType
+    000001EA E501                   MOV         #1,R5
+          type.c   142        TypeAddBaseType(&ShortType, TypeShort, sizeof(short), (char *)&sa.y - &sa.x);
+    000001EC D48A                   MOV.L       L787+18,R4 ; _ShortType
+    000001EE 6AF3                   MOV         R15,R10
+    000001F0 7A20                   ADD         #32,R10
+    000001F2 67A3                   MOV         R10,R7
+    000001F4 7702                   ADD         #2,R7
+    000001F6 37A8                   SUB         R10,R7
+    000001F8 E602                   MOV         #2,R6
+    000001FA BFBC                   BSR         _TypeAddBaseType
+    000001FC 6563                   MOV         R6,R5
+          type.c   143        TypeAddBaseType(&CharType, TypeChar, sizeof(unsigned char), (char *)&ca.y - &ca.x);
+    000001FE 6DF3                   MOV         R15,R13
+    00000200 D486                   MOV.L       L787+22,R4 ; _CharType
+    00000202 E601                   MOV         #1,R6
+    00000204 7D1C                   ADD         #28,R13
+    00000206 67D3                   MOV         R13,R7
+    00000208 7701                   ADD         #1,R7
+    0000020A 37D8                   SUB         R13,R7
+    0000020C BFB3                   BSR         _TypeAddBaseType
+    0000020E E503                   MOV         #3,R5
+          type.c   144        TypeAddBaseType(&LongType, TypeLong, sizeof(long), (char *)&la.y - &la.x);
+    00000210 D483                   MOV.L       L787+26,R4 ; _LongType
+    00000212 6BF3                   MOV         R15,R11
+    00000214 7B14                   ADD         #20,R11
+    00000216 67B3                   MOV         R11,R7
+    00000218 7704                   ADD         #4,R7
+    0000021A 37B8                   SUB         R11,R7
+    0000021C E604                   MOV         #4,R6
+    0000021E BFAA                   BSR         _TypeAddBaseType
+    00000220 6563                   MOV         R6,R5
+          type.c   145        TypeAddBaseType(&UnsignedIntType, TypeUnsignedInt, sizeof(unsigned int), IntAlignBytes);
+    00000222 E604                   MOV         #4,R6
+    00000224 D47F                   MOV.L       L787+30,R4 ; _UnsignedIntType
+    00000226 67E2                   MOV.L       @R14,R7
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE    9
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000228 BFA5                   BSR         _TypeAddBaseType
+    0000022A E505                   MOV         #5,R5
+          type.c   146        TypeAddBaseType(&UnsignedShortType, TypeUnsignedShort, sizeof(unsigned short), (char *)&sa.y - &sa.x);
+    0000022C D47E                   MOV.L       L787+34,R4 ; _UnsignedShortType
+    0000022E 67A3                   MOV         R10,R7
+    00000230 7702                   ADD         #2,R7
+    00000232 37A8                   SUB         R10,R7
+    00000234 E602                   MOV         #2,R6
+    00000236 BF9E                   BSR         _TypeAddBaseType
+    00000238 E506                   MOV         #6,R5
+          type.c   147        TypeAddBaseType(&UnsignedLongType, TypeUnsignedLong, sizeof(unsigned long), (char *)&la.y - &la.x);
+    0000023A 67B3                   MOV         R11,R7
+    0000023C D47B                   MOV.L       L787+38,R4 ; _UnsignedLongType
+    0000023E E604                   MOV         #4,R6
+    00000240 7704                   ADD         #4,R7
+    00000242 37B8                   SUB         R11,R7
+    00000244 BF97                   BSR         _TypeAddBaseType
+    00000246 E507                   MOV         #7,R5
+          type.c   148        TypeAddBaseType(&VoidType, TypeVoid, 0, 1);
+    00000248 D479                   MOV.L       L787+42,R4 ; _VoidType
+    0000024A E701                   MOV         #1,R7
+    0000024C E600                   MOV         #0,R6
+    0000024E BF92                   BSR         _TypeAddBaseType
+    00000250 6563                   MOV         R6,R5
+          type.c   149        TypeAddBaseType(&FunctionType, TypeFunction, sizeof(int), IntAlignBytes);
+    00000252 E604                   MOV         #4,R6
+    00000254 D477                   MOV.L       L787+46,R4 ; _FunctionType
+    00000256 67E2                   MOV.L       @R14,R7
+    00000258 BF8D                   BSR         _TypeAddBaseType
+    0000025A E509                   MOV         #9,R5
+          type.c   150        TypeAddBaseType(&MacroType, TypeMacro, sizeof(int), IntAlignBytes);
+    0000025C 67E2                   MOV.L       @R14,R7
+    0000025E E604                   MOV         #4,R6
+    00000260 D475                   MOV.L       L787+50,R4 ; _MacroType
+    00000262 BF88                   BSR         _TypeAddBaseType
+    00000264 E50A                   MOV         #10,R5
+          type.c   151        TypeAddBaseType(&GotoLabelType, TypeGotoLabel, 0, 1);
+    00000266 E701                   MOV         #1,R7
+    00000268 D474                   MOV.L       L787+54,R4 ; _GotoLabelType
+    0000026A E600                   MOV         #0,R6
+    0000026C BF83                   BSR         _TypeAddBaseType
+    0000026E E510                   MOV         #16,R5
+          type.c   152    #ifndef NO_FP
+          type.c   153        TypeAddBaseType(&FPType, TypeFP, sizeof(double), (char *)&da.y - &da.x);
+    00000270 D373                   MOV.L       L787+58,R3 ; __divls
+    00000272 6EF3                   MOV         R15,R14
+    00000274 7E08                   ADD         #8,R14
+    00000276 61E3                   MOV         R14,R1
+    00000278 7104                   ADD         #4,R1
+    0000027A 31E8                   SUB         R14,R1
+    0000027C 430B                   JSR         @R3
+    0000027E E001                   MOV         #1,R0
+    00000280 D470                   MOV.L       L787+62,R4 ; _FPType
+    00000282 6703                   MOV         R0,R7
+    00000284 E608                   MOV         #8,R6
+    00000286 BF76                   BSR         _TypeAddBaseType
+    00000288 6563                   MOV         R6,R5
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE   10
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+          type.c   154        TypeAddBaseType(&TypeType, Type_Type, sizeof(double), (char *)&da.y - &da.x);  /* must be large enough
+                         + to cast to a double */
+    0000028A 61E3                   MOV         R14,R1
+    0000028C D36C                   MOV.L       L787+58,R3 ; __divls
+    0000028E 7104                   ADD         #4,R1
+    00000290 31E8                   SUB         R14,R1
+    00000292 430B                   JSR         @R3
+    00000294 E001                   MOV         #1,R0
+    00000296 6703                   MOV         R0,R7
+    00000298 D46B                   MOV.L       L787+66,R4 ; _TypeType
+    0000029A E608                   MOV         #8,R6
+    0000029C BF6B                   BSR         _TypeAddBaseType
+    0000029E E511                   MOV         #17,R5
+          type.c   155    #else
+          type.c   156        TypeAddBaseType(&TypeType, Type_Type, sizeof(struct ValueType *), PointerAlignBytes);
+          type.c   157    #endif
+          type.c   158        CharArrayType = TypeAdd(NULL, &CharType, TypeArray, 0, StrEmpty, sizeof(char), (char *)&ca.y - &ca.x);
+    000002A0 DE6A                   MOV.L       L787+70,R14; _StrEmpty
+    000002A2 63D3                   MOV         R13,R3
+    000002A4 D55D                   MOV.L       L787+22,R5 ; _CharType
+    000002A6 E201                   MOV         #1,R2
+    000002A8 7301                   ADD         #1,R3
+    000002AA 33D8                   SUB         R13,R3
+    000002AC 2F36                   MOV.L       R3,@-R15
+    000002AE E700                   MOV         #0,R7
+    000002B0 2F26                   MOV.L       R2,@-R15
+    000002B2 E60C                   MOV         #12,R6
+    000002B4 63E2                   MOV.L       @R14,R3
+    000002B6 2F36                   MOV.L       R3,@-R15
+    000002B8 BEA2                   BSR         _TypeAdd
+    000002BA 6473                   MOV         R7,R4
+    000002BC D364                   MOV.L       L787+74,R3 ; _CharArrayType
+          type.c   159        CharPtrType = TypeAdd(NULL, &CharType, TypePointer, 0, StrEmpty, sizeof(void *), PointerAlignBytes);
+    000002BE E104                   MOV         #4,R1
+    000002C0 D556                   MOV.L       L787+22,R5 ; _CharType
+    000002C2 E700                   MOV         #0,R7
+    000002C4 2302                   MOV.L       R0,@R3
+    000002C6 E60B                   MOV         #11,R6
+    000002C8 62C2                   MOV.L       @R12,R2
+    000002CA 2F26                   MOV.L       R2,@-R15
+    000002CC 2F16                   MOV.L       R1,@-R15
+    000002CE 63E2                   MOV.L       @R14,R3
+    000002D0 2F36                   MOV.L       R3,@-R15
+    000002D2 BE95                   BSR         _TypeAdd
+    000002D4 6473                   MOV         R7,R4
+          type.c   160        CharPtrPtrType = TypeAdd(NULL, CharPtrType, TypePointer, 0, StrEmpty, sizeof(void *), PointerAlignByte
+                         +s);
+    000002D6 E104                   MOV         #4,R1
+    000002D8 D35E                   MOV.L       L787+78,R3 ; _CharPtrType
+    000002DA E700                   MOV         #0,R7
+    000002DC 2302                   MOV.L       R0,@R3
+    000002DE E60B                   MOV         #11,R6
+    000002E0 62C2                   MOV.L       @R12,R2
+    000002E2 6503                   MOV         R0,R5
+    000002E4 2F26                   MOV.L       R2,@-R15
+    000002E6 2F16                   MOV.L       R1,@-R15
+    000002E8 63E2                   MOV.L       @R14,R3
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE   11
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000002EA 2F36                   MOV.L       R3,@-R15
+    000002EC BE88                   BSR         _TypeAdd
+    000002EE 6473                   MOV         R7,R4
+    000002F0 D359                   MOV.L       L787+82,R3 ; _CharPtrPtrType
+          type.c   161        VoidPtrType = TypeAdd(NULL, &VoidType, TypePointer, 0, StrEmpty, sizeof(void *), PointerAlignBytes);
+    000002F2 E700                   MOV         #0,R7
+    000002F4 D54E                   MOV.L       L787+42,R5 ; _VoidType
+    000002F6 E60B                   MOV         #11,R6
+    000002F8 2302                   MOV.L       R0,@R3
+    000002FA E304                   MOV         #4,R3
+    000002FC 62C2                   MOV.L       @R12,R2
+    000002FE 2F26                   MOV.L       R2,@-R15
+    00000300 2F36                   MOV.L       R3,@-R15
+    00000302 62E2                   MOV.L       @R14,R2
+    00000304 2F26                   MOV.L       R2,@-R15
+    00000306 BE7B                   BSR         _TypeAdd
+    00000308 6473                   MOV         R7,R4
+    0000030A D354                   MOV.L       L787+86,R3 ; _VoidPtrType
+    0000030C 2302                   MOV.L       R0,@R3
+          type.c   162    }
+    0000030E 7F5C                   ADD         #92,R15
+    00000310 4F26                   LDS.L       @R15+,PR
+    00000312 6AF6                   MOV.L       @R15+,R10
+    00000314 6BF6                   MOV.L       @R15+,R11
+    00000316 6CF6                   MOV.L       @R15+,R12
+    00000318 6DF6                   MOV.L       @R15+,R13
+    0000031A 000B                   RTS
+    0000031C 6EF6                   MOV.L       @R15+,R14
+          type.c   163    
+          type.c   164    /* deallocate heap-allocated types */
+          type.c   165    void TypeCleanupNode(struct ValueType *Typ)
+    0000031E              _TypeCleanupNode:                ; function: TypeCleanupNode
+                                                           ; frame size=20
+    0000031E 2FE6                   MOV.L       R14,@-R15
+    00000320 2FD6                   MOV.L       R13,@-R15
+    00000322 2FC6                   MOV.L       R12,@-R15
+    00000324 2FB6                   MOV.L       R11,@-R15
+    00000326 4F22                   STS.L       PR,@-R15
+          type.c   166    {
+          type.c   167        struct ValueType *SubType;
+          type.c   168        struct ValueType *NextSubType;
+          type.c   169        
+          type.c   170        /* clean up and free all the sub-nodes */
+          type.c   171        for (SubType = Typ->DerivedTypeList; SubType != NULL; SubType = NextSubType)
+    00000328 DC4D                   MOV.L       L787+90,R12; _VariableTableCleanup
+    0000032A DD4E                   MOV.L       L787+94,R13; _HeapFreeMem
+    0000032C A010                   BRA         L713
+    0000032E 5E46                   MOV.L       @(24,R4),R14
+    00000330              L714:                             
+          type.c   172        {
+          type.c   173            NextSubType = SubType->Next;
+    00000330 5BE7                   MOV.L       @(28,R14),R11
+          type.c   174            TypeCleanupNode(SubType);
+    00000332 BFF4                   BSR         _TypeCleanupNode
+    00000334 64E3                   MOV         R14,R4
+          type.c   175            if (SubType->OnHeap)
+    00000336 53E9                   MOV.L       @(36,R14),R3
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE   12
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000338 2338                   TST         R3,R3
+    0000033A 8908                   BT          L715
+          type.c   176            {
+          type.c   177                /* if it's a struct or union deallocate all the member values */
+          type.c   178                if (SubType->Members != NULL)
+    0000033C 53E8                   MOV.L       @(32,R14),R3
+    0000033E 2338                   TST         R3,R3
+    00000340 8903                   BT          L716
+          type.c   179                {
+          type.c   180                    VariableTableCleanup(SubType->Members);
+    00000342 4C0B                   JSR         @R12
+    00000344 54E8                   MOV.L       @(32,R14),R4
+          type.c   181                    HeapFreeMem(SubType->Members);
+    00000346 4D0B                   JSR         @R13
+    00000348 54E8                   MOV.L       @(32,R14),R4
+    0000034A              L716:                             
+          type.c   182                }
+          type.c   183    
+          type.c   184                /* free this node */
+          type.c   185                HeapFreeMem(SubType);
+    0000034A 4D0B                   JSR         @R13
+    0000034C 64E3                   MOV         R14,R4
+    0000034E              L715:                             
+    0000034E 6EB3                   MOV         R11,R14
+    00000350              L713:                             
+    00000350 2EE8                   TST         R14,R14
+    00000352 8BED                   BF          L714
+          type.c   186            }
+          type.c   187        }
+          type.c   188    }
+    00000354 4F26                   LDS.L       @R15+,PR
+    00000356 6BF6                   MOV.L       @R15+,R11
+    00000358 6CF6                   MOV.L       @R15+,R12
+    0000035A 6DF6                   MOV.L       @R15+,R13
+    0000035C 000B                   RTS
+    0000035E 6EF6                   MOV.L       @R15+,R14
+          type.c   189    
+          type.c   190    void TypeCleanup()
+    00000360              _TypeCleanup:                    ; function: TypeCleanup
+                                                           ; frame size=0
+          type.c   191    {
+          type.c   192        TypeCleanupNode(&UberType);
+    00000360 D441                   MOV.L       L787+98,R4 ; _UberType
+    00000362 AFDC                   BRA         _TypeCleanupNode
+    00000364 0009                   NOP
+          type.c   193    }
+          type.c   194    
+          type.c   195    /* parse a struct or union declaration */
+          type.c   196    void TypeParseStruct(struct ParseState *Parser, struct ValueType **Typ, int IsStruct)
+    00000366              _TypeParseStruct:                ; function: TypeParseStruct
+                                                           ; frame size=64
+    00000366 2FE6                   MOV.L       R14,@-R15
+    00000368 2FD6                   MOV.L       R13,@-R15
+    0000036A 6E43                   MOV         R4,R14
+    0000036C 2FC6                   MOV.L       R12,@-R15
+    0000036E 6D53                   MOV         R5,R13
+    00000370 2FB6                   MOV.L       R11,@-R15
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE   13
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000372 2FA6                   MOV.L       R10,@-R15
+    00000374 2F96                   MOV.L       R9,@-R15
+    00000376 6963                   MOV         R6,R9
+          type.c   197    {
+          type.c   198        struct Value *LexValue;
+          type.c   199        struct ValueType *MemberType;
+          type.c   200        char *MemberIdentifier;
+          type.c   201        char *StructIdentifier;
+          type.c   202        struct Value *MemberValue;
+          type.c   203        enum LexToken Token;
+          type.c   204        int AlignBoundary;
+          type.c   205        
+          type.c   206        Token = LexGetToken(Parser, &LexValue, FALSE);
+    00000378 DB3C                   MOV.L       L787+102,R11; _LexGetToken
+    0000037A E600                   MOV         #0,R6
+    0000037C 2F86                   MOV.L       R8,@-R15
+    0000037E 4F22                   STS.L       PR,@-R15
+    00000380 7FE8                   ADD         #-24,R15
+    00000382 65F3                   MOV         R15,R5
+    00000384 4B0B                   JSR         @R11
+    00000386 7508                   ADD         #8,R5
+          type.c   207        if (Token == TokenIdentifier)
+    00000388 882D                   CMP/EQ      #45,R0
+    0000038A 8F0E                   BF/S        L717
+    0000038C 6C03                   MOV         R0,R12
+          type.c   208        {
+          type.c   209            LexGetToken(Parser, &LexValue, TRUE);
+    0000038E E601                   MOV         #1,R6
+    00000390 65F3                   MOV         R15,R5
+    00000392 7508                   ADD         #8,R5
+    00000394 4B0B                   JSR         @R11
+    00000396 64E3                   MOV         R14,R4
+          type.c   210            StructIdentifier = LexValue->Val->Identifier;
+    00000398 5AF2                   MOV.L       @(8,R15),R10
+          type.c   211            Token = LexGetToken(Parser, NULL, FALSE);
+    0000039A E600                   MOV         #0,R6
+    0000039C 5AA1                   MOV.L       @(4,R10),R10
+    0000039E 6563                   MOV         R6,R5
+    000003A0 6AA2                   MOV.L       @R10,R10
+    000003A2 4B0B                   JSR         @R11
+    000003A4 64E3                   MOV         R14,R4
+    000003A6 A005                   BRA         L718
+    000003A8 6C03                   MOV         R0,R12
+    000003AA              L717:                             
+          type.c   212        }
+          type.c   213        else
+          type.c   214        {
+          type.c   215            static char TempNameBuf[7] = "^s0000";
+          type.c   216            StructIdentifier = PlatformMakeTempName(TempNameBuf);
+    000003AA D431                   MOV.L       L787+106,R4; __$TempNameBuf$569
+    000003AC D231                   MOV.L       L787+110,R2; _PlatformMakeTempName
+    000003AE 420B                   JSR         @R2
+    000003B0 0009                   NOP
+    000003B2 6A03                   MOV         R0,R10
+    000003B4              L718:                             
+          type.c   217        }
+          type.c   218    
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE   14
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+          type.c   219        *Typ = TypeGetMatching(Parser, &UberType, IsStruct ? TypeStruct : TypeUnion, 0, StructIdentifier, Toke
+                         +n != TokenLeftBrace);
+    000003B4 60C3                   MOV         R12,R0
+    000003B6 8834                   CMP/EQ      #52,R0
+    000003B8 0029                   MOVT        R0
+    000003BA CA01                   XOR         #1,R0
+    000003BC 2F06                   MOV.L       R0,@-R15
+    000003BE 2998                   TST         R9,R9
+    000003C0 2FA6                   MOV.L       R10,@-R15
+    000003C2 8D02                   BT/S        L719
+    000003C4 E700                   MOV         #0,R7
+    000003C6 A001                   BRA         L720
+    000003C8 E60D                   MOV         #13,R6
+    000003CA              L719:                             
+    000003CA E60E                   MOV         #14,R6
+    000003CC              L720:                             
+    000003CC D526                   MOV.L       L787+98,R5 ; _UberType
+    000003CE BE3A                   BSR         _TypeGetMatching
+    000003D0 64E3                   MOV         R14,R4
+    000003D2 7F08                   ADD         #8,R15
+    000003D4 2D02                   MOV.L       R0,@R13
+          type.c   220    
+          type.c   221        Token = LexGetToken(Parser, NULL, FALSE);
+    000003D6 E600                   MOV         #0,R6
+    000003D8 6563                   MOV         R6,R5
+    000003DA 4B0B                   JSR         @R11
+    000003DC 64E3                   MOV         R14,R4
+          type.c   222        if (Token != TokenLeftBrace)
+    000003DE 8834                   CMP/EQ      #52,R0
+    000003E0 DA25                   MOV.L       L787+114,R10; _ProgramFail
+    000003E2 8D4D                   BT/S        L721
+    000003E4 6403                   MOV         R0,R4
+          type.c   223        { 
+          type.c   224            /* use the already defined structure */
+          type.c   225            if ((*Typ)->Members == NULL)
+    000003E6 63D2                   MOV.L       @R13,R3
+    000003E8 5238                   MOV.L       @(32,R3),R2
+    000003EA 2228                   TST         R2,R2
+    000003EC 8901                   BT          L788
+    000003EE A115                   BRA         L723
+    000003F0 0009                   NOP
+    000003F2              L788:                             
+          type.c   226                ProgramFail(Parser, "structure '%s' isn't defined", LexValue->Val->Identifier);
+    000003F2 52F2                   MOV.L       @(8,R15),R2
+    000003F4 5321                   MOV.L       @(4,R2),R3
+    000003F6 6132                   MOV.L       @R3,R1
+    000003F8 D220                   MOV.L       L787+118,R2; L571
+    000003FA 2F16                   MOV.L       R1,@-R15
+    000003FC 2F26                   MOV.L       R2,@-R15
+    000003FE 4A0B                   JSR         @R10
+    00000400 64E3                   MOV         R14,R4
+          type.c   227                
+          type.c   228            return;
+    00000402 A10B                   BRA         L723
+    00000404 7F08                   ADD         #8,R15
+    00000406              L787:                             
+    00000406 0000                   .DATA.W     0
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE   15
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000408 <00000000>             .DATA.L     __$IntAlignBytes
+    0000040C <00000000>             .DATA.L     __$PointerAlignBytes
+    00000410 <00000018>             .DATA.L     H'00000018+_UberType
+    00000414 <00000000>             .DATA.L     _IntType
+    00000418 <00000000>             .DATA.L     _ShortType
+    0000041C <00000000>             .DATA.L     _CharType
+    00000420 <00000000>             .DATA.L     _LongType
+    00000424 <00000000>             .DATA.L     _UnsignedIntType
+    00000428 <00000000>             .DATA.L     _UnsignedShortType
+    0000042C <00000000>             .DATA.L     _UnsignedLongType
+    00000430 <00000000>             .DATA.L     _VoidType
+    00000434 <00000000>             .DATA.L     _FunctionType
+    00000438 <00000000>             .DATA.L     _MacroType
+    0000043C <00000000>             .DATA.L     _GotoLabelType
+    00000440 <00000000>             .DATA.L     __divls
+    00000444 <00000000>             .DATA.L     _FPType
+    00000448 <00000000>             .DATA.L     _TypeType
+    0000044C <00000000>             .DATA.L     _StrEmpty
+    00000450 <00000000>             .DATA.L     _CharArrayType
+    00000454 <00000000>             .DATA.L     _CharPtrType
+    00000458 <00000000>             .DATA.L     _CharPtrPtrType
+    0000045C <00000000>             .DATA.L     _VoidPtrType
+    00000460 <00000000>             .DATA.L     _VariableTableCleanup
+    00000464 <00000000>             .DATA.L     _HeapFreeMem
+    00000468 <00000000>             .DATA.L     _UberType
+    0000046C <00000000>             .DATA.L     _LexGetToken
+    00000470 <00000000>             .DATA.L     __$TempNameBuf$569
+    00000474 <00000000>             .DATA.L     _PlatformMakeTempName
+    00000478 <00000000>             .DATA.L     _ProgramFail
+    0000047C <00000000>             .DATA.L     L571
+    00000480              L721:                             
+          type.c   229        }
+          type.c   230        
+          type.c   231        if (TopStackFrame != NULL)
+    00000480 D235                   MOV.L       L789+4,R2  ; _TopStackFrame
+    00000482 6322                   MOV.L       @R2,R3
+    00000484 2338                   TST         R3,R3
+    00000486 8904                   BT          L724
+          type.c   232            ProgramFail(Parser, "struct/union definitions can only be globals");
+    00000488 D334                   MOV.L       L789+8,R3  ; L572
+    0000048A 2F36                   MOV.L       R3,@-R15
+    0000048C 4A0B                   JSR         @R10
+    0000048E 64E3                   MOV         R14,R4
+    00000490 7F04                   ADD         #4,R15
+    00000492              L724:                             
+          type.c   233            
+          type.c   234        LexGetToken(Parser, NULL, TRUE);    
+    00000492 E601                   MOV         #1,R6
+    00000494 E500                   MOV         #0,R5
+    00000496 4B0B                   JSR         @R11
+    00000498 64E3                   MOV         R14,R4
+          type.c   235        (*Typ)->Members = VariableAlloc(Parser, sizeof(struct Table) + STRUCT_TABLE_SIZE * sizeof(struct Table
+                         +Entry), TRUE);
+    0000049A E120                   MOV         #32,R1
+    0000049C 955A                   MOV.W       L789,R5    ; H'00E4
+    0000049E E601                   MOV         #1,R6
+    000004A0 D32F                   MOV.L       L789+12,R3 ; _VariableAlloc
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE   16
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000004A2 62D2                   MOV.L       @R13,R2
+    000004A4 312C                   ADD         R2,R1
+    000004A6 2F16                   MOV.L       R1,@-R15
+    000004A8 430B                   JSR         @R3
+    000004AA 64E3                   MOV         R14,R4
+    000004AC 63F6                   MOV.L       @R15+,R3
+          type.c   236        (*Typ)->Members->HashTable = (struct TableEntry **)((char *)(*Typ)->Members + sizeof(struct Table));
+          type.c   237        TableInitTable((*Typ)->Members, (struct TableEntry **)((char *)(*Typ)->Members + sizeof(struct Table))
+                         +, STRUCT_TABLE_SIZE, TRUE);
+    000004AE E701                   MOV         #1,R7
+    000004B0 2302                   MOV.L       R0,@R3
+    000004B2 E60B                   MOV         #11,R6
+    000004B4 64D2                   MOV.L       @R13,R4
+    000004B6 1F44                   MOV.L       R4,@(16,R15)
+    000004B8 5448                   MOV.L       @(32,R4),R4
+    000004BA 6343                   MOV         R4,R3
+    000004BC 7308                   ADD         #8,R3
+    000004BE 1431                   MOV.L       R3,@(4,R4)
+    000004C0 65D2                   MOV.L       @R13,R5
+    000004C2 1F53                   MOV.L       R5,@(12,R15)
+    000004C4 5558                   MOV.L       @(32,R5),R5
+    000004C6 1F55                   MOV.L       R5,@(20,R15)
+    000004C8 D326                   MOV.L       L789+16,R3 ; _TableInitTable
+    000004CA 7508                   ADD         #8,R5
+    000004CC 430B                   JSR         @R3
+    000004CE 54F5                   MOV.L       @(20,R15),R4
+    000004D0 E801                   MOV         #1,R8
+          type.c   238        
+          type.c   239        do {
+    000004D2              L725:                             
+          type.c   240            TypeParse(Parser, &MemberType, &MemberIdentifier, NULL);
+    000004D2 E700                   MOV         #0,R7
+    000004D4 66F3                   MOV         R15,R6
+    000004D6 65F3                   MOV         R15,R5
+    000004D8 7504                   ADD         #4,R5
+    000004DA B36A                   BSR         _TypeParse
+    000004DC 64E3                   MOV         R14,R4
+          type.c   241            if (MemberType == NULL || MemberIdentifier == NULL)
+    000004DE 53F1                   MOV.L       @(4,R15),R3
+    000004E0 2338                   TST         R3,R3
+    000004E2 8902                   BT          L727
+    000004E4 63F2                   MOV.L       @R15,R3
+    000004E6 2338                   TST         R3,R3
+    000004E8 8B04                   BF          L726
+    000004EA              L727:                             
+          type.c   242                ProgramFail(Parser, "invalid type in struct");
+    000004EA D31F                   MOV.L       L789+20,R3 ; L574
+    000004EC 2F36                   MOV.L       R3,@-R15
+    000004EE 4A0B                   JSR         @R10
+    000004F0 64E3                   MOV         R14,R4
+    000004F2 7F04                   ADD         #4,R15
+    000004F4              L726:                             
+          type.c   243            
+          type.c   244            MemberValue = VariableAllocValueAndData(Parser, sizeof(int), FALSE, NULL, TRUE);
+    000004F4 2F86                   MOV.L       R8,@-R15
+    000004F6 E700                   MOV         #0,R7
+    000004F8 D21C                   MOV.L       L789+24,R2 ; _VariableAllocValueAndData
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE   17
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000004FA E504                   MOV         #4,R5
+    000004FC 6673                   MOV         R7,R6
+    000004FE 420B                   JSR         @R2
+    00000500 64E3                   MOV         R14,R4
+    00000502 7F04                   ADD         #4,R15
+          type.c   245            MemberValue->Typ = MemberType;
+    00000504 53F1                   MOV.L       @(4,R15),R3
+          type.c   246            if (IsStruct)
+    00000506 2998                   TST         R9,R9
+    00000508 6C03                   MOV         R0,R12
+    0000050A 8D31                   BT/S        L728
+    0000050C 2C32                   MOV.L       R3,@R12
+          type.c   247            { 
+          type.c   248                /* allocate this member's location in the struct */
+          type.c   249                AlignBoundary = MemberValue->Typ->AlignBytes;
+    0000050E 64C2                   MOV.L       @R12,R4
+          type.c   250                if (((*Typ)->Sizeof & (AlignBoundary-1)) != 0)
+    00000510 63D2                   MOV.L       @R13,R3
+    00000512 5443                   MOV.L       @(12,R4),R4
+    00000514 5332                   MOV.L       @(8,R3),R3
+    00000516 6243                   MOV         R4,R2
+    00000518 72FF                   ADD         #-1,R2
+    0000051A 2238                   TST         R3,R2
+    0000051C 8909                   BT          L729
+          type.c   251                    (*Typ)->Sizeof += AlignBoundary - ((*Typ)->Sizeof & (AlignBoundary-1));
+    0000051E 6343                   MOV         R4,R3
+    00000520 65D2                   MOV.L       @R13,R5
+    00000522 6143                   MOV         R4,R1
+    00000524 5252                   MOV.L       @(8,R5),R2
+    00000526 73FF                   ADD         #-1,R3
+    00000528 2329                   AND         R2,R3
+    0000052A 3138                   SUB         R3,R1
+    0000052C 6323                   MOV         R2,R3
+    0000052E 331C                   ADD         R1,R3
+    00000530 1532                   MOV.L       R3,@(8,R5)
+    00000532              L729:                             
+          type.c   252                    
+          type.c   253                MemberValue->Val->Integer = (*Typ)->Sizeof;
+          type.c   254                (*Typ)->Sizeof += TypeSizeValue(MemberValue, TRUE);
+    00000532 E501                   MOV         #1,R5
+    00000534 52C1                   MOV.L       @(4,R12),R2
+    00000536 63D2                   MOV.L       @R13,R3
+    00000538 5132                   MOV.L       @(8,R3),R1
+    0000053A 2212                   MOV.L       R1,@R2
+    0000053C 63D2                   MOV.L       @R13,R3
+    0000053E E108                   MOV         #8,R1
+    00000540 313C                   ADD         R3,R1
+    00000542 2F16                   MOV.L       R1,@-R15
+    00000544 BDDB                   BSR         _TypeSizeValue
+    00000546 64C3                   MOV         R12,R4
+    00000548 62F6                   MOV.L       @R15+,R2
+    0000054A 6322                   MOV.L       @R2,R3
+    0000054C 330C                   ADD         R0,R3
+    0000054E 2232                   MOV.L       R3,@R2
+    00000550 A020                   BRA         L730
+    00000552 0009                   NOP
+    00000554              L789:                             
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE   18
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000554 00E4                   .DATA.W     H'00E4
+    00000556 0000                   .DATA.W     0
+    00000558 <00000000>             .DATA.L     _TopStackFrame
+    0000055C <00000000>             .DATA.L     L572
+    00000560 <00000000>             .DATA.L     _VariableAlloc
+    00000564 <00000000>             .DATA.L     _TableInitTable
+    00000568 <00000000>             .DATA.L     L574
+    0000056C <00000000>             .DATA.L     _VariableAllocValueAndData
+    00000570              L728:                             
+          type.c   255            }
+          type.c   256            else
+          type.c   257            { 
+          type.c   258                /* union members always start at 0, make sure it's big enough to hold the largest member */
+          type.c   259                MemberValue->Val->Integer = 0;
+    00000570 51C1                   MOV.L       @(4,R12),R1
+    00000572 E300                   MOV         #0,R3
+    00000574 2132                   MOV.L       R3,@R1
+          type.c   260                if (MemberValue->Typ->Sizeof > (*Typ)->Sizeof)
+    00000576 62C2                   MOV.L       @R12,R2
+    00000578 63D2                   MOV.L       @R13,R3
+    0000057A 5132                   MOV.L       @(8,R3),R1
+    0000057C 5222                   MOV.L       @(8,R2),R2
+    0000057E 3217                   CMP/GT      R1,R2
+    00000580 8B08                   BF          L730
+          type.c   261                    (*Typ)->Sizeof = TypeSizeValue(MemberValue, TRUE);
+    00000582 E208                   MOV         #8,R2
+    00000584 60D2                   MOV.L       @R13,R0
+    00000586 E501                   MOV         #1,R5
+    00000588 320C                   ADD         R0,R2
+    0000058A 2F26                   MOV.L       R2,@-R15
+    0000058C BDB7                   BSR         _TypeSizeValue
+    0000058E 64C3                   MOV         R12,R4
+    00000590 63F6                   MOV.L       @R15+,R3
+    00000592 2302                   MOV.L       R0,@R3
+    00000594              L730:                             
+          type.c   262            }
+          type.c   263    
+          type.c   264            /* make sure to align to the size of the largest member's alignment */
+          type.c   265            if ((*Typ)->AlignBytes < MemberValue->Typ->AlignBytes)
+    00000594 62D2                   MOV.L       @R13,R2
+    00000596 63C2                   MOV.L       @R12,R3
+    00000598 5223                   MOV.L       @(12,R2),R2
+    0000059A 5133                   MOV.L       @(12,R3),R1
+    0000059C 3213                   CMP/GE      R1,R2
+    0000059E 8903                   BT          L732
+          type.c   266                (*Typ)->AlignBytes = MemberValue->Typ->AlignBytes;
+    000005A0 60D2                   MOV.L       @R13,R0
+    000005A2 63C2                   MOV.L       @R12,R3
+    000005A4 5233                   MOV.L       @(12,R3),R2
+    000005A6 1023                   MOV.L       R2,@(12,R0)
+    000005A8              L732:                             
+          type.c   267            
+          type.c   268            /* define it */
+          type.c   269            if (!TableSet((*Typ)->Members, MemberIdentifier, MemberValue, Parser->FileName, Parser->Line, Pars
+                         +er->CharacterPos))
+    000005A8 85E5                   MOV.W       @(10,R14),R0
+    000005AA 66C3                   MOV         R12,R6
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE   19
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000005AC D335                   MOV.L       L790+2,R3  ; _TableSet
+    000005AE 2F06                   MOV.L       R0,@-R15
+    000005B0 85E4                   MOV.W       @(8,R14),R0
+    000005B2 2F06                   MOV.L       R0,@-R15
+    000005B4 57E1                   MOV.L       @(4,R14),R7
+    000005B6 55F2                   MOV.L       @(8,R15),R5
+    000005B8 64D2                   MOV.L       @R13,R4
+    000005BA 430B                   JSR         @R3
+    000005BC 5448                   MOV.L       @(32,R4),R4
+    000005BE 2008                   TST         R0,R0
+    000005C0 8F07                   BF/S        L733
+    000005C2 7F08                   ADD         #8,R15
+          type.c   270                ProgramFail(Parser, "member '%s' already defined", &MemberIdentifier);
+    000005C4 D230                   MOV.L       L790+6,R2  ; L577
+    000005C6 63F3                   MOV         R15,R3
+    000005C8 2F36                   MOV.L       R3,@-R15
+    000005CA 2F26                   MOV.L       R2,@-R15
+    000005CC 4A0B                   JSR         @R10
+    000005CE 64E3                   MOV         R14,R4
+    000005D0 7F08                   ADD         #8,R15
+    000005D2              L733:                             
+          type.c   271                
+          type.c   272            if (LexGetToken(Parser, NULL, TRUE) != TokenSemicolon)
+    000005D2 E601                   MOV         #1,R6
+    000005D4 E500                   MOV         #0,R5
+    000005D6 4B0B                   JSR         @R11
+    000005D8 64E3                   MOV         R14,R4
+    000005DA 8832                   CMP/EQ      #50,R0
+    000005DC 8904                   BT          L734
+          type.c   273                ProgramFail(Parser, "semicolon expected");
+    000005DE D22B                   MOV.L       L790+10,R2 ; L578
+    000005E0 2F26                   MOV.L       R2,@-R15
+    000005E2 4A0B                   JSR         @R10
+    000005E4 64E3                   MOV         R14,R4
+    000005E6 7F04                   ADD         #4,R15
+    000005E8              L734:                             
+          type.c   274                        
+          type.c   275        } while (LexGetToken(Parser, NULL, FALSE) != TokenRightBrace);
+    000005E8 E600                   MOV         #0,R6
+    000005EA 6563                   MOV         R6,R5
+    000005EC 4B0B                   JSR         @R11
+    000005EE 64E3                   MOV         R14,R4
+    000005F0 8835                   CMP/EQ      #53,R0
+    000005F2 8901                   BT          L791
+    000005F4 AF6D                   BRA         L725
+    000005F6 0009                   NOP
+    000005F8              L791:                             
+          type.c   276        
+          type.c   277        /* now align the structure to the size of its largest member's alignment */
+          type.c   278        AlignBoundary = (*Typ)->AlignBytes;
+    000005F8 66D2                   MOV.L       @R13,R6
+    000005FA 5463                   MOV.L       @(12,R6),R4
+    000005FC 5262                   MOV.L       @(8,R6),R2
+    000005FE 6543                   MOV         R4,R5
+    00000600 75FF                   ADD         #-1,R5
+    00000602 2258                   TST         R5,R2
+    00000604 8906                   BT          L735
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE   20
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+          type.c   279        if (((*Typ)->Sizeof & (AlignBoundary-1)) != 0)
+          type.c   280            (*Typ)->Sizeof += AlignBoundary - ((*Typ)->Sizeof & (AlignBoundary-1));
+    00000606 66D2                   MOV.L       @R13,R6
+    00000608 5262                   MOV.L       @(8,R6),R2
+    0000060A 2529                   AND         R2,R5
+    0000060C 3458                   SUB         R5,R4
+    0000060E 6323                   MOV         R2,R3
+    00000610 334C                   ADD         R4,R3
+    00000612 1632                   MOV.L       R3,@(8,R6)
+    00000614              L735:                             
+          type.c   281        
+          type.c   282        LexGetToken(Parser, NULL, TRUE);
+    00000614 E601                   MOV         #1,R6
+    00000616 E500                   MOV         #0,R5
+    00000618 4B0B                   JSR         @R11
+    0000061A 64E3                   MOV         R14,R4
+          type.c   283    }
+    0000061C              L723:                             
+    0000061C 7F18                   ADD         #24,R15
+    0000061E 4F26                   LDS.L       @R15+,PR
+    00000620 68F6                   MOV.L       @R15+,R8
+    00000622 69F6                   MOV.L       @R15+,R9
+    00000624 6AF6                   MOV.L       @R15+,R10
+    00000626 6BF6                   MOV.L       @R15+,R11
+    00000628 6CF6                   MOV.L       @R15+,R12
+    0000062A 6DF6                   MOV.L       @R15+,R13
+    0000062C 000B                   RTS
+    0000062E 6EF6                   MOV.L       @R15+,R14
+          type.c   284    
+          type.c   285    /* create a system struct which has no user-visible members */
+          type.c   286    struct ValueType *TypeCreateOpaqueStruct(struct ParseState *Parser, const char *StructName, int Size)
+    00000630              _TypeCreateOpaqueStruct:         ; function: TypeCreateOpaqueStruct
+                                                           ; frame size=28
+    00000630 2FE6                   MOV.L       R14,@-R15
+          type.c   287    {
+          type.c   288        struct ValueType *Typ = TypeGetMatching(Parser, &UberType, TypeStruct, 0, StructName, FALSE);
+    00000632 E300                   MOV         #0,R3
+    00000634 4F22                   STS.L       PR,@-R15
+    00000636 6733                   MOV         R3,R7
+    00000638 7FF4                   ADD         #-12,R15
+    0000063A 1F41                   MOV.L       R4,@(4,R15)
+    0000063C 2F52                   MOV.L       R5,@R15
+    0000063E 1F62                   MOV.L       R6,@(8,R15)
+    00000640 2F36                   MOV.L       R3,@-R15
+    00000642 E60D                   MOV         #13,R6
+    00000644 D512                   MOV.L       L790+14,R5 ; _UberType
+    00000646 52F1                   MOV.L       @(4,R15),R2
+    00000648 2F26                   MOV.L       R2,@-R15
+    0000064A BCFC                   BSR         _TypeGetMatching
+    0000064C 54F3                   MOV.L       @(12,R15),R4
+    0000064E 6E03                   MOV         R0,R14
+          type.c   289        
+          type.c   290        /* create the (empty) table */
+          type.c   291        Typ->Members = VariableAlloc(Parser, sizeof(struct Table) + STRUCT_TABLE_SIZE * sizeof(struct TableEnt
+                         +ry), TRUE);
+    00000650 9517                   MOV.W       L790,R5    ; H'00E4
+    00000652 E601                   MOV         #1,R6
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE   21
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000654 D30F                   MOV.L       L790+18,R3 ; _VariableAlloc
+    00000656 430B                   JSR         @R3
+    00000658 54F3                   MOV.L       @(12,R15),R4
+          type.c   292        Typ->Members->HashTable = (struct TableEntry **)((char *)Typ->Members + sizeof(struct Table));
+    0000065A 6403                   MOV         R0,R4
+          type.c   293        TableInitTable(Typ->Members, (struct TableEntry **)((char *)Typ->Members + sizeof(struct Table)), STRU
+                         +CT_TABLE_SIZE, TRUE);
+    0000065C D30E                   MOV.L       L790+22,R3 ; _TableInitTable
+    0000065E 6203                   MOV         R0,R2
+    00000660 1E08                   MOV.L       R0,@(32,R14)
+    00000662 E701                   MOV         #1,R7
+    00000664 7208                   ADD         #8,R2
+    00000666 E60B                   MOV         #11,R6
+    00000668 1421                   MOV.L       R2,@(4,R4)
+    0000066A 55E8                   MOV.L       @(32,R14),R5
+    0000066C 1F52                   MOV.L       R5,@(8,R15)
+    0000066E 7508                   ADD         #8,R5
+    00000670 430B                   JSR         @R3
+    00000672 54F2                   MOV.L       @(8,R15),R4
+          type.c   294        Typ->Sizeof = Size;
+    00000674 52F4                   MOV.L       @(16,R15),R2
+          type.c   295        
+          type.c   296        return Typ;
+    00000676 60E3                   MOV         R14,R0
+    00000678 1E22                   MOV.L       R2,@(8,R14)
+          type.c   297    }
+    0000067A 7F14                   ADD         #20,R15
+    0000067C 4F26                   LDS.L       @R15+,PR
+    0000067E 000B                   RTS
+    00000680 6EF6                   MOV.L       @R15+,R14
+    00000682              L790:                             
+    00000682 00E4                   .DATA.W     H'00E4
+    00000684 <00000000>             .DATA.L     _TableSet
+    00000688 <00000000>             .DATA.L     L577
+    0000068C <00000000>             .DATA.L     L578
+    00000690 <00000000>             .DATA.L     _UberType
+    00000694 <00000000>             .DATA.L     _VariableAlloc
+    00000698 <00000000>             .DATA.L     _TableInitTable
+          type.c   298    
+          type.c   299    /* parse an enum declaration */
+          type.c   300    void TypeParseEnum(struct ParseState *Parser, struct ValueType **Typ)
+    0000069C              _TypeParseEnum:                  ; function: TypeParseEnum
+                                                           ; frame size=64
+    0000069C 2FE6                   MOV.L       R14,@-R15
+    0000069E 6E43                   MOV         R4,R14
+    000006A0 2FD6                   MOV.L       R13,@-R15
+    000006A2 2FC6                   MOV.L       R12,@-R15
+    000006A4 2FB6                   MOV.L       R11,@-R15
+    000006A6 2FA6                   MOV.L       R10,@-R15
+    000006A8 2F96                   MOV.L       R9,@-R15
+          type.c   301    {
+          type.c   302        struct Value *LexValue;
+          type.c   303        struct Value InitValue;
+          type.c   304        enum LexToken Token;
+          type.c   305        struct ValueType *EnumType;
+          type.c   306        int EnumValue = 0;
+    000006AA EA00                   MOV         #0,R10
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE   22
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+          type.c   307        char *EnumIdentifier;
+          type.c   308        
+          type.c   309        Token = LexGetToken(Parser, &LexValue, FALSE);
+    000006AC DD7A                   MOV.L       L792+2,R13 ; _LexGetToken
+    000006AE 66A3                   MOV         R10,R6
+    000006B0 2F86                   MOV.L       R8,@-R15
+    000006B2 6853                   MOV         R5,R8
+    000006B4 4F22                   STS.L       PR,@-R15
+    000006B6 7FE8                   ADD         #-24,R15
+    000006B8 1FA1                   MOV.L       R10,@(4,R15)
+    000006BA 65F3                   MOV         R15,R5
+    000006BC 4D0B                   JSR         @R13
+    000006BE 64E3                   MOV         R14,R4
+          type.c   310        if (Token == TokenIdentifier)
+    000006C0 882D                   CMP/EQ      #45,R0
+    000006C2 8F0D                   BF/S        L737
+    000006C4 6B03                   MOV         R0,R11
+          type.c   311        {
+          type.c   312            LexGetToken(Parser, &LexValue, TRUE);
+    000006C6 E601                   MOV         #1,R6
+    000006C8 65F3                   MOV         R15,R5
+    000006CA 4D0B                   JSR         @R13
+    000006CC 64E3                   MOV         R14,R4
+          type.c   313            EnumIdentifier = LexValue->Val->Identifier;
+          type.c   314            Token = LexGetToken(Parser, NULL, FALSE);
+    000006CE E600                   MOV         #0,R6
+    000006D0 69F2                   MOV.L       @R15,R9
+    000006D2 6563                   MOV         R6,R5
+    000006D4 5991                   MOV.L       @(4,R9),R9
+    000006D6 6992                   MOV.L       @R9,R9
+    000006D8 4D0B                   JSR         @R13
+    000006DA 64E3                   MOV         R14,R4
+    000006DC A005                   BRA         L738
+    000006DE 6B03                   MOV         R0,R11
+    000006E0              L737:                             
+          type.c   315        }
+          type.c   316        else
+          type.c   317        {
+          type.c   318            static char TempNameBuf[7] = "^e0000";
+          type.c   319            EnumIdentifier = PlatformMakeTempName(TempNameBuf);
+    000006E0 D46E                   MOV.L       L792+6,R4  ; __$TempNameBuf$596
+    000006E2 D26F                   MOV.L       L792+10,R2 ; _PlatformMakeTempName
+    000006E4 420B                   JSR         @R2
+    000006E6 0009                   NOP
+    000006E8 6903                   MOV         R0,R9
+    000006EA              L738:                             
+          type.c   320        }
+          type.c   321    
+          type.c   322        EnumType = TypeGetMatching(Parser, &UberType, TypeEnum, 0, EnumIdentifier, Token != TokenLeftBrace);
+    000006EA 60B3                   MOV         R11,R0
+    000006EC D56D                   MOV.L       L792+14,R5 ; _UberType
+    000006EE E700                   MOV         #0,R7
+    000006F0 8834                   CMP/EQ      #52,R0
+    000006F2 0029                   MOVT        R0
+    000006F4 CA01                   XOR         #1,R0
+    000006F6 E60F                   MOV         #15,R6
+    000006F8 2F06                   MOV.L       R0,@-R15
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE   23
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000006FA 2F96                   MOV.L       R9,@-R15
+    000006FC BCA3                   BSR         _TypeGetMatching
+    000006FE 64E3                   MOV         R14,R4
+          type.c   323        *Typ = &IntType;
+    00000700 D269                   MOV.L       L792+18,R2 ; _IntType
+          type.c   324        if (Token != TokenLeftBrace)
+    00000702 60B3                   MOV         R11,R0
+    00000704 DC69                   MOV.L       L792+22,R12; _ProgramFail
+    00000706 7F08                   ADD         #8,R15
+    00000708 8834                   CMP/EQ      #52,R0
+    0000070A 8D0B                   BT/S        L739
+    0000070C 2822                   MOV.L       R2,@R8
+          type.c   325        { 
+          type.c   326            /* use the already defined enum */
+          type.c   327            if ((*Typ)->Members == NULL)
+    0000070E 6282                   MOV.L       @R8,R2
+    00000710 5328                   MOV.L       @(32,R2),R3
+    00000712 2338                   TST         R3,R3
+    00000714 8B5B                   BF          L741
+          type.c   328                ProgramFail(Parser, "enum '%s' isn't defined", EnumIdentifier);
+    00000716 2F96                   MOV.L       R9,@-R15
+    00000718 D365                   MOV.L       L792+26,R3 ; L598
+    0000071A 2F36                   MOV.L       R3,@-R15
+    0000071C 4C0B                   JSR         @R12
+    0000071E 64E3                   MOV         R14,R4
+          type.c   329                
+          type.c   330            return;
+    00000720 A055                   BRA         L741
+    00000722 7F08                   ADD         #8,R15
+    00000724              L739:                             
+          type.c   331        }
+          type.c   332        
+          type.c   333        if (TopStackFrame != NULL)
+    00000724 D363                   MOV.L       L792+30,R3 ; _TopStackFrame
+    00000726 6232                   MOV.L       @R3,R2
+    00000728 2228                   TST         R2,R2
+    0000072A 8904                   BT          L742
+          type.c   334            ProgramFail(Parser, "enum definitions can only be globals");
+    0000072C D262                   MOV.L       L792+34,R2 ; L599
+    0000072E 2F26                   MOV.L       R2,@-R15
+    00000730 4C0B                   JSR         @R12
+    00000732 64E3                   MOV         R14,R4
+    00000734 7F04                   ADD         #4,R15
+    00000736              L742:                             
+          type.c   335            
+          type.c   336        LexGetToken(Parser, NULL, TRUE);    
+    00000736 E601                   MOV         #1,R6
+    00000738 E500                   MOV         #0,R5
+    0000073A 4D0B                   JSR         @R13
+    0000073C 64E3                   MOV         R14,R4
+          type.c   337        (*Typ)->Members = &GlobalTable;
+          type.c   338        memset((void *)&InitValue, '\0', sizeof(struct Value));
+    0000073E E610                   MOV         #16,R6
+    00000740 6382                   MOV.L       @R8,R3
+    00000742 E500                   MOV         #0,R5
+    00000744 D25D                   MOV.L       L792+38,R2 ; _GlobalTable
+    00000746 64F3                   MOV         R15,R4
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE   24
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000748 1328                   MOV.L       R2,@(32,R3)
+    0000074A D35D                   MOV.L       L792+42,R3 ; _memset
+    0000074C 430B                   JSR         @R3
+    0000074E 7408                   ADD         #8,R4
+          type.c   339        InitValue.Typ = &IntType;
+    00000750 D255                   MOV.L       L792+18,R2 ; _IntType
+          type.c   340        InitValue.Val = (union AnyValue *)&EnumValue;
+    00000752 63F3                   MOV         R15,R3
+    00000754 D85B                   MOV.L       L792+46,R8 ; _VariableDefine
+    00000756 7304                   ADD         #4,R3
+    00000758 D95B                   MOV.L       L792+50,R9 ; L603
+    0000075A 1F22                   MOV.L       R2,@(8,R15)
+    0000075C 1F33                   MOV.L       R3,@(12,R15)
+          type.c   341        do {
+    0000075E              L743:                             
+          type.c   342            if (LexGetToken(Parser, &LexValue, TRUE) != TokenIdentifier)
+    0000075E E601                   MOV         #1,R6
+    00000760 65F3                   MOV         R15,R5
+    00000762 4D0B                   JSR         @R13
+    00000764 64E3                   MOV         R14,R4
+    00000766 882D                   CMP/EQ      #45,R0
+    00000768 8904                   BT          L744
+          type.c   343                ProgramFail(Parser, "identifier expected");
+    0000076A D258                   MOV.L       L792+54,R2 ; L601
+    0000076C 2F26                   MOV.L       R2,@-R15
+    0000076E 4C0B                   JSR         @R12
+    00000770 64E3                   MOV         R14,R4
+    00000772 7F04                   ADD         #4,R15
+    00000774              L744:                             
+          type.c   344            
+          type.c   345            EnumIdentifier = LexValue->Val->Identifier;
+    00000774 6BF2                   MOV.L       @R15,R11
+          type.c   346            if (LexGetToken(Parser, NULL, FALSE) == TokenAssign)
+    00000776 E600                   MOV         #0,R6
+    00000778 5BB1                   MOV.L       @(4,R11),R11
+    0000077A 6563                   MOV         R6,R5
+    0000077C 6BB2                   MOV.L       @R11,R11
+    0000077E 4D0B                   JSR         @R13
+    00000780 64E3                   MOV         R14,R4
+    00000782 8802                   CMP/EQ      #2,R0
+    00000784 8B07                   BF          L745
+          type.c   347            {
+          type.c   348                LexGetToken(Parser, NULL, TRUE);
+    00000786 E601                   MOV         #1,R6
+    00000788 E500                   MOV         #0,R5
+    0000078A 4D0B                   JSR         @R13
+    0000078C 64E3                   MOV         R14,R4
+          type.c   349                EnumValue = ExpressionParseInt(Parser);
+    0000078E D250                   MOV.L       L792+58,R2 ; _ExpressionParseInt
+    00000790 420B                   JSR         @R2
+    00000792 64E3                   MOV         R14,R4
+    00000794 1F01                   MOV.L       R0,@(4,R15)
+    00000796              L745:                             
+          type.c   350            }
+          type.c   351            
+          type.c   352            VariableDefine(Parser, EnumIdentifier, &InitValue, NULL, FALSE);
+    00000796 E700                   MOV         #0,R7
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE   25
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000798 2FA6                   MOV.L       R10,@-R15
+    0000079A 65B3                   MOV         R11,R5
+    0000079C 66F3                   MOV         R15,R6
+    0000079E 760C                   ADD         #12,R6
+    000007A0 480B                   JSR         @R8
+    000007A2 64E3                   MOV         R14,R4
+    000007A4 7F04                   ADD         #4,R15
+          type.c   353                
+          type.c   354            Token = LexGetToken(Parser, NULL, TRUE);
+    000007A6 E601                   MOV         #1,R6
+    000007A8 E500                   MOV         #0,R5
+    000007AA 4D0B                   JSR         @R13
+    000007AC 64E3                   MOV         R14,R4
+          type.c   355            if (Token != TokenComma && Token != TokenRightBrace)
+    000007AE 8801                   CMP/EQ      #1,R0
+    000007B0 8D07                   BT/S        L746
+    000007B2 6B03                   MOV         R0,R11
+    000007B4 60B3                   MOV         R11,R0
+    000007B6 8835                   CMP/EQ      #53,R0
+    000007B8 8903                   BT          L746
+          type.c   356                ProgramFail(Parser, "comma expected");
+    000007BA 2F96                   MOV.L       R9,@-R15
+    000007BC 4C0B                   JSR         @R12
+    000007BE 64E3                   MOV         R14,R4
+    000007C0 7F04                   ADD         #4,R15
+    000007C2              L746:                             
+          type.c   357            
+          type.c   358            EnumValue++;
+          type.c   359                        
+          type.c   360        } while (Token == TokenComma);
+    000007C2 60B3                   MOV         R11,R0
+    000007C4 53F1                   MOV.L       @(4,R15),R3
+    000007C6 8801                   CMP/EQ      #1,R0
+    000007C8 7301                   ADD         #1,R3
+    000007CA 1F31                   MOV.L       R3,@(4,R15)
+    000007CC 89C7                   BT          L743
+    000007CE              L741:                             
+          type.c   361    }
+    000007CE 7F18                   ADD         #24,R15
+    000007D0 4F26                   LDS.L       @R15+,PR
+    000007D2 68F6                   MOV.L       @R15+,R8
+    000007D4 69F6                   MOV.L       @R15+,R9
+    000007D6 6AF6                   MOV.L       @R15+,R10
+    000007D8 6BF6                   MOV.L       @R15+,R11
+    000007DA 6CF6                   MOV.L       @R15+,R12
+    000007DC 6DF6                   MOV.L       @R15+,R13
+    000007DE 000B                   RTS
+    000007E0 6EF6                   MOV.L       @R15+,R14
+          type.c   362    
+          type.c   363    /* parse a type - just the basic type */
+          type.c   364    int TypeParseFront(struct ParseState *Parser, struct ValueType **Typ, int *IsStatic)
+    000007E2              _TypeParseFront:                 ; function: TypeParseFront
+                                                           ; frame size=80
+    000007E2 2FE6                   MOV.L       R14,@-R15
+    000007E4 2FD6                   MOV.L       R13,@-R15
+    000007E6 6D53                   MOV         R5,R13
+          type.c   365    {
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE   26
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+          type.c   366        struct ParseState Before;
+          type.c   367        struct Value *LexerValue;
+          type.c   368        enum LexToken Token;
+          type.c   369        int Unsigned = FALSE;
+          type.c   370        struct Value *VarValue;
+          type.c   371        int StaticQualifier = FALSE;
+          type.c   372        *Typ = NULL;
+          type.c   373    
+          type.c   374        /* ignore leading type qualifiers */
+          type.c   375        ParserCopy(&Before, Parser);
+    000007E8 D33A                   MOV.L       L792+62,R3 ; _ParserCopy
+    000007EA 2FC6                   MOV.L       R12,@-R15
+    000007EC 2FB6                   MOV.L       R11,@-R15
+    000007EE 6C43                   MOV         R4,R12
+    000007F0 2FA6                   MOV.L       R10,@-R15
+    000007F2 E400                   MOV         #0,R4
+    000007F4 2F96                   MOV.L       R9,@-R15
+    000007F6 65C3                   MOV         R12,R5
+    000007F8 2F86                   MOV.L       R8,@-R15
+    000007FA 6A43                   MOV         R4,R10
+    000007FC 4F22                   STS.L       PR,@-R15
+    000007FE 6943                   MOV         R4,R9
+    00000800 7FD4                   ADD         #-44,R15
+    00000802 1F62                   MOV.L       R6,@(8,R15)
+    00000804 2D42                   MOV.L       R4,@R13
+    00000806 64F3                   MOV         R15,R4
+    00000808 430B                   JSR         @R3
+    0000080A 740C                   ADD         #12,R4
+          type.c   376        Token = LexGetToken(Parser, &LexerValue, TRUE);
+    0000080C DB22                   MOV.L       L792+2,R11 ; _LexGetToken
+    0000080E E601                   MOV         #1,R6
+    00000810 65F3                   MOV         R15,R5
+    00000812 4B0B                   JSR         @R11
+    00000814 64C3                   MOV         R12,R4
+    00000816 6E03                   MOV         R0,R14
+          type.c   377        while (Token == TokenStaticType || Token == TokenAutoType || Token == TokenRegisterType || Token == To
+                         +kenExternType)
+    00000818 A009                   BRA         L747
+    0000081A E801                   MOV         #1,R8
+    0000081C              L748:                             
+          type.c   378        {
+          type.c   379            if (Token == TokenStaticType)
+    0000081C 60E3                   MOV         R14,R0
+    0000081E 883F                   CMP/EQ      #63,R0
+    00000820 8F01                   BF/S        L749
+          type.c   380                StaticQualifier = TRUE;
+          type.c   381                
+          type.c   382            Token = LexGetToken(Parser, &LexerValue, TRUE);
+    00000822 E601                   MOV         #1,R6
+    00000824 6983                   MOV         R8,R9
+    00000826              L749:                             
+    00000826 65F3                   MOV         R15,R5
+    00000828 4B0B                   JSR         @R11
+    0000082A 64C3                   MOV         R12,R4
+    0000082C 6E03                   MOV         R0,R14
+    0000082E              L747:                             
+    0000082E 60E3                   MOV         R14,R0
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE   27
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000830 883F                   CMP/EQ      #63,R0
+    00000832 89F3                   BT          L748
+    00000834 60E3                   MOV         R14,R0
+    00000836 8840                   CMP/EQ      #64,R0
+    00000838 89F0                   BT          L748
+    0000083A 60E3                   MOV         R14,R0
+    0000083C 8841                   CMP/EQ      #65,R0
+    0000083E 89ED                   BT          L748
+    00000840 60E3                   MOV         R14,R0
+    00000842 8842                   CMP/EQ      #66,R0
+    00000844 89EA                   BT          L748
+          type.c   383        }
+          type.c   384        
+          type.c   385        if (IsStatic != NULL)
+    00000846 52F2                   MOV.L       @(8,R15),R2
+    00000848 2228                   TST         R2,R2
+    0000084A 8901                   BT          L750
+          type.c   386            *IsStatic = StaticQualifier;
+    0000084C 53F2                   MOV.L       @(8,R15),R3
+    0000084E 2392                   MOV.L       R9,@R3
+    00000850              L750:                             
+          type.c   387            
+          type.c   388        /* handle signed/unsigned with no trailing type */
+          type.c   389        if (Token == TokenSignedType || Token == TokenUnsignedType)
+    00000850 60E3                   MOV         R14,R0
+    00000852 883D                   CMP/EQ      #61,R0
+    00000854 8902                   BT          L752
+    00000856 60E3                   MOV         R14,R0
+    00000858 8845                   CMP/EQ      #69,R0
+    0000085A 8B44                   BF          L751
+    0000085C              L752:                             
+          type.c   390        {
+          type.c   391            enum LexToken FollowToken = LexGetToken(Parser, &LexerValue, FALSE);
+    0000085C E600                   MOV         #0,R6
+    0000085E 65F3                   MOV         R15,R5
+    00000860 4B0B                   JSR         @R11
+    00000862 64C3                   MOV         R12,R4
+    00000864 6403                   MOV         R0,R4
+          type.c   392            Unsigned = (Token == TokenUnsignedType);
+    00000866 60E3                   MOV         R14,R0
+    00000868 8845                   CMP/EQ      #69,R0
+    0000086A 0A29                   MOVT        R10
+          type.c   393            
+          type.c   394            if (FollowToken != TokenIntType && FollowToken != TokenLongType && FollowToken != TokenShortType &
+                         +& FollowToken != TokenCharType)
+    0000086C 6043                   MOV         R4,R0
+    0000086E 8836                   CMP/EQ      #54,R0
+    00000870 8934                   BT          L753
+    00000872 6043                   MOV         R4,R0
+    00000874 883C                   CMP/EQ      #60,R0
+    00000876 8931                   BT          L753
+    00000878 6043                   MOV         R4,R0
+    0000087A 883E                   CMP/EQ      #62,R0
+    0000087C 892E                   BT          L753
+    0000087E 6043                   MOV         R4,R0
+    00000880 8837                   CMP/EQ      #55,R0
+    00000882 892B                   BT          L753
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE   28
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+          type.c   395            {
+          type.c   396                if (Token == TokenUnsignedType)
+    00000884 60E3                   MOV         R14,R0
+    00000886 8845                   CMP/EQ      #69,R0
+    00000888 8B02                   BF          L754
+          type.c   397                    *Typ = &UnsignedIntType;
+    0000088A D213                   MOV.L       L792+66,R2 ; _UnsignedIntType
+    0000088C A060                   BRA         L785
+    0000088E 0009                   NOP
+    00000890              L754:                             
+          type.c   398                else
+          type.c   399                    *Typ = &IntType;
+    00000890 D105                   MOV.L       L792+18,R1 ; _IntType
+    00000892 A095                   BRA         L650
+    00000894 2D12                   MOV.L       R1,@R13
+    00000896              L792:                             
+    00000896 0000                   .DATA.W     0
+    00000898 <00000000>             .DATA.L     _LexGetToken
+    0000089C <00000000>             .DATA.L     __$TempNameBuf$596
+    000008A0 <00000000>             .DATA.L     _PlatformMakeTempName
+    000008A4 <00000000>             .DATA.L     _UberType
+    000008A8 <00000000>             .DATA.L     _IntType
+    000008AC <00000000>             .DATA.L     _ProgramFail
+    000008B0 <00000000>             .DATA.L     L598
+    000008B4 <00000000>             .DATA.L     _TopStackFrame
+    000008B8 <00000000>             .DATA.L     L599
+    000008BC <00000000>             .DATA.L     _GlobalTable
+    000008C0 <00000000>             .DATA.L     _memset
+    000008C4 <00000000>             .DATA.L     _VariableDefine
+    000008C8 <00000000>             .DATA.L     L603
+    000008CC <00000000>             .DATA.L     L601
+    000008D0 <00000000>             .DATA.L     _ExpressionParseInt
+    000008D4 <00000000>             .DATA.L     _ParserCopy
+    000008D8 <00000000>             .DATA.L     _UnsignedIntType
+    000008DC              L753:                             
+          type.c   400                
+          type.c   401                return TRUE;
+          type.c   402            }
+          type.c   403            
+          type.c   404            Token = LexGetToken(Parser, &LexerValue, TRUE);
+    000008DC E601                   MOV         #1,R6
+    000008DE 65F3                   MOV         R15,R5
+    000008E0 4B0B                   JSR         @R11
+    000008E2 64C3                   MOV         R12,R4
+    000008E4 6E03                   MOV         R0,R14
+    000008E6              L751:                             
+          type.c   405        }
+          type.c   406        
+          type.c   407        switch (Token)
+    000008E6 60E3                   MOV         R14,R0
+    000008E8 8836                   CMP/EQ      #54,R0
+    000008EA 8915                   BT          L670
+    000008EC 883E                   CMP/EQ      #62,R0
+    000008EE 891B                   BT          L671
+    000008F0 8837                   CMP/EQ      #55,R0
+    000008F2 8921                   BT          L672
+    000008F4 883C                   CMP/EQ      #60,R0
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE   29
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000008F6 8922                   BT          L673
+    000008F8 8838                   CMP/EQ      #56,R0
+    000008FA 8928                   BT          L674
+    000008FC 8839                   CMP/EQ      #57,R0
+    000008FE 8926                   BT          L675
+    00000900 883A                   CMP/EQ      #58,R0
+    00000902 8927                   BT          L676
+    00000904 8843                   CMP/EQ      #67,R0
+    00000906 8928                   BT          L677
+    00000908 8844                   CMP/EQ      #68,R0
+    0000090A 8926                   BT          L678
+    0000090C 883B                   CMP/EQ      #59,R0
+    0000090E 8935                   BT          L680
+    00000910 882D                   CMP/EQ      #45,R0
+    00000912 8941                   BT          L681
+    00000914 A04D                   BRA         L682
+    00000916 0009                   NOP
+    00000918              L670:                            ; case label 
+          type.c   408        {
+          type.c   409            case TokenIntType: *Typ = Unsigned ? &UnsignedIntType : &IntType; break;
+    00000918 2AA8                   TST         R10,R10
+    0000091A 8902                   BT          L758
+    0000091C D263                   MOV.L       L793,R2    ; _UnsignedIntType
+    0000091E A017                   BRA         L785
+    00000920 0009                   NOP
+    00000922              L758:                             
+    00000922 D263                   MOV.L       L793+4,R2  ; _IntType
+    00000924 A014                   BRA         L785
+    00000926 0009                   NOP
+    00000928              L671:                            ; case label 
+          type.c   410            case TokenShortType: *Typ = Unsigned ? &UnsignedShortType : &ShortType; break;
+    00000928 2AA8                   TST         R10,R10
+    0000092A 8902                   BT          L760
+    0000092C D161                   MOV.L       L793+8,R1  ; _UnsignedShortType
+    0000092E A03E                   BRA         L784
+    00000930 0009                   NOP
+    00000932              L760:                             
+    00000932 D161                   MOV.L       L793+12,R1 ; _ShortType
+    00000934 A03B                   BRA         L784
+    00000936 0009                   NOP
+    00000938              L672:                            ; case label 
+          type.c   411            case TokenCharType: *Typ = &CharType; break;
+    00000938 D260                   MOV.L       L793+16,R2 ; _CharType
+    0000093A A009                   BRA         L785
+    0000093C 0009                   NOP
+    0000093E              L673:                            ; case label 
+          type.c   412            case TokenLongType: *Typ = Unsigned ? &UnsignedLongType : &LongType; break;
+    0000093E 2AA8                   TST         R10,R10
+    00000940 8902                   BT          L762
+    00000942 D15F                   MOV.L       L793+20,R1 ; _UnsignedLongType
+    00000944 A033                   BRA         L784
+    00000946 0009                   NOP
+    00000948              L762:                             
+    00000948 D15E                   MOV.L       L793+24,R1 ; _LongType
+    0000094A A030                   BRA         L784
+    0000094C 0009                   NOP
+    0000094E              L674:                            ; case label 
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE   30
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+          type.c   413    #ifndef NO_FP
+          type.c   414            case TokenFloatType: case TokenDoubleType: *Typ = &FPType; break;
+    0000094E              L675:                            ; case label 
+    0000094E D25E                   MOV.L       L793+28,R2 ; _FPType
+    00000950              L785:                             
+    00000950 A036                   BRA         L650
+    00000952 2D22                   MOV.L       R2,@R13
+    00000954              L676:                            ; case label 
+          type.c   415    #endif
+          type.c   416            case TokenVoidType: *Typ = &VoidType; break;
+    00000954 D15D                   MOV.L       L793+32,R1 ; _VoidType
+    00000956 A02A                   BRA         L784
+    00000958 0009                   NOP
+    0000095A              L677:                            ; case label 
+          type.c   417            
+          type.c   418            case TokenStructType: case TokenUnionType: 
+    0000095A              L678:                            ; case label 
+          type.c   419                if (*Typ != NULL)
+    0000095A 62D2                   MOV.L       @R13,R2
+    0000095C 2228                   TST         R2,R2
+    0000095E 8905                   BT          L764
+          type.c   420                    ProgramFail(Parser, "bad type declaration");
+    00000960 D35B                   MOV.L       L793+36,R3 ; L619
+    00000962 2F36                   MOV.L       R3,@-R15
+    00000964 D25B                   MOV.L       L793+40,R2 ; _ProgramFail
+    00000966 420B                   JSR         @R2
+    00000968 64C3                   MOV         R12,R4
+    0000096A 7F04                   ADD         #4,R15
+    0000096C              L764:                             
+          type.c   421                    
+          type.c   422                TypeParseStruct(Parser, Typ, Token == TokenStructType);
+    0000096C 60E3                   MOV         R14,R0
+    0000096E 8843                   CMP/EQ      #67,R0
+    00000970 0629                   MOVT        R6
+    00000972 65D3                   MOV         R13,R5
+    00000974 BCF7                   BSR         _TypeParseStruct
+    00000976 64C3                   MOV         R12,R4
+          type.c   423                break;
+    00000978 A022                   BRA         L650
+    0000097A 0009                   NOP
+    0000097C              L680:                            ; case label 
+          type.c   424    
+          type.c   425            case TokenEnumType:
+          type.c   426                if (*Typ != NULL)
+    0000097C 63D2                   MOV.L       @R13,R3
+    0000097E 2338                   TST         R3,R3
+    00000980 8905                   BT          L765
+          type.c   427                    ProgramFail(Parser, "bad type declaration");
+    00000982 D353                   MOV.L       L793+36,R3 ; L619
+    00000984 D253                   MOV.L       L793+40,R2 ; _ProgramFail
+    00000986 2F36                   MOV.L       R3,@-R15
+    00000988 420B                   JSR         @R2
+    0000098A 64C3                   MOV         R12,R4
+    0000098C 7F04                   ADD         #4,R15
+    0000098E              L765:                             
+          type.c   428                    
+          type.c   429                TypeParseEnum(Parser, Typ);
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE   31
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    0000098E 65D3                   MOV         R13,R5
+    00000990 BE84                   BSR         _TypeParseEnum
+    00000992 64C3                   MOV         R12,R4
+          type.c   430                break;
+    00000994 A014                   BRA         L650
+    00000996 0009                   NOP
+    00000998              L681:                            ; case label 
+          type.c   431            
+          type.c   432            case TokenIdentifier:
+          type.c   433                /* we already know it's a typedef-defined type because we got here */
+          type.c   434                VariableGet(Parser, LexerValue->Val->Identifier, &VarValue);
+    00000998 65F2                   MOV.L       @R15,R5
+    0000099A 66F3                   MOV         R15,R6
+    0000099C D34E                   MOV.L       L793+44,R3 ; _VariableGet
+    0000099E 7604                   ADD         #4,R6
+    000009A0 5551                   MOV.L       @(4,R5),R5
+    000009A2 6552                   MOV.L       @R5,R5
+    000009A4 430B                   JSR         @R3
+    000009A6 64C3                   MOV         R12,R4
+          type.c   435                *Typ = VarValue->Val->Typ;
+    000009A8 52F1                   MOV.L       @(4,R15),R2
+    000009AA 5321                   MOV.L       @(4,R2),R3
+    000009AC 6132                   MOV.L       @R3,R1
+          type.c   436                break;
+    000009AE              L784:                             
+    000009AE A007                   BRA         L650
+    000009B0 2D12                   MOV.L       R1,@R13
+    000009B2              L682:                            ; default label 
+          type.c   437    
+          type.c   438            default: ParserCopy(Parser, &Before); return FALSE;
+    000009B2 65F3                   MOV         R15,R5
+    000009B4 D249                   MOV.L       L793+48,R2 ; _ParserCopy
+    000009B6 750C                   ADD         #12,R5
+    000009B8 420B                   JSR         @R2
+    000009BA 64C3                   MOV         R12,R4
+    000009BC A001                   BRA         L756
+    000009BE E000                   MOV         #0,R0
+    000009C0              L650:
+          type.c   439        }
+          type.c   440        
+          type.c   441        return TRUE;
+    000009C0 E001                   MOV         #1,R0
+          type.c   442    }
+    000009C2              L756:                             
+    000009C2 7F2C                   ADD         #44,R15
+    000009C4 4F26                   LDS.L       @R15+,PR
+    000009C6 68F6                   MOV.L       @R15+,R8
+    000009C8 69F6                   MOV.L       @R15+,R9
+    000009CA 6AF6                   MOV.L       @R15+,R10
+    000009CC 6BF6                   MOV.L       @R15+,R11
+    000009CE 6CF6                   MOV.L       @R15+,R12
+    000009D0 6DF6                   MOV.L       @R15+,R13
+    000009D2 000B                   RTS
+    000009D4 6EF6                   MOV.L       @R15+,R14
+          type.c   443    
+          type.c   444    /* parse a type - the part at the end after the identifier. eg. array specifications etc. */
+          type.c   445    struct ValueType *TypeParseBack(struct ParseState *Parser, struct ValueType *FromType)
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE   32
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000009D6              _TypeParseBack:                  ; function: TypeParseBack
+                                                           ; frame size=60
+    000009D6 2FE6                   MOV.L       R14,@-R15
+    000009D8 4F22                   STS.L       PR,@-R15
+    000009DA 6E43                   MOV         R4,R14
+          type.c   446    {
+          type.c   447        enum LexToken Token;
+          type.c   448        struct ParseState Before;
+          type.c   449    
+          type.c   450        ParserCopy(&Before, Parser);
+    000009DC D33F                   MOV.L       L793+48,R3 ; _ParserCopy
+    000009DE 7FD4                   ADD         #-44,R15
+    000009E0 2F52                   MOV.L       R5,@R15
+    000009E2 64F3                   MOV         R15,R4
+    000009E4 65E3                   MOV         R14,R5
+    000009E6 430B                   JSR         @R3
+    000009E8 740C                   ADD         #12,R4
+          type.c   451        Token = LexGetToken(Parser, NULL, TRUE);
+    000009EA E601                   MOV         #1,R6
+    000009EC D23C                   MOV.L       L793+52,R2 ; _LexGetToken
+    000009EE E500                   MOV         #0,R5
+    000009F0 420B                   JSR         @R2
+    000009F2 64E3                   MOV         R14,R4
+          type.c   452        if (Token == TokenLeftSquareBracket)
+    000009F4 8827                   CMP/EQ      #39,R0
+    000009F6 8F29                   BF/S        L766
+    000009F8 6403                   MOV         R0,R4
+          type.c   453        {
+          type.c   454            /* add another array bound */
+          type.c   455            enum RunMode OldMode = Parser->Mode;
+          type.c   456            int ArraySize;
+          type.c   457            Parser->Mode = RunModeRun;
+    000009FA E300                   MOV         #0,R3
+    000009FC 52E3                   MOV.L       @(12,R14),R2
+    000009FE 1F21                   MOV.L       R2,@(4,R15)
+    00000A00 1E33                   MOV.L       R3,@(12,R14)
+          type.c   458            ArraySize = ExpressionParseInt(Parser);
+    00000A02 D238                   MOV.L       L793+56,R2 ; _ExpressionParseInt
+    00000A04 420B                   JSR         @R2
+    00000A06 64E3                   MOV         R14,R4
+    00000A08 1F02                   MOV.L       R0,@(8,R15)
+          type.c   459            Parser->Mode = OldMode;
+          type.c   460            
+          type.c   461            if (LexGetToken(Parser, NULL, TRUE) != TokenRightSquareBracket)
+    00000A0A E601                   MOV         #1,R6
+    00000A0C 53F1                   MOV.L       @(4,R15),R3
+    00000A0E E500                   MOV         #0,R5
+    00000A10 1E33                   MOV.L       R3,@(12,R14)
+    00000A12 D333                   MOV.L       L793+52,R3 ; _LexGetToken
+    00000A14 430B                   JSR         @R3
+    00000A16 64E3                   MOV         R14,R4
+    00000A18 8828                   CMP/EQ      #40,R0
+    00000A1A 8905                   BT          L767
+          type.c   462                ProgramFail(Parser, "']' expected");
+    00000A1C D332                   MOV.L       L793+60,R3 ; L629
+    00000A1E 2F36                   MOV.L       R3,@-R15
+    00000A20 D22C                   MOV.L       L793+40,R2 ; _ProgramFail
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE   33
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000A22 420B                   JSR         @R2
+    00000A24 64E3                   MOV         R14,R4
+    00000A26 7F04                   ADD         #4,R15
+    00000A28              L767:                             
+          type.c   463            
+          type.c   464            return TypeGetMatching(Parser, TypeParseBack(Parser, FromType), TypeArray, ArraySize, StrEmpty, TR
+                         +UE);
+    00000A28 D130                   MOV.L       L793+64,R1 ; _StrEmpty
+    00000A2A E301                   MOV         #1,R3
+    00000A2C 2F36                   MOV.L       R3,@-R15
+    00000A2E 6212                   MOV.L       @R1,R2
+    00000A30 2F26                   MOV.L       R2,@-R15
+    00000A32 55F2                   MOV.L       @(8,R15),R5
+    00000A34 BFCF                   BSR         _TypeParseBack
+    00000A36 64E3                   MOV         R14,R4
+    00000A38 6503                   MOV         R0,R5
+    00000A3A 64E3                   MOV         R14,R4
+    00000A3C E60C                   MOV         #12,R6
+    00000A3E BB02                   BSR         _TypeGetMatching
+    00000A40 57F4                   MOV.L       @(16,R15),R7
+    00000A42 7F08                   ADD         #8,R15
+    00000A44 7F2C                   ADD         #44,R15
+    00000A46 4F26                   LDS.L       @R15+,PR
+    00000A48 000B                   RTS
+    00000A4A 6EF6                   MOV.L       @R15+,R14
+    00000A4C              L766:                             
+          type.c   465        }
+          type.c   466        else
+          type.c   467        {
+          type.c   468            /* the type specification has finished */
+          type.c   469            ParserCopy(Parser, &Before);
+    00000A4C D323                   MOV.L       L793+48,R3 ; _ParserCopy
+    00000A4E 65F3                   MOV         R15,R5
+    00000A50 750C                   ADD         #12,R5
+    00000A52 430B                   JSR         @R3
+    00000A54 64E3                   MOV         R14,R4
+          type.c   470            return FromType;
+    00000A56 60F2                   MOV.L       @R15,R0
+          type.c   471        }
+          type.c   472    }
+    00000A58              L768:                             
+    00000A58 7F2C                   ADD         #44,R15
+    00000A5A 4F26                   LDS.L       @R15+,PR
+    00000A5C 000B                   RTS
+    00000A5E 6EF6                   MOV.L       @R15+,R14
+          type.c   473    
+          type.c   474    /* parse a type - the part which is repeated with each identifier in a declaration list */
+          type.c   475    void TypeParseIdentPart(struct ParseState *Parser, struct ValueType *BasicTyp, struct ValueType **Typ, cha
+                         +r **Identifier)
+    00000A60              _TypeParseIdentPart:             ; function: TypeParseIdentPart
+                                                           ; frame size=76
+    00000A60 2FE6                   MOV.L       R14,@-R15
+    00000A62 6E43                   MOV         R4,R14
+          type.c   476    {
+          type.c   477        struct ParseState Before;
+          type.c   478        enum LexToken Token;
+          type.c   479        struct Value *LexValue;
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE   34
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+          type.c   480        int Done = FALSE;
+          type.c   481        *Typ = BasicTyp;
+          type.c   482        *Identifier = StrEmpty;
+    00000A64 D221                   MOV.L       L793+64,R2 ; _StrEmpty
+    00000A66 2FD6                   MOV.L       R13,@-R15
+    00000A68 2FC6                   MOV.L       R12,@-R15
+    00000A6A 6D63                   MOV         R6,R13
+    00000A6C 2FB6                   MOV.L       R11,@-R15
+    00000A6E 2FA6                   MOV.L       R10,@-R15
+    00000A70 2F96                   MOV.L       R9,@-R15
+    00000A72 6A73                   MOV         R7,R10
+    00000A74 2F86                   MOV.L       R8,@-R15
+    00000A76 E800                   MOV         #0,R8
+    00000A78 4F22                   STS.L       PR,@-R15
+    00000A7A 7FDC                   ADD         #-36,R15
+    00000A7C 2D52                   MOV.L       R5,@R13
+    00000A7E 6322                   MOV.L       @R2,R3
+          type.c   483        
+          type.c   484        while (!Done)
+    00000A80 A079                   BRA         L770
+    00000A82 2A32                   MOV.L       R3,@R10
+    00000A84              L771:                             
+          type.c   485        {
+          type.c   486            ParserCopy(&Before, Parser);
+    00000A84 D315                   MOV.L       L793+48,R3 ; _ParserCopy
+    00000A86 65E3                   MOV         R14,R5
+    00000A88 64F3                   MOV         R15,R4
+    00000A8A 430B                   JSR         @R3
+    00000A8C 7404                   ADD         #4,R4
+          type.c   487            Token = LexGetToken(Parser, &LexValue, TRUE);
+    00000A8E E601                   MOV         #1,R6
+    00000A90 D213                   MOV.L       L793+52,R2 ; _LexGetToken
+    00000A92 65F3                   MOV         R15,R5
+    00000A94 420B                   JSR         @R2
+    00000A96 64E3                   MOV         R14,R4
+    00000A98 6403                   MOV         R0,R4
+          type.c   488            switch (Token)
+    00000A9A 882B                   CMP/EQ      #43,R0
+    00000A9C 8D28                   BT/S        L684
+    00000A9E E901                   MOV         #1,R9
+    00000AA0 881E                   CMP/EQ      #30,R0
+    00000AA2 893E                   BT          L686
+    00000AA4 882D                   CMP/EQ      #45,R0
+    00000AA6 894F                   BT          L687
+    00000AA8 A05F                   BRA         L688
+    00000AAA 0009                   NOP
+    00000AAC              L793:                             
+    00000AAC <00000000>             .DATA.L     _UnsignedIntType
+    00000AB0 <00000000>             .DATA.L     _IntType
+    00000AB4 <00000000>             .DATA.L     _UnsignedShortType
+    00000AB8 <00000000>             .DATA.L     _ShortType
+    00000ABC <00000000>             .DATA.L     _CharType
+    00000AC0 <00000000>             .DATA.L     _UnsignedLongType
+    00000AC4 <00000000>             .DATA.L     _LongType
+    00000AC8 <00000000>             .DATA.L     _FPType
+    00000ACC <00000000>             .DATA.L     _VoidType
+    00000AD0 <00000000>             .DATA.L     L619
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE   35
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000AD4 <00000000>             .DATA.L     _ProgramFail
+    00000AD8 <00000000>             .DATA.L     _VariableGet
+    00000ADC <00000000>             .DATA.L     _ParserCopy
+    00000AE0 <00000000>             .DATA.L     _LexGetToken
+    00000AE4 <00000000>             .DATA.L     _ExpressionParseInt
+    00000AE8 <00000000>             .DATA.L     L629
+    00000AEC <00000000>             .DATA.L     _StrEmpty
+    00000AF0              L684:                            ; case label 
+          type.c   489            {
+          type.c   490                case TokenOpenBracket:
+          type.c   491                    if (*Typ != NULL)
+    00000AF0 63D2                   MOV.L       @R13,R3
+    00000AF2 2338                   TST         R3,R3
+    00000AF4 8903                   BT          L773
+          type.c   492                        ProgramFail(Parser, "bad type declaration");
+    00000AF6 2FB6                   MOV.L       R11,@-R15
+    00000AF8 4C0B                   JSR         @R12
+    00000AFA 64E3                   MOV         R14,R4
+    00000AFC 7F04                   ADD         #4,R15
+    00000AFE              L773:                             
+          type.c   493                    
+          type.c   494                    TypeParse(Parser, Typ, Identifier, NULL);
+    00000AFE E700                   MOV         #0,R7
+    00000B00 66A3                   MOV         R10,R6
+    00000B02 65D3                   MOV         R13,R5
+    00000B04 B055                   BSR         _TypeParse
+    00000B06 64E3                   MOV         R14,R4
+          type.c   495                    if (LexGetToken(Parser, NULL, TRUE) != TokenCloseBracket)
+    00000B08 D233                   MOV.L       L794,R2    ; _LexGetToken
+    00000B0A E601                   MOV         #1,R6
+    00000B0C E500                   MOV         #0,R5
+    00000B0E 420B                   JSR         @R2
+    00000B10 64E3                   MOV         R14,R4
+    00000B12 882C                   CMP/EQ      #44,R0
+    00000B14 892F                   BT          L770
+          type.c   496                        ProgramFail(Parser, "')' expected");
+    00000B16 DB31                   MOV.L       L794+4,R11 ; L642
+    00000B18 2FB6                   MOV.L       R11,@-R15
+    00000B1A 4C0B                   JSR         @R12
+    00000B1C 64E3                   MOV         R14,R4
+          type.c   497                    break;
+    00000B1E A02A                   BRA         L770
+    00000B20 7F04                   ADD         #4,R15
+    00000B22              L686:                            ; case label 
+          type.c   498                    
+          type.c   499                case TokenAsterisk:
+          type.c   500                    if (*Typ == NULL)
+    00000B22 63D2                   MOV.L       @R13,R3
+    00000B24 2338                   TST         R3,R3
+    00000B26 8B03                   BF          L775
+          type.c   501                        ProgramFail(Parser, "bad type declaration");
+    00000B28 2FB6                   MOV.L       R11,@-R15
+    00000B2A 4C0B                   JSR         @R12
+    00000B2C 64E3                   MOV         R14,R4
+    00000B2E 7F04                   ADD         #4,R15
+    00000B30              L775:                             
+          type.c   502    
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE   36
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+          type.c   503                    *Typ = TypeGetMatching(Parser, *Typ, TypePointer, 0, StrEmpty, TRUE);
+    00000B30 2F96                   MOV.L       R9,@-R15
+    00000B32 E700                   MOV         #0,R7
+    00000B34 D22A                   MOV.L       L794+8,R2  ; _StrEmpty
+    00000B36 E60B                   MOV         #11,R6
+    00000B38 6322                   MOV.L       @R2,R3
+    00000B3A 2F36                   MOV.L       R3,@-R15
+    00000B3C 65D2                   MOV.L       @R13,R5
+    00000B3E BA82                   BSR         _TypeGetMatching
+    00000B40 64E3                   MOV         R14,R4
+    00000B42 7F08                   ADD         #8,R15
+          type.c   504                    break;
+    00000B44 A017                   BRA         L770
+    00000B46 2D02                   MOV.L       R0,@R13
+    00000B48              L687:                            ; case label 
+          type.c   505                
+          type.c   506                case TokenIdentifier:
+          type.c   507                    if (*Typ == NULL || *Identifier != StrEmpty)
+    00000B48 63D2                   MOV.L       @R13,R3
+    00000B4A 2338                   TST         R3,R3
+    00000B4C 8904                   BT          L777
+    00000B4E D124                   MOV.L       L794+8,R1  ; _StrEmpty
+    00000B50 62A2                   MOV.L       @R10,R2
+    00000B52 6312                   MOV.L       @R1,R3
+    00000B54 3230                   CMP/EQ      R3,R2
+    00000B56 8903                   BT          L776
+    00000B58              L777:                             
+          type.c   508                        ProgramFail(Parser, "bad type declaration");
+    00000B58 2FB6                   MOV.L       R11,@-R15
+    00000B5A 4C0B                   JSR         @R12
+    00000B5C 64E3                   MOV         R14,R4
+    00000B5E 7F04                   ADD         #4,R15
+    00000B60              L776:                             
+          type.c   509                    
+          type.c   510                    *Identifier = LexValue->Val->Identifier;
+    00000B60 63F2                   MOV.L       @R15,R3
+    00000B62 5231                   MOV.L       @(4,R3),R2
+    00000B64 6122                   MOV.L       @R2,R1
+    00000B66 A005                   BRA         L651
+    00000B68 2A12                   MOV.L       R1,@R10
+    00000B6A              L688:                            ; default label 
+          type.c   511                    Done = TRUE;
+          type.c   512                    break;
+          type.c   513                    
+          type.c   514                default: ParserCopy(Parser, &Before); Done = TRUE; break;
+    00000B6A 65F3                   MOV         R15,R5
+    00000B6C D31D                   MOV.L       L794+12,R3 ; _ParserCopy
+    00000B6E 7504                   ADD         #4,R5
+    00000B70 430B                   JSR         @R3
+    00000B72 64E3                   MOV         R14,R4
+    00000B74              L651:
+    00000B74 6893                   MOV         R9,R8
+    00000B76              L770:                             
+    00000B76 2888                   TST         R8,R8
+    00000B78 DB1B                   MOV.L       L794+16,R11; L619
+    00000B7A DC1C                   MOV.L       L794+20,R12; _ProgramFail
+    00000B7C 8982                   BT          L771
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE   37
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+          type.c   515            }
+          type.c   516        }
+          type.c   517        
+          type.c   518        if (*Typ == NULL)
+    00000B7E 62D2                   MOV.L       @R13,R2
+    00000B80 2228                   TST         R2,R2
+    00000B82 8B03                   BF          L778
+          type.c   519            ProgramFail(Parser, "bad type declaration");
+    00000B84 2FB6                   MOV.L       R11,@-R15
+    00000B86 4C0B                   JSR         @R12
+    00000B88 64E3                   MOV         R14,R4
+    00000B8A 7F04                   ADD         #4,R15
+    00000B8C              L778:                             
+          type.c   520    
+          type.c   521        if (*Identifier != StrEmpty)
+    00000B8C D114                   MOV.L       L794+8,R1  ; _StrEmpty
+    00000B8E 6312                   MOV.L       @R1,R3
+    00000B90 62A2                   MOV.L       @R10,R2
+    00000B92 3230                   CMP/EQ      R3,R2
+    00000B94 8903                   BT          L779
+          type.c   522        { 
+          type.c   523            /* parse stuff after the identifier */
+          type.c   524            *Typ = TypeParseBack(Parser, *Typ);
+    00000B96 65D2                   MOV.L       @R13,R5
+    00000B98 BF1D                   BSR         _TypeParseBack
+    00000B9A 64E3                   MOV         R14,R4
+    00000B9C 2D02                   MOV.L       R0,@R13
+    00000B9E              L779:                             
+          type.c   525        }
+          type.c   526    }
+    00000B9E 7F24                   ADD         #36,R15
+    00000BA0 4F26                   LDS.L       @R15+,PR
+    00000BA2 68F6                   MOV.L       @R15+,R8
+    00000BA4 69F6                   MOV.L       @R15+,R9
+    00000BA6 6AF6                   MOV.L       @R15+,R10
+    00000BA8 6BF6                   MOV.L       @R15+,R11
+    00000BAA 6CF6                   MOV.L       @R15+,R12
+    00000BAC 6DF6                   MOV.L       @R15+,R13
+    00000BAE 000B                   RTS
+    00000BB0 6EF6                   MOV.L       @R15+,R14
+          type.c   527    
+          type.c   528    /* parse a type - a complete declaration including identifier */
+          type.c   529    void TypeParse(struct ParseState *Parser, struct ValueType **Typ, char **Identifier, int *IsStatic)
+    00000BB2              _TypeParse:                      ; function: TypeParse
+                                                           ; frame size=24
+    00000BB2 4F22                   STS.L       PR,@-R15
+    00000BB4 7FEC                   ADD         #-20,R15
+    00000BB6 1F41                   MOV.L       R4,@(4,R15)
+    00000BB8 1F52                   MOV.L       R5,@(8,R15)
+          type.c   530    {
+          type.c   531        struct ValueType *BasicType;
+          type.c   532        
+          type.c   533        TypeParseFront(Parser, &BasicType, IsStatic);
+    00000BBA 65F3                   MOV         R15,R5
+    00000BBC 1F63                   MOV.L       R6,@(12,R15)
+    00000BBE 6673                   MOV         R7,R6
+    00000BC0 1F74                   MOV.L       R7,@(16,R15)
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE   38
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000BC2 BE0E                   BSR         _TypeParseFront
+    00000BC4 54F1                   MOV.L       @(4,R15),R4
+          type.c   534        TypeParseIdentPart(Parser, BasicType, Typ, Identifier);
+    00000BC6 57F3                   MOV.L       @(12,R15),R7
+    00000BC8 56F2                   MOV.L       @(8,R15),R6
+    00000BCA 65F2                   MOV.L       @R15,R5
+    00000BCC BF48                   BSR         _TypeParseIdentPart
+    00000BCE 54F1                   MOV.L       @(4,R15),R4
+          type.c   535    }
+    00000BD0 7F14                   ADD         #20,R15
+    00000BD2 4F26                   LDS.L       @R15+,PR
+    00000BD4 000B                   RTS
+    00000BD6 0009                   NOP
+    00000BD8              L794:                             
+    00000BD8 <00000000>             .DATA.L     _LexGetToken
+    00000BDC <00000000>             .DATA.L     L642
+    00000BE0 <00000000>             .DATA.L     _StrEmpty
+    00000BE4 <00000000>             .DATA.L     _ParserCopy
+    00000BE8 <00000000>             .DATA.L     L619
+    00000BEC <00000000>             .DATA.L     _ProgramFail
+          type.c   536    
+C   00000000              L522:
+    00000000 6461746120             .SDATA      "data type '%s' is already defined"
+             7479706520   
+             2725732720   
+             697320616C   
+             7265616479   
+             2064656669   
+             6E6564       
+    00000021 00                     .DATA.B     H'00
+    00000022 00000002               .RES.W      1
+    00000024              L571:
+    00000024 7374727563             .SDATA      "structure '%s' isn't defined"
+             7475726520   
+             2725732720   
+             69736E2774   
+             2064656669   
+             6E6564       
+    00000040 00                     .DATA.B     H'00
+    00000041 00000001               .RES.B      1
+    00000042 00000002               .RES.W      1
+    00000044              L572:
+    00000044 7374727563             .SDATA      "struct/union definitions can only be globals"
+             742F756E69   
+             6F6E206465   
+             66696E6974   
+             696F6E7320   
+             63616E206F   
+             6E6C792062   
+             6520676C6F   
+             62616C73     
+    00000070 00                     .DATA.B     H'00
+    00000071 00000001               .RES.B      1
+    00000072 00000002               .RES.W      1
+    00000074              L574:
+    00000074 696E76616C             .SDATA      "invalid type in struct"
+             6964207479   
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE   39
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+             706520696E   
+             2073747275   
+             6374         
+    0000008A 00                     .DATA.B     H'00
+    0000008B 00000001               .RES.B      1
+    0000008C              L577:
+    0000008C 6D656D6265             .SDATA      "member '%s' already defined"
+             7220272573   
+             2720616C72   
+             6561647920   
+             646566696E   
+             6564         
+    000000A7 00                     .DATA.B     H'00
+    000000A8              L578:
+    000000A8 73656D6963             .SDATA      "semicolon expected"
+             6F6C6F6E20   
+             6578706563   
+             746564       
+    000000BA 00                     .DATA.B     H'00
+    000000BB 00000001               .RES.B      1
+    000000BC              L598:
+    000000BC 656E756D20             .SDATA      "enum '%s' isn't defined"
+             2725732720   
+             69736E2774   
+             2064656669   
+             6E6564       
+    000000D3 00                     .DATA.B     H'00
+    000000D4              L599:
+    000000D4 656E756D20             .SDATA      "enum definitions can only be globals"
+             646566696E   
+             6974696F6E   
+             732063616E   
+             206F6E6C79   
+             2062652067   
+             6C6F62616C   
+             73           
+    000000F8 00                     .DATA.B     H'00
+    000000F9 00000001               .RES.B      1
+    000000FA 00000002               .RES.W      1
+    000000FC              L601:
+    000000FC 6964656E74             .SDATA      "identifier expected"
+             6966696572   
+             2065787065   
+             63746564     
+    0000010F 00                     .DATA.B     H'00
+    00000110              L603:
+    00000110 636F6D6D61             .SDATA      "comma expected"
+             2065787065   
+             63746564     
+    0000011E 00                     .DATA.B     H'00
+    0000011F 00000001               .RES.B      1
+    00000120              L619:
+    00000120 6261642074             .SDATA      "bad type declaration"
+             7970652064   
+             65636C6172   
+             6174696F6E   
+    00000134 00                     .DATA.B     H'00
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE   40
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000135 00000001               .RES.B      1
+    00000136 00000002               .RES.W      1
+    00000138              L629:
+    00000138 275D272065             .SDATA      "']' expected"
+             7870656374   
+             6564         
+    00000144 00                     .DATA.B     H'00
+    00000145 00000001               .RES.B      1
+    00000146 00000002               .RES.W      1
+    00000148              L642:
+    00000148 2729272065             .SDATA      "')' expected"
+             7870656374   
+             6564         
+    00000154 00                     .DATA.B     H'00
+D   00000000              __$TempNameBuf$569:              ; static: TempNameBuf
+    00000000 5E73303030             .SDATA      "^s0000"
+             30           
+    00000006 00                     .DATA.B     H'00
+    00000007              __$TempNameBuf$596:              ; static: TempNameBuf
+    00000007 5E65303030             .SDATA      "^e0000"
+             30           
+    0000000D 00                     .DATA.B     H'00
+B   00000000              _UberType:                       ; static: UberType
+    00000000 0000002C               .RES.L      11
+    0000002C              _IntType:                        ; static: IntType
+    0000002C 0000002C               .RES.L      11
+    00000058              _CharType:                       ; static: CharType
+    00000058 0000002C               .RES.L      11
+    00000084              _FPType:                         ; static: FPType
+    00000084 0000002C               .RES.L      11
+    000000B0              _VoidType:                       ; static: VoidType
+    000000B0 0000002C               .RES.L      11
+    000000DC              _TypeType:                       ; static: TypeType
+    000000DC 0000002C               .RES.L      11
+    00000108              _FunctionType:                   ; static: FunctionType
+    00000108 0000002C               .RES.L      11
+    00000134              _MacroType:                      ; static: MacroType
+    00000134 0000002C               .RES.L      11
+    00000160              _GotoLabelType:                  ; static: GotoLabelType
+    00000160 0000002C               .RES.L      11
+    0000018C              _CharPtrType:                    ; static: CharPtrType
+    0000018C 00000004               .RES.L      1
+    00000190              _CharPtrPtrType:                 ; static: CharPtrPtrType
+    00000190 00000004               .RES.L      1
+    00000194              _CharArrayType:                  ; static: CharArrayType
+    00000194 00000004               .RES.L      1
+    00000198              _VoidPtrType:                    ; static: VoidPtrType
+    00000198 00000004               .RES.L      1
+    0000019C              _ShortType:                      ; static: ShortType
+    0000019C 0000002C               .RES.L      11
+    000001C8              _LongType:                       ; static: LongType
+    000001C8 0000002C               .RES.L      11
+    000001F4              _UnsignedIntType:                ; static: UnsignedIntType
+    000001F4 0000002C               .RES.L      11
+    00000220              _UnsignedShortType:              ; static: UnsignedShortType
+    00000220 0000002C               .RES.L      11
+    0000024C              _UnsignedLongType:               ; static: UnsignedLongType
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE   41
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    0000024C 0000002C               .RES.L      11
+    00000278              _EnumType:                       ; static: EnumType
+    00000278 0000002C               .RES.L      11
+    000002A4              __$PointerAlignBytes:            ; static: PointerAlignBytes
+    000002A4 00000004               .RES.L      1
+    000002A8              __$IntAlignBytes:                ; static: IntAlignBytes
+    000002A8 00000004               .RES.L      1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:25  PAGE    1
+
+
+******** STATISTICS INFORMATION ********
+
+
+********** ERROR INFORMATION ***********
+
+NUMBER OF ERRORS:           0
+NUMBER OF WARNINGS:         0
+
+
+
+
+******* SOURCE LINE INFORMATION ********
+
+COMPILED SOURCE LINE:      536
+
+
+
+******* SECTION SIZE INFORMATION *******
+
+PROGRAM  SECTION (P):                               00000BF0 Byte(s)
+CONSTANT SECTION (C):                               00000155 Byte(s)
+DATA     SECTION (D):                               0000000E Byte(s)
+BSS      SECTION (B):                               000002AC Byte(s)
+
+ TOTAL PROGRAM SIZE: 00000FFF Byte(s)
+
+
+
+********** LABEL INFORMATION ***********
+
+NUMBER OF EXTERNAL REFERENCE SYMBOLS:           18
+NUMBER OF EXTERNAL DEFINITION SYMBOLS:          35
+NUMBER OF INTERNAL/EXTERNAL SYMBOLS:           167
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*** COMMAND PARAMETER ***
+
+
+  -subcommand=C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\hmk347.tmp 
+

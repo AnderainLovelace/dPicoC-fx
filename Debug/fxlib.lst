@@ -1,0 +1,2711 @@
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE    1
+
+************ OBJECT LISTING ************
+
+FILE NAME: E:\Anderain\fx-9860\dPicoc\fxlib\fxlib.c
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+         fxlib.c     1    /* stdio.h library for large systems - small embedded systems use clibrary.c instead */
+         fxlib.c     2    #include <errno.h>
+         fxlib.c     3    #include <fxlib.h>
+         fxlib.c     4    #include "../interpreter.h"
+         fxlib.c     5    
+         fxlib.c     6    static int ZeroValue = 0;
+         fxlib.c     7    // AllClr
+         fxlib.c     8    void FxlibBdisp_AllClr_DD(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int 
+                         +NumArgs)
+P   00000000              _FxlibBdisp_AllClr_DD:           ; function: FxlibBdisp_AllClr_DD
+                                                           ; frame size=0
+         fxlib.c     9    {
+         fxlib.c    10            Bdisp_AllClr_DD();
+    00000000 D3C2                   MOV.L       L1016+2,R3 ; _Bdisp_AllClr_DD
+    00000002 432B                   JMP         @R3
+    00000004 0009                   NOP
+         fxlib.c    11    }
+         fxlib.c    12    
+         fxlib.c    13    void FxlibBdisp_AllClr_VRAM(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, in
+                         +t NumArgs)
+    00000006              _FxlibBdisp_AllClr_VRAM:         ; function: FxlibBdisp_AllClr_VRAM
+                                                           ; frame size=0
+         fxlib.c    14    {
+         fxlib.c    15            Bdisp_AllClr_VRAM();
+    00000006 D3C2                   MOV.L       L1016+6,R3 ; _Bdisp_AllClr_VRAM
+    00000008 432B                   JMP         @R3
+    0000000A 0009                   NOP
+         fxlib.c    16    }
+         fxlib.c    17    void FxlibBdisp_AllClr_DDVRAM(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, 
+                         +int NumArgs)
+    0000000C              _FxlibBdisp_AllClr_DDVRAM:       ; function: FxlibBdisp_AllClr_DDVRAM
+                                                           ; frame size=0
+         fxlib.c    18    {
+         fxlib.c    19            Bdisp_AllClr_DDVRAM();
+    0000000C D3C1                   MOV.L       L1016+10,R3; _Bdisp_AllClr_DDVRAM
+    0000000E 432B                   JMP         @R3
+    00000010 0009                   NOP
+         fxlib.c    20    }
+         fxlib.c    21    void FxlibBdisp_AreaClr_DD(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int
+                         + NumArgs)
+    00000012              _FxlibBdisp_AreaClr_DD:          ; function: FxlibBdisp_AreaClr_DD
+                                                           ; frame size=4
+         fxlib.c    22    {
+         fxlib.c    23            Bdisp_AreaClr_DD(Param[0]->Val->Pointer);
+    00000012 6463                   MOV         R6,R4
+    00000014 D3C0                   MOV.L       L1016+14,R3; _Bdisp_AreaClr_DD
+    00000016 2F66                   MOV.L       R6,@-R15
+    00000018 6442                   MOV.L       @R4,R4
+    0000001A 5441                   MOV.L       @(4,R4),R4
+    0000001C 6442                   MOV.L       @R4,R4
+    0000001E 432B                   JMP         @R3
+    00000020 7F04                   ADD         #4,R15
+         fxlib.c    24    }
+         fxlib.c    25    
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE    2
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+         fxlib.c    26    void FxlibBdisp_AreaClr_VRAM(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, i
+                         +nt NumArgs)
+    00000022              _FxlibBdisp_AreaClr_VRAM:        ; function: FxlibBdisp_AreaClr_VRAM
+                                                           ; frame size=4
+         fxlib.c    27    {
+         fxlib.c    28            Bdisp_AreaClr_VRAM(Param[0]->Val->Pointer);
+    00000022 6463                   MOV         R6,R4
+    00000024 D3BD                   MOV.L       L1016+18,R3; _Bdisp_AreaClr_VRAM
+    00000026 2F66                   MOV.L       R6,@-R15
+    00000028 6442                   MOV.L       @R4,R4
+    0000002A 5441                   MOV.L       @(4,R4),R4
+    0000002C 6442                   MOV.L       @R4,R4
+    0000002E 432B                   JMP         @R3
+    00000030 7F04                   ADD         #4,R15
+         fxlib.c    29    }
+         fxlib.c    30    void FxlibBdisp_AreaClr_DDVRAM(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param,
+                         + int NumArgs)
+    00000032              _FxlibBdisp_AreaClr_DDVRAM:      ; function: FxlibBdisp_AreaClr_DDVRAM
+                                                           ; frame size=4
+         fxlib.c    31    {
+         fxlib.c    32            Bdisp_AreaClr_DDVRAM(Param[0]->Val->Pointer);
+    00000032 6463                   MOV         R6,R4
+    00000034 D3BA                   MOV.L       L1016+22,R3; _Bdisp_AreaClr_DDVRAM
+    00000036 2F66                   MOV.L       R6,@-R15
+    00000038 6442                   MOV.L       @R4,R4
+    0000003A 5441                   MOV.L       @(4,R4),R4
+    0000003C 6442                   MOV.L       @R4,R4
+    0000003E 432B                   JMP         @R3
+    00000040 7F04                   ADD         #4,R15
+         fxlib.c    33    }
+         fxlib.c    34    void FxlibBdisp_AreaReverseVRAM(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param
+                         +, int NumArgs)
+    00000042              _FxlibBdisp_AreaReverseVRAM:     ; function: FxlibBdisp_AreaReverseVRAM
+                                                           ; frame size=4
+    00000042 2FE6                   MOV.L       R14,@-R15
+         fxlib.c    35    {
+         fxlib.c    36            Bdisp_AreaReverseVRAM(Param[0]->Val->Integer,Param[1]->Val->Integer,Param[2]->Val->Integer,Param[3
+                         +]->Val->Integer);
+    00000044 D3B7                   MOV.L       L1016+26,R3; _Bdisp_AreaReverseVRAM
+    00000046 6E63                   MOV         R6,R14
+    00000048 57E3                   MOV.L       @(12,R14),R7
+    0000004A 5771                   MOV.L       @(4,R7),R7
+    0000004C 56E2                   MOV.L       @(8,R14),R6
+    0000004E 6772                   MOV.L       @R7,R7
+    00000050 5661                   MOV.L       @(4,R6),R6
+    00000052 6662                   MOV.L       @R6,R6
+    00000054 55E1                   MOV.L       @(4,R14),R5
+    00000056 5551                   MOV.L       @(4,R5),R5
+    00000058 64E2                   MOV.L       @R14,R4
+    0000005A 6552                   MOV.L       @R5,R5
+    0000005C 5441                   MOV.L       @(4,R4),R4
+    0000005E 6442                   MOV.L       @R4,R4
+    00000060 432B                   JMP         @R3
+    00000062 6EF6                   MOV.L       @R15+,R14
+         fxlib.c    37    }
+         fxlib.c    38    void FxlibBdisp_GetDisp_DD(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int
+                         + NumArgs)
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE    3
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000064              _FxlibBdisp_GetDisp_DD:          ; function: FxlibBdisp_GetDisp_DD
+                                                           ; frame size=4
+    00000064 2F66                   MOV.L       R6,@-R15
+         fxlib.c    39    {
+         fxlib.c    40            Bdisp_GetDisp_DD(Param[0]->Val->Pointer);
+    00000066 6463                   MOV         R6,R4
+    00000068 D3AF                   MOV.L       L1016+30,R3; _Bdisp_GetDisp_DD
+    0000006A 6442                   MOV.L       @R4,R4
+    0000006C 5441                   MOV.L       @(4,R4),R4
+    0000006E 6442                   MOV.L       @R4,R4
+    00000070 432B                   JMP         @R3
+    00000072 7F04                   ADD         #4,R15
+         fxlib.c    41    }
+         fxlib.c    42    void FxlibBdisp_GetDisp_VRAM(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, i
+                         +nt NumArgs)
+    00000074              _FxlibBdisp_GetDisp_VRAM:        ; function: FxlibBdisp_GetDisp_VRAM
+                                                           ; frame size=4
+    00000074 2F66                   MOV.L       R6,@-R15
+         fxlib.c    43    {
+         fxlib.c    44            Bdisp_GetDisp_VRAM(Param[0]->Val->Pointer);
+    00000076 6463                   MOV         R6,R4
+    00000078 D3AC                   MOV.L       L1016+34,R3; _Bdisp_GetDisp_VRAM
+    0000007A 6442                   MOV.L       @R4,R4
+    0000007C 5441                   MOV.L       @(4,R4),R4
+    0000007E 6442                   MOV.L       @R4,R4
+    00000080 432B                   JMP         @R3
+    00000082 7F04                   ADD         #4,R15
+         fxlib.c    45    }
+         fxlib.c    46    void FxlibBdisp_PutDisp_DD(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int
+                         + NumArgs)
+    00000084              _FxlibBdisp_PutDisp_DD:          ; function: FxlibBdisp_PutDisp_DD
+                                                           ; frame size=0
+         fxlib.c    47    {
+         fxlib.c    48            Bdisp_PutDisp_DD();
+    00000084 D3AA                   MOV.L       L1016+38,R3; _Bdisp_PutDisp_DD
+    00000086 432B                   JMP         @R3
+    00000088 0009                   NOP
+         fxlib.c    49    }
+         fxlib.c    50    void FxlibBdisp_PutDispArea_DD(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param,
+                         + int NumArgs)
+    0000008A              _FxlibBdisp_PutDispArea_DD:      ; function: FxlibBdisp_PutDispArea_DD
+                                                           ; frame size=4
+         fxlib.c    51    {
+         fxlib.c    52            Bdisp_PutDispArea_DD(Param[0]->Val->Pointer);
+    0000008A 6463                   MOV         R6,R4
+    0000008C D3A9                   MOV.L       L1016+42,R3; _Bdisp_PutDispArea_DD
+    0000008E 2F66                   MOV.L       R6,@-R15
+    00000090 6442                   MOV.L       @R4,R4
+    00000092 5441                   MOV.L       @(4,R4),R4
+    00000094 6442                   MOV.L       @R4,R4
+    00000096 432B                   JMP         @R3
+    00000098 7F04                   ADD         #4,R15
+         fxlib.c    53    }
+         fxlib.c    54    void FxlibBdisp_SetPoint_DD(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, in
+                         +t NumArgs)
+    0000009A              _FxlibBdisp_SetPoint_DD:         ; function: FxlibBdisp_SetPoint_DD
+                                                           ; frame size=4
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE    4
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    0000009A 2FE6                   MOV.L       R14,@-R15
+         fxlib.c    55    {
+         fxlib.c    56            Bdisp_SetPoint_DD(Param[0]->Val->Integer,Param[1]->Val->Integer,Param[2]->Val->Integer);
+    0000009C D3A6                   MOV.L       L1016+46,R3; _Bdisp_SetPoint_DD
+    0000009E 6E63                   MOV         R6,R14
+    000000A0 56E2                   MOV.L       @(8,R14),R6
+    000000A2 5661                   MOV.L       @(4,R6),R6
+    000000A4 55E1                   MOV.L       @(4,R14),R5
+    000000A6 6662                   MOV.L       @R6,R6
+    000000A8 5551                   MOV.L       @(4,R5),R5
+    000000AA 6552                   MOV.L       @R5,R5
+    000000AC 64E2                   MOV.L       @R14,R4
+    000000AE 5441                   MOV.L       @(4,R4),R4
+    000000B0 6442                   MOV.L       @R4,R4
+    000000B2 432B                   JMP         @R3
+    000000B4 6EF6                   MOV.L       @R15+,R14
+         fxlib.c    57    }
+         fxlib.c    58    void FxlibBdisp_SetPoint_VRAM(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, 
+                         +int NumArgs)
+    000000B6              _FxlibBdisp_SetPoint_VRAM:       ; function: FxlibBdisp_SetPoint_VRAM
+                                                           ; frame size=4
+    000000B6 2FE6                   MOV.L       R14,@-R15
+         fxlib.c    59    {
+         fxlib.c    60            Bdisp_SetPoint_VRAM(Param[0]->Val->Integer,Param[1]->Val->Integer,Param[2]->Val->Integer);
+    000000B8 D3A0                   MOV.L       L1016+50,R3; _Bdisp_SetPoint_VRAM
+    000000BA 6E63                   MOV         R6,R14
+    000000BC 56E2                   MOV.L       @(8,R14),R6
+    000000BE 5661                   MOV.L       @(4,R6),R6
+    000000C0 55E1                   MOV.L       @(4,R14),R5
+    000000C2 6662                   MOV.L       @R6,R6
+    000000C4 5551                   MOV.L       @(4,R5),R5
+    000000C6 6552                   MOV.L       @R5,R5
+    000000C8 64E2                   MOV.L       @R14,R4
+    000000CA 5441                   MOV.L       @(4,R4),R4
+    000000CC 6442                   MOV.L       @R4,R4
+    000000CE 432B                   JMP         @R3
+    000000D0 6EF6                   MOV.L       @R15+,R14
+         fxlib.c    61    }
+         fxlib.c    62    void FxlibBdisp_SetPoint_DDVRAM(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param
+                         +, int NumArgs)
+    000000D2              _FxlibBdisp_SetPoint_DDVRAM:     ; function: FxlibBdisp_SetPoint_DDVRAM
+                                                           ; frame size=4
+    000000D2 2FE6                   MOV.L       R14,@-R15
+         fxlib.c    63    {
+         fxlib.c    64            Bdisp_SetPoint_DDVRAM(Param[0]->Val->Integer,Param[1]->Val->Integer,Param[2]->Val->Integer);
+    000000D4 D39A                   MOV.L       L1016+54,R3; _Bdisp_SetPoint_DDVRAM
+    000000D6 6E63                   MOV         R6,R14
+    000000D8 56E2                   MOV.L       @(8,R14),R6
+    000000DA 5661                   MOV.L       @(4,R6),R6
+    000000DC 55E1                   MOV.L       @(4,R14),R5
+    000000DE 6662                   MOV.L       @R6,R6
+    000000E0 5551                   MOV.L       @(4,R5),R5
+    000000E2 6552                   MOV.L       @R5,R5
+    000000E4 64E2                   MOV.L       @R14,R4
+    000000E6 5441                   MOV.L       @(4,R4),R4
+    000000E8 6442                   MOV.L       @R4,R4
+    000000EA 432B                   JMP         @R3
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE    5
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000000EC 6EF6                   MOV.L       @R15+,R14
+         fxlib.c    65    }
+         fxlib.c    66    void FxlibBdisp_GetPoint_VRAM(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, 
+                         +int NumArgs)
+    000000EE              _FxlibBdisp_GetPoint_VRAM:       ; function: FxlibBdisp_GetPoint_VRAM
+                                                           ; frame size=16
+         fxlib.c    67    {
+         fxlib.c    68            ReturnValue->Val->Integer = Bdisp_GetPoint_VRAM(Param[0]->Val->Integer,Param[1]->Val->Integer);
+    000000EE 6163                   MOV         R6,R1
+    000000F0 2F86                   MOV.L       R8,@-R15
+    000000F2 6463                   MOV         R6,R4
+    000000F4 4F22                   STS.L       PR,@-R15
+    000000F6 7FF8                   ADD         #-8,R15
+    000000F8 1F51                   MOV.L       R5,@(4,R15)
+    000000FA 2F62                   MOV.L       R6,@R15
+    000000FC 53F1                   MOV.L       @(4,R15),R3
+    000000FE 5831                   MOV.L       @(4,R3),R8
+    00000100 5511                   MOV.L       @(4,R1),R5
+    00000102 5551                   MOV.L       @(4,R5),R5
+    00000104 6442                   MOV.L       @R4,R4
+    00000106 6552                   MOV.L       @R5,R5
+    00000108 5441                   MOV.L       @(4,R4),R4
+    0000010A D38E                   MOV.L       L1016+58,R3; _Bdisp_GetPoint_VRAM
+    0000010C 430B                   JSR         @R3
+    0000010E 6442                   MOV.L       @R4,R4
+    00000110 2802                   MOV.L       R0,@R8
+         fxlib.c    69    }
+    00000112 7F08                   ADD         #8,R15
+    00000114 4F26                   LDS.L       @R15+,PR
+    00000116 000B                   RTS
+    00000118 68F6                   MOV.L       @R15+,R8
+         fxlib.c    70    void FxlibBdisp_WriteGraph_DD(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, 
+                         +int NumArgs)
+    0000011A              _FxlibBdisp_WriteGraph_DD:       ; function: FxlibBdisp_WriteGraph_DD
+                                                           ; frame size=4
+         fxlib.c    71    {
+         fxlib.c    72            Bdisp_WriteGraph_DD(Param[0]->Val->Pointer);
+    0000011A 6463                   MOV         R6,R4
+    0000011C D38A                   MOV.L       L1016+62,R3; _Bdisp_WriteGraph_DD
+    0000011E 2F66                   MOV.L       R6,@-R15
+    00000120 6442                   MOV.L       @R4,R4
+    00000122 5441                   MOV.L       @(4,R4),R4
+    00000124 6442                   MOV.L       @R4,R4
+    00000126 432B                   JMP         @R3
+    00000128 7F04                   ADD         #4,R15
+         fxlib.c    73    }
+         fxlib.c    74    void FxlibBdisp_WriteGraph_VRAM(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param
+                         +, int NumArgs)
+    0000012A              _FxlibBdisp_WriteGraph_VRAM:     ; function: FxlibBdisp_WriteGraph_VRAM
+                                                           ; frame size=4
+         fxlib.c    75    {
+         fxlib.c    76            Bdisp_WriteGraph_VRAM(Param[0]->Val->Pointer);
+    0000012A 6463                   MOV         R6,R4
+    0000012C D387                   MOV.L       L1016+66,R3; _Bdisp_WriteGraph_VRAM
+    0000012E 2F66                   MOV.L       R6,@-R15
+    00000130 6442                   MOV.L       @R4,R4
+    00000132 5441                   MOV.L       @(4,R4),R4
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE    6
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000134 6442                   MOV.L       @R4,R4
+    00000136 432B                   JMP         @R3
+    00000138 7F04                   ADD         #4,R15
+         fxlib.c    77    }
+         fxlib.c    78    void FxlibBdisp_WriteGraph_DDVRAM(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Par
+                         +am, int NumArgs)
+    0000013A              _FxlibBdisp_WriteGraph_DDVRAM:   ; function: FxlibBdisp_WriteGraph_DDVRAM
+                                                           ; frame size=4
+         fxlib.c    79    {
+         fxlib.c    80            Bdisp_WriteGraph_DDVRAM(Param[0]->Val->Pointer);
+    0000013A 6463                   MOV         R6,R4
+    0000013C D384                   MOV.L       L1016+70,R3; _Bdisp_WriteGraph_DDVRAM
+    0000013E 2F66                   MOV.L       R6,@-R15
+    00000140 6442                   MOV.L       @R4,R4
+    00000142 5441                   MOV.L       @(4,R4),R4
+    00000144 6442                   MOV.L       @R4,R4
+    00000146 432B                   JMP         @R3
+    00000148 7F04                   ADD         #4,R15
+         fxlib.c    81    }
+         fxlib.c    82    
+         fxlib.c    83    void FxlibBdisp_ReadArea_DD(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, in
+                         +t NumArgs)
+    0000014A              _FxlibBdisp_ReadArea_DD:         ; function: FxlibBdisp_ReadArea_DD
+                                                           ; frame size=4
+         fxlib.c    84    {
+         fxlib.c    85            Bdisp_ReadArea_DD(Param[0]->Val->Pointer,Param[1]->Val->Pointer);
+    0000014A 6363                   MOV         R6,R3
+    0000014C 2F66                   MOV.L       R6,@-R15
+    0000014E 6463                   MOV         R6,R4
+    00000150 5531                   MOV.L       @(4,R3),R5
+    00000152 5551                   MOV.L       @(4,R5),R5
+    00000154 6442                   MOV.L       @R4,R4
+    00000156 6552                   MOV.L       @R5,R5
+    00000158 5441                   MOV.L       @(4,R4),R4
+    0000015A 6442                   MOV.L       @R4,R4
+    0000015C D37D                   MOV.L       L1016+74,R3; _Bdisp_ReadArea_DD
+    0000015E 432B                   JMP         @R3
+    00000160 7F04                   ADD         #4,R15
+         fxlib.c    86    }
+         fxlib.c    87    void FxlibBdisp_ReadArea_VRAM(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, 
+                         +int NumArgs)
+    00000162              _FxlibBdisp_ReadArea_VRAM:       ; function: FxlibBdisp_ReadArea_VRAM
+                                                           ; frame size=4
+         fxlib.c    88    {
+         fxlib.c    89            Bdisp_ReadArea_VRAM(Param[0]->Val->Pointer,Param[1]->Val->Pointer);
+    00000162 6363                   MOV         R6,R3
+    00000164 2F66                   MOV.L       R6,@-R15
+    00000166 6463                   MOV         R6,R4
+    00000168 5531                   MOV.L       @(4,R3),R5
+    0000016A 5551                   MOV.L       @(4,R5),R5
+    0000016C 6442                   MOV.L       @R4,R4
+    0000016E 6552                   MOV.L       @R5,R5
+    00000170 5441                   MOV.L       @(4,R4),R4
+    00000172 6442                   MOV.L       @R4,R4
+    00000174 D378                   MOV.L       L1016+78,R3; _Bdisp_ReadArea_VRAM
+    00000176 432B                   JMP         @R3
+    00000178 7F04                   ADD         #4,R15
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE    7
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+         fxlib.c    90    }
+         fxlib.c    91    void FxlibBdisp_DrawLineVRAM(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, i
+                         +nt NumArgs)
+    0000017A              _FxlibBdisp_DrawLineVRAM:        ; function: FxlibBdisp_DrawLineVRAM
+                                                           ; frame size=4
+    0000017A 2FE6                   MOV.L       R14,@-R15
+         fxlib.c    92    {
+         fxlib.c    93            Bdisp_DrawLineVRAM(Param[0]->Val->Integer,Param[1]->Val->Integer,Param[2]->Val->Integer,Param[3]->
+                         +Val->Integer);
+    0000017C D377                   MOV.L       L1016+82,R3; _Bdisp_DrawLineVRAM
+    0000017E 6E63                   MOV         R6,R14
+    00000180 57E3                   MOV.L       @(12,R14),R7
+    00000182 5771                   MOV.L       @(4,R7),R7
+    00000184 56E2                   MOV.L       @(8,R14),R6
+    00000186 6772                   MOV.L       @R7,R7
+    00000188 5661                   MOV.L       @(4,R6),R6
+    0000018A 6662                   MOV.L       @R6,R6
+    0000018C 55E1                   MOV.L       @(4,R14),R5
+    0000018E 5551                   MOV.L       @(4,R5),R5
+    00000190 64E2                   MOV.L       @R14,R4
+    00000192 6552                   MOV.L       @R5,R5
+    00000194 5441                   MOV.L       @(4,R4),R4
+    00000196 6442                   MOV.L       @R4,R4
+    00000198 432B                   JMP         @R3
+    0000019A 6EF6                   MOV.L       @R15+,R14
+         fxlib.c    94    }
+         fxlib.c    95    void FxlibBdisp_ClearLineVRAM(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, 
+                         +int NumArgs)
+    0000019C              _FxlibBdisp_ClearLineVRAM:       ; function: FxlibBdisp_ClearLineVRAM
+                                                           ; frame size=4
+    0000019C 2FE6                   MOV.L       R14,@-R15
+    0000019E 6E63                   MOV         R6,R14
+         fxlib.c    96    {
+         fxlib.c    97            Bdisp_ClearLineVRAM(Param[0]->Val->Integer,Param[1]->Val->Integer,Param[2]->Val->Integer,Param[3]-
+                         +>Val->Integer);
+    000001A0 D36F                   MOV.L       L1016+86,R3; _Bdisp_ClearLineVRAM
+    000001A2 57E3                   MOV.L       @(12,R14),R7
+    000001A4 56E2                   MOV.L       @(8,R14),R6
+    000001A6 5771                   MOV.L       @(4,R7),R7
+    000001A8 5661                   MOV.L       @(4,R6),R6
+    000001AA 6772                   MOV.L       @R7,R7
+    000001AC 6662                   MOV.L       @R6,R6
+    000001AE 55E1                   MOV.L       @(4,R14),R5
+    000001B0 64E2                   MOV.L       @R14,R4
+    000001B2 5551                   MOV.L       @(4,R5),R5
+    000001B4 5441                   MOV.L       @(4,R4),R4
+    000001B6 6552                   MOV.L       @R5,R5
+    000001B8 6442                   MOV.L       @R4,R4
+    000001BA 432B                   JMP         @R3
+    000001BC 6EF6                   MOV.L       @R15+,R14
+         fxlib.c    98    }
+         fxlib.c    99    
+         fxlib.c   100    void FxlibLocate                (struct ParseState *Parser, struct Value *ReturnValue, struct Value **Para
+                         +m, int NumArgs)
+    000001BE              _FxlibLocate:                    ; function: FxlibLocate
+                                                           ; frame size=4
+         fxlib.c   101    {
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE    8
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+         fxlib.c   102            locate(Param[0]->Val->Integer,Param[1]->Val->Integer);
+    000001BE 6363                   MOV         R6,R3
+    000001C0 2F66                   MOV.L       R6,@-R15
+    000001C2 6463                   MOV         R6,R4
+    000001C4 5531                   MOV.L       @(4,R3),R5
+    000001C6 5551                   MOV.L       @(4,R5),R5
+    000001C8 6442                   MOV.L       @R4,R4
+    000001CA 6552                   MOV.L       @R5,R5
+    000001CC 5441                   MOV.L       @(4,R4),R4
+    000001CE 6442                   MOV.L       @R4,R4
+    000001D0 D364                   MOV.L       L1016+90,R3; _locate
+    000001D2 432B                   JMP         @R3
+    000001D4 7F04                   ADD         #4,R15
+         fxlib.c   103    }
+         fxlib.c   104    void FxlibPrint                 (struct ParseState *Parser, struct Value *ReturnValue, struct Value **Para
+                         +m, int NumArgs)
+    000001D6              _FxlibPrint:                     ; function: FxlibPrint
+                                                           ; frame size=4
+         fxlib.c   105    {
+         fxlib.c   106            Print(Param[0]->Val->Pointer);
+    000001D6 6463                   MOV         R6,R4
+    000001D8 D363                   MOV.L       L1016+94,R3; _Print
+    000001DA 2F66                   MOV.L       R6,@-R15
+    000001DC 6442                   MOV.L       @R4,R4
+    000001DE 5441                   MOV.L       @(4,R4),R4
+    000001E0 6442                   MOV.L       @R4,R4
+    000001E2 432B                   JMP         @R3
+    000001E4 7F04                   ADD         #4,R15
+         fxlib.c   107    }
+         fxlib.c   108    void FxlibPrintRev              (struct ParseState *Parser, struct Value *ReturnValue, struct Value **Para
+                         +m, int NumArgs)
+    000001E6              _FxlibPrintRev:                  ; function: FxlibPrintRev
+                                                           ; frame size=4
+         fxlib.c   109    {
+         fxlib.c   110            PrintRev(Param[0]->Val->Pointer);
+    000001E6 6463                   MOV         R6,R4
+    000001E8 D360                   MOV.L       L1016+98,R3; _PrintRev
+    000001EA 2F66                   MOV.L       R6,@-R15
+    000001EC 6442                   MOV.L       @R4,R4
+    000001EE 5441                   MOV.L       @(4,R4),R4
+    000001F0 6442                   MOV.L       @R4,R4
+    000001F2 432B                   JMP         @R3
+    000001F4 7F04                   ADD         #4,R15
+         fxlib.c   111    }
+         fxlib.c   112    void FxlibPrintC                (struct ParseState *Parser, struct Value *ReturnValue, struct Value **Para
+                         +m, int NumArgs)
+    000001F6              _FxlibPrintC:                    ; function: FxlibPrintC
+                                                           ; frame size=4
+         fxlib.c   113    {
+         fxlib.c   114            PrintC(Param[0]->Val->Pointer);
+    000001F6 6463                   MOV         R6,R4
+    000001F8 D35D                   MOV.L       L1016+102,R3; _PrintC
+    000001FA 2F66                   MOV.L       R6,@-R15
+    000001FC 6442                   MOV.L       @R4,R4
+    000001FE 5441                   MOV.L       @(4,R4),R4
+    00000200 6442                   MOV.L       @R4,R4
+    00000202 432B                   JMP         @R3
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE    9
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000204 7F04                   ADD         #4,R15
+         fxlib.c   115    }
+         fxlib.c   116    void FxlibPrintRevC             (struct ParseState *Parser, struct Value *ReturnValue, struct Value **Para
+                         +m, int NumArgs)
+    00000206              _FxlibPrintRevC:                 ; function: FxlibPrintRevC
+                                                           ; frame size=4
+         fxlib.c   117    {
+         fxlib.c   118            PrintRevC(Param[0]->Val->Pointer);
+    00000206 6463                   MOV         R6,R4
+    00000208 D35A                   MOV.L       L1016+106,R3; _PrintRevC
+    0000020A 2F66                   MOV.L       R6,@-R15
+    0000020C 6442                   MOV.L       @R4,R4
+    0000020E 5441                   MOV.L       @(4,R4),R4
+    00000210 6442                   MOV.L       @R4,R4
+    00000212 432B                   JMP         @R3
+    00000214 7F04                   ADD         #4,R15
+         fxlib.c   119    }
+         fxlib.c   120    void FxlibPrintLine             (struct ParseState *Parser, struct Value *ReturnValue, struct Value **Para
+                         +m, int NumArgs)
+    00000216              _FxlibPrintLine:                 ; function: FxlibPrintLine
+                                                           ; frame size=4
+         fxlib.c   121    {
+         fxlib.c   122            PrintLine(Param[0]->Val->Pointer,Param[1]->Val->Integer);
+    00000216 6363                   MOV         R6,R3
+    00000218 2F66                   MOV.L       R6,@-R15
+    0000021A 6463                   MOV         R6,R4
+    0000021C 5531                   MOV.L       @(4,R3),R5
+    0000021E 5551                   MOV.L       @(4,R5),R5
+    00000220 6442                   MOV.L       @R4,R4
+    00000222 6552                   MOV.L       @R5,R5
+    00000224 5441                   MOV.L       @(4,R4),R4
+    00000226 6442                   MOV.L       @R4,R4
+    00000228 D353                   MOV.L       L1016+110,R3; _PrintLine
+    0000022A 432B                   JMP         @R3
+    0000022C 7F04                   ADD         #4,R15
+         fxlib.c   123    }
+         fxlib.c   124    void FxlibPrintRLine    (struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int N
+                         +umArgs)
+    0000022E              _FxlibPrintRLine:                ; function: FxlibPrintRLine
+                                                           ; frame size=4
+         fxlib.c   125    {
+         fxlib.c   126            PrintRLine(Param[0]->Val->Pointer,Param[1]->Val->Integer);
+    0000022E 6363                   MOV         R6,R3
+    00000230 2F66                   MOV.L       R6,@-R15
+    00000232 6463                   MOV         R6,R4
+    00000234 5531                   MOV.L       @(4,R3),R5
+    00000236 5551                   MOV.L       @(4,R5),R5
+    00000238 6442                   MOV.L       @R4,R4
+    0000023A 6552                   MOV.L       @R5,R5
+    0000023C 5441                   MOV.L       @(4,R4),R4
+    0000023E 6442                   MOV.L       @R4,R4
+    00000240 D34E                   MOV.L       L1016+114,R3; _PrintRLine
+    00000242 432B                   JMP         @R3
+    00000244 7F04                   ADD         #4,R15
+         fxlib.c   127    }
+         fxlib.c   128    void FxlibPrintXY               (struct ParseState *Parser, struct Value *ReturnValue, struct Value **Para
+                         +m, int NumArgs)
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE   10
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000246              _FxlibPrintXY:                   ; function: FxlibPrintXY
+                                                           ; frame size=4
+    00000246 2FE6                   MOV.L       R14,@-R15
+         fxlib.c   129    {
+         fxlib.c   130            PrintXY(Param[0]->Val->Integer,Param[1]->Val->Integer,Param[2]->Val->Pointer,Param[3]->Val->Intege
+                         +r);
+    00000248 D34D                   MOV.L       L1016+118,R3; _PrintXY
+    0000024A 6E63                   MOV         R6,R14
+    0000024C 57E3                   MOV.L       @(12,R14),R7
+    0000024E 5771                   MOV.L       @(4,R7),R7
+    00000250 56E2                   MOV.L       @(8,R14),R6
+    00000252 6772                   MOV.L       @R7,R7
+    00000254 5661                   MOV.L       @(4,R6),R6
+    00000256 6662                   MOV.L       @R6,R6
+    00000258 55E1                   MOV.L       @(4,R14),R5
+    0000025A 5551                   MOV.L       @(4,R5),R5
+    0000025C 64E2                   MOV.L       @R14,R4
+    0000025E 6552                   MOV.L       @R5,R5
+    00000260 5441                   MOV.L       @(4,R4),R4
+    00000262 6442                   MOV.L       @R4,R4
+    00000264 432B                   JMP         @R3
+    00000266 6EF6                   MOV.L       @R15+,R14
+         fxlib.c   131    }
+         fxlib.c   132    void FxlibPrintMini             (struct ParseState *Parser, struct Value *ReturnValue, struct Value **Para
+                         +m, int NumArgs)
+    00000268              _FxlibPrintMini:                 ; function: FxlibPrintMini
+                                                           ; frame size=4
+    00000268 2FE6                   MOV.L       R14,@-R15
+    0000026A 6E63                   MOV         R6,R14
+         fxlib.c   133    {
+         fxlib.c   134            PrintMini(Param[0]->Val->Integer,Param[1]->Val->Integer,Param[2]->Val->Pointer,Param[3]->Val->Inte
+                         +ger);
+    0000026C D345                   MOV.L       L1016+122,R3; _PrintMini
+    0000026E 57E3                   MOV.L       @(12,R14),R7
+    00000270 56E2                   MOV.L       @(8,R14),R6
+    00000272 5771                   MOV.L       @(4,R7),R7
+    00000274 5661                   MOV.L       @(4,R6),R6
+    00000276 6772                   MOV.L       @R7,R7
+    00000278 6662                   MOV.L       @R6,R6
+    0000027A 55E1                   MOV.L       @(4,R14),R5
+    0000027C 64E2                   MOV.L       @R14,R4
+    0000027E 5551                   MOV.L       @(4,R5),R5
+    00000280 5441                   MOV.L       @(4,R4),R4
+    00000282 6552                   MOV.L       @R5,R5
+    00000284 6442                   MOV.L       @R4,R4
+    00000286 432B                   JMP         @R3
+    00000288 6EF6                   MOV.L       @R15+,R14
+         fxlib.c   135    }
+         fxlib.c   136    
+         fxlib.c   137    void FxlibSaveDisp              (struct ParseState *Parser, struct Value *ReturnValue, struct Value **Para
+                         +m, int NumArgs)
+    0000028A              _FxlibSaveDisp:                  ; function: FxlibSaveDisp
+                                                           ; frame size=4
+         fxlib.c   138    {
+         fxlib.c   139            SaveDisp(Param[0]->Val->Integer);
+    0000028A 6463                   MOV         R6,R4
+    0000028C D33E                   MOV.L       L1016+126,R3; _SaveDisp
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE   11
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    0000028E 2F66                   MOV.L       R6,@-R15
+    00000290 6442                   MOV.L       @R4,R4
+    00000292 5441                   MOV.L       @(4,R4),R4
+    00000294 6442                   MOV.L       @R4,R4
+    00000296 432B                   JMP         @R3
+    00000298 7F04                   ADD         #4,R15
+         fxlib.c   140    }
+         fxlib.c   141    void FxlibRestoreDisp   (struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int N
+                         +umArgs)
+    0000029A              _FxlibRestoreDisp:               ; function: FxlibRestoreDisp
+                                                           ; frame size=4
+         fxlib.c   142    {
+         fxlib.c   143            RestoreDisp(Param[0]->Val->Integer);
+    0000029A 6463                   MOV         R6,R4
+    0000029C D33B                   MOV.L       L1016+130,R3; _RestoreDisp
+    0000029E 2F66                   MOV.L       R6,@-R15
+    000002A0 6442                   MOV.L       @R4,R4
+    000002A2 5441                   MOV.L       @(4,R4),R4
+    000002A4 6442                   MOV.L       @R4,R4
+    000002A6 432B                   JMP         @R3
+    000002A8 7F04                   ADD         #4,R15
+         fxlib.c   144    }
+         fxlib.c   145    void FxlibPopUpWin              (struct ParseState *Parser, struct Value *ReturnValue, struct Value **Para
+                         +m, int NumArgs)
+    000002AA              _FxlibPopUpWin:                  ; function: FxlibPopUpWin
+                                                           ; frame size=4
+         fxlib.c   146    {
+         fxlib.c   147            PopUpWin(Param[0]->Val->Integer);
+    000002AA 6463                   MOV         R6,R4
+    000002AC D338                   MOV.L       L1016+134,R3; _PopUpWin
+    000002AE 2F66                   MOV.L       R6,@-R15
+    000002B0 6442                   MOV.L       @R4,R4
+    000002B2 5441                   MOV.L       @(4,R4),R4
+    000002B4 6442                   MOV.L       @R4,R4
+    000002B6 432B                   JMP         @R3
+    000002B8 7F04                   ADD         #4,R15
+         fxlib.c   148    }
+         fxlib.c   149    void FxlibBfile_OpenFile                        (struct ParseState *Parser, struct Value *ReturnValue, str
+                         +uct Value **Param, int NumArgs)
+    000002BA              _FxlibBfile_OpenFile:            ; function: FxlibBfile_OpenFile
+                                                           ; frame size=16
+         fxlib.c   150    {
+         fxlib.c   151            ReturnValue->Val->Integer = Bfile_OpenFile(Param[0]->Val->Pointer,Param[1]->Val->Integer);
+    000002BA 6163                   MOV         R6,R1
+    000002BC 2F86                   MOV.L       R8,@-R15
+    000002BE 6463                   MOV         R6,R4
+    000002C0 4F22                   STS.L       PR,@-R15
+    000002C2 7FF8                   ADD         #-8,R15
+    000002C4 1F51                   MOV.L       R5,@(4,R15)
+    000002C6 2F62                   MOV.L       R6,@R15
+    000002C8 53F1                   MOV.L       @(4,R15),R3
+    000002CA 5831                   MOV.L       @(4,R3),R8
+    000002CC 5511                   MOV.L       @(4,R1),R5
+    000002CE 5551                   MOV.L       @(4,R5),R5
+    000002D0 6442                   MOV.L       @R4,R4
+    000002D2 6552                   MOV.L       @R5,R5
+    000002D4 5441                   MOV.L       @(4,R4),R4
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE   12
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000002D6 D32F                   MOV.L       L1016+138,R3; _Bfile_OpenFile
+    000002D8 430B                   JSR         @R3
+    000002DA 6442                   MOV.L       @R4,R4
+    000002DC 2802                   MOV.L       R0,@R8
+         fxlib.c   152    }
+    000002DE 7F08                   ADD         #8,R15
+    000002E0 4F26                   LDS.L       @R15+,PR
+    000002E2 000B                   RTS
+    000002E4 68F6                   MOV.L       @R15+,R8
+         fxlib.c   153    void FxlibBfile_OpenMainMemory          (struct ParseState *Parser, struct Value *ReturnValue, struct Valu
+                         +e **Param, int NumArgs)
+    000002E6              _FxlibBfile_OpenMainMemory:      ; function: FxlibBfile_OpenMainMemory
+                                                           ; frame size=16
+         fxlib.c   154    {
+         fxlib.c   155            ReturnValue->Val->Integer = Bfile_OpenMainMemory(Param[0]->Val->Pointer);
+    000002E6 6463                   MOV         R6,R4
+    000002E8 2F86                   MOV.L       R8,@-R15
+    000002EA 4F22                   STS.L       PR,@-R15
+    000002EC 7FF8                   ADD         #-8,R15
+    000002EE 1F51                   MOV.L       R5,@(4,R15)
+    000002F0 2F62                   MOV.L       R6,@R15
+    000002F2 53F1                   MOV.L       @(4,R15),R3
+    000002F4 6442                   MOV.L       @R4,R4
+    000002F6 5831                   MOV.L       @(4,R3),R8
+    000002F8 5441                   MOV.L       @(4,R4),R4
+    000002FA D327                   MOV.L       L1016+142,R3; _Bfile_OpenMainMemory
+    000002FC 430B                   JSR         @R3
+    000002FE 6442                   MOV.L       @R4,R4
+    00000300 2802                   MOV.L       R0,@R8
+         fxlib.c   156    }
+    00000302 7F08                   ADD         #8,R15
+    00000304 4F26                   LDS.L       @R15+,PR
+    00000306 000B                   RTS
+    00000308 68F6                   MOV.L       @R15+,R8
+    0000030A              L1016:                            
+    0000030A 0000                   .DATA.W     0
+    0000030C <00000000>             .DATA.L     _Bdisp_AllClr_DD
+    00000310 <00000000>             .DATA.L     _Bdisp_AllClr_VRAM
+    00000314 <00000000>             .DATA.L     _Bdisp_AllClr_DDVRAM
+    00000318 <00000000>             .DATA.L     _Bdisp_AreaClr_DD
+    0000031C <00000000>             .DATA.L     _Bdisp_AreaClr_VRAM
+    00000320 <00000000>             .DATA.L     _Bdisp_AreaClr_DDVRAM
+    00000324 <00000000>             .DATA.L     _Bdisp_AreaReverseVRAM
+    00000328 <00000000>             .DATA.L     _Bdisp_GetDisp_DD
+    0000032C <00000000>             .DATA.L     _Bdisp_GetDisp_VRAM
+    00000330 <00000000>             .DATA.L     _Bdisp_PutDisp_DD
+    00000334 <00000000>             .DATA.L     _Bdisp_PutDispArea_DD
+    00000338 <00000000>             .DATA.L     _Bdisp_SetPoint_DD
+    0000033C <00000000>             .DATA.L     _Bdisp_SetPoint_VRAM
+    00000340 <00000000>             .DATA.L     _Bdisp_SetPoint_DDVRAM
+    00000344 <00000000>             .DATA.L     _Bdisp_GetPoint_VRAM
+    00000348 <00000000>             .DATA.L     _Bdisp_WriteGraph_DD
+    0000034C <00000000>             .DATA.L     _Bdisp_WriteGraph_VRAM
+    00000350 <00000000>             .DATA.L     _Bdisp_WriteGraph_DDVRAM
+    00000354 <00000000>             .DATA.L     _Bdisp_ReadArea_DD
+    00000358 <00000000>             .DATA.L     _Bdisp_ReadArea_VRAM
+    0000035C <00000000>             .DATA.L     _Bdisp_DrawLineVRAM
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE   13
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000360 <00000000>             .DATA.L     _Bdisp_ClearLineVRAM
+    00000364 <00000000>             .DATA.L     _locate
+    00000368 <00000000>             .DATA.L     _Print
+    0000036C <00000000>             .DATA.L     _PrintRev
+    00000370 <00000000>             .DATA.L     _PrintC
+    00000374 <00000000>             .DATA.L     _PrintRevC
+    00000378 <00000000>             .DATA.L     _PrintLine
+    0000037C <00000000>             .DATA.L     _PrintRLine
+    00000380 <00000000>             .DATA.L     _PrintXY
+    00000384 <00000000>             .DATA.L     _PrintMini
+    00000388 <00000000>             .DATA.L     _SaveDisp
+    0000038C <00000000>             .DATA.L     _RestoreDisp
+    00000390 <00000000>             .DATA.L     _PopUpWin
+    00000394 <00000000>             .DATA.L     _Bfile_OpenFile
+    00000398 <00000000>             .DATA.L     _Bfile_OpenMainMemory
+         fxlib.c   157    void FxlibBfile_ReadFile                        (struct ParseState *Parser, struct Value *ReturnValue, str
+                         +uct Value **Param, int NumArgs)
+    0000039C              _FxlibBfile_ReadFile:            ; function: FxlibBfile_ReadFile
+                                                           ; frame size=16
+    0000039C 2FE6                   MOV.L       R14,@-R15
+         fxlib.c   158    {
+         fxlib.c   159            ReturnValue->Val->Integer = Bfile_ReadFile(Param[0]->Val->Integer,Param[1]->Val->Pointer,Param[2]-
+                         +>Val->Integer,Param[3]->Val->Integer);
+    0000039E 6353                   MOV         R5,R3
+    000003A0 2F86                   MOV.L       R8,@-R15
+    000003A2 6E63                   MOV         R6,R14
+    000003A4 4F22                   STS.L       PR,@-R15
+    000003A6 7FFC                   ADD         #-4,R15
+    000003A8 2F52                   MOV.L       R5,@R15
+    000003AA 5831                   MOV.L       @(4,R3),R8
+    000003AC 57E3                   MOV.L       @(12,R14),R7
+    000003AE 5771                   MOV.L       @(4,R7),R7
+    000003B0 56E2                   MOV.L       @(8,R14),R6
+    000003B2 6772                   MOV.L       @R7,R7
+    000003B4 5661                   MOV.L       @(4,R6),R6
+    000003B6 6662                   MOV.L       @R6,R6
+    000003B8 55E1                   MOV.L       @(4,R14),R5
+    000003BA 5551                   MOV.L       @(4,R5),R5
+    000003BC 64E2                   MOV.L       @R14,R4
+    000003BE 6552                   MOV.L       @R5,R5
+    000003C0 5441                   MOV.L       @(4,R4),R4
+    000003C2 D3BB                   MOV.L       L1017+2,R3 ; _Bfile_ReadFile
+    000003C4 430B                   JSR         @R3
+    000003C6 6442                   MOV.L       @R4,R4
+    000003C8 2802                   MOV.L       R0,@R8
+         fxlib.c   160    }
+    000003CA 7F04                   ADD         #4,R15
+    000003CC 4F26                   LDS.L       @R15+,PR
+    000003CE 68F6                   MOV.L       @R15+,R8
+    000003D0 000B                   RTS
+    000003D2 6EF6                   MOV.L       @R15+,R14
+         fxlib.c   161    void FxlibBfile_WriteFile                       (struct ParseState *Parser, struct Value *ReturnValue, str
+                         +uct Value **Param, int NumArgs)
+    000003D4              _FxlibBfile_WriteFile:           ; function: FxlibBfile_WriteFile
+                                                           ; frame size=16
+    000003D4 2FE6                   MOV.L       R14,@-R15
+         fxlib.c   162    {
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE   14
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+         fxlib.c   163            ReturnValue->Val->Integer = Bfile_WriteFile(Param[0]->Val->Integer,Param[1]->Val->Pointer,Param[2]
+                         +->Val->Integer);
+    000003D6 6353                   MOV         R5,R3
+    000003D8 2F86                   MOV.L       R8,@-R15
+    000003DA 6E63                   MOV         R6,R14
+    000003DC 4F22                   STS.L       PR,@-R15
+    000003DE 7FFC                   ADD         #-4,R15
+    000003E0 2F52                   MOV.L       R5,@R15
+    000003E2 5831                   MOV.L       @(4,R3),R8
+    000003E4 56E2                   MOV.L       @(8,R14),R6
+    000003E6 5661                   MOV.L       @(4,R6),R6
+    000003E8 55E1                   MOV.L       @(4,R14),R5
+    000003EA 6662                   MOV.L       @R6,R6
+    000003EC 5551                   MOV.L       @(4,R5),R5
+    000003EE 6552                   MOV.L       @R5,R5
+    000003F0 64E2                   MOV.L       @R14,R4
+    000003F2 5441                   MOV.L       @(4,R4),R4
+    000003F4 D3AF                   MOV.L       L1017+6,R3 ; _Bfile_WriteFile
+    000003F6 430B                   JSR         @R3
+    000003F8 6442                   MOV.L       @R4,R4
+    000003FA 2802                   MOV.L       R0,@R8
+         fxlib.c   164    }
+    000003FC 7F04                   ADD         #4,R15
+    000003FE 4F26                   LDS.L       @R15+,PR
+    00000400 68F6                   MOV.L       @R15+,R8
+    00000402 000B                   RTS
+    00000404 6EF6                   MOV.L       @R15+,R14
+         fxlib.c   165    void FxlibBfile_SeekFile                        (struct ParseState *Parser, struct Value *ReturnValue, str
+                         +uct Value **Param, int NumArgs)
+    00000406              _FxlibBfile_SeekFile:            ; function: FxlibBfile_SeekFile
+                                                           ; frame size=16
+         fxlib.c   166    {
+         fxlib.c   167            ReturnValue->Val->Integer = Bfile_SeekFile(Param[0]->Val->Integer,Param[1]->Val->Integer);
+    00000406 6163                   MOV         R6,R1
+    00000408 2F86                   MOV.L       R8,@-R15
+    0000040A 6463                   MOV         R6,R4
+    0000040C 4F22                   STS.L       PR,@-R15
+    0000040E 7FF8                   ADD         #-8,R15
+    00000410 1F51                   MOV.L       R5,@(4,R15)
+    00000412 2F62                   MOV.L       R6,@R15
+    00000414 53F1                   MOV.L       @(4,R15),R3
+    00000416 5831                   MOV.L       @(4,R3),R8
+    00000418 5511                   MOV.L       @(4,R1),R5
+    0000041A 5551                   MOV.L       @(4,R5),R5
+    0000041C 6442                   MOV.L       @R4,R4
+    0000041E 6552                   MOV.L       @R5,R5
+    00000420 5441                   MOV.L       @(4,R4),R4
+    00000422 D3A5                   MOV.L       L1017+10,R3; _Bfile_SeekFile
+    00000424 430B                   JSR         @R3
+    00000426 6442                   MOV.L       @R4,R4
+    00000428 2802                   MOV.L       R0,@R8
+         fxlib.c   168    }
+    0000042A 7F08                   ADD         #8,R15
+    0000042C 4F26                   LDS.L       @R15+,PR
+    0000042E 000B                   RTS
+    00000430 68F6                   MOV.L       @R15+,R8
+         fxlib.c   169    void FxlibBfile_CloseFile                       (struct ParseState *Parser, struct Value *ReturnValue, str
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE   15
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+                         +uct Value **Param, int NumArgs)
+    00000432              _FxlibBfile_CloseFile:           ; function: FxlibBfile_CloseFile
+                                                           ; frame size=16
+         fxlib.c   170    {
+         fxlib.c   171            ReturnValue->Val->Integer = Bfile_CloseFile(Param[0]->Val->Integer);
+    00000432 6463                   MOV         R6,R4
+    00000434 2F86                   MOV.L       R8,@-R15
+    00000436 4F22                   STS.L       PR,@-R15
+    00000438 7FF8                   ADD         #-8,R15
+    0000043A 1F51                   MOV.L       R5,@(4,R15)
+    0000043C 2F62                   MOV.L       R6,@R15
+    0000043E 53F1                   MOV.L       @(4,R15),R3
+    00000440 6442                   MOV.L       @R4,R4
+    00000442 5831                   MOV.L       @(4,R3),R8
+    00000444 5441                   MOV.L       @(4,R4),R4
+    00000446 D39D                   MOV.L       L1017+14,R3; _Bfile_CloseFile
+    00000448 430B                   JSR         @R3
+    0000044A 6442                   MOV.L       @R4,R4
+    0000044C 2802                   MOV.L       R0,@R8
+         fxlib.c   172    }
+    0000044E 7F08                   ADD         #8,R15
+    00000450 4F26                   LDS.L       @R15+,PR
+    00000452 000B                   RTS
+    00000454 68F6                   MOV.L       @R15+,R8
+         fxlib.c   173    void FxlibBfile_GetMediaFree            (struct ParseState *Parser, struct Value *ReturnValue, struct Valu
+                         +e **Param, int NumArgs)
+    00000456              _FxlibBfile_GetMediaFree:        ; function: FxlibBfile_GetMediaFree
+                                                           ; frame size=16
+         fxlib.c   174    {
+         fxlib.c   175            ReturnValue->Val->Integer = Bfile_GetMediaFree(Param[0]->Val->Integer,Param[1]->Val->Pointer);
+    00000456 6163                   MOV         R6,R1
+    00000458 2F86                   MOV.L       R8,@-R15
+    0000045A 6463                   MOV         R6,R4
+    0000045C 4F22                   STS.L       PR,@-R15
+    0000045E 7FF8                   ADD         #-8,R15
+    00000460 1F51                   MOV.L       R5,@(4,R15)
+    00000462 2F62                   MOV.L       R6,@R15
+    00000464 53F1                   MOV.L       @(4,R15),R3
+    00000466 5831                   MOV.L       @(4,R3),R8
+    00000468 5511                   MOV.L       @(4,R1),R5
+    0000046A 5551                   MOV.L       @(4,R5),R5
+    0000046C 6442                   MOV.L       @R4,R4
+    0000046E 6552                   MOV.L       @R5,R5
+    00000470 5441                   MOV.L       @(4,R4),R4
+    00000472 D393                   MOV.L       L1017+18,R3; _Bfile_GetMediaFree
+    00000474 430B                   JSR         @R3
+    00000476 6442                   MOV.L       @R4,R4
+    00000478 2802                   MOV.L       R0,@R8
+         fxlib.c   176    }
+    0000047A 7F08                   ADD         #8,R15
+    0000047C 4F26                   LDS.L       @R15+,PR
+    0000047E 000B                   RTS
+    00000480 68F6                   MOV.L       @R15+,R8
+         fxlib.c   177    void FxlibBfile_GetFileSize                     (struct ParseState *Parser, struct Value *ReturnValue, str
+                         +uct Value **Param, int NumArgs)
+    00000482              _FxlibBfile_GetFileSize:         ; function: FxlibBfile_GetFileSize
+                                                           ; frame size=16
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE   16
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+         fxlib.c   178    {
+         fxlib.c   179            ReturnValue->Val->Integer = Bfile_GetFileSize(Param[0]->Val->Integer);
+    00000482 6463                   MOV         R6,R4
+    00000484 2F86                   MOV.L       R8,@-R15
+    00000486 4F22                   STS.L       PR,@-R15
+    00000488 7FF8                   ADD         #-8,R15
+    0000048A 1F51                   MOV.L       R5,@(4,R15)
+    0000048C 2F62                   MOV.L       R6,@R15
+    0000048E 53F1                   MOV.L       @(4,R15),R3
+    00000490 6442                   MOV.L       @R4,R4
+    00000492 5831                   MOV.L       @(4,R3),R8
+    00000494 5441                   MOV.L       @(4,R4),R4
+    00000496 D38B                   MOV.L       L1017+22,R3; _Bfile_GetFileSize
+    00000498 430B                   JSR         @R3
+    0000049A 6442                   MOV.L       @R4,R4
+    0000049C 2802                   MOV.L       R0,@R8
+         fxlib.c   180    }
+    0000049E 7F08                   ADD         #8,R15
+    000004A0 4F26                   LDS.L       @R15+,PR
+    000004A2 000B                   RTS
+    000004A4 68F6                   MOV.L       @R15+,R8
+         fxlib.c   181    void FxlibBfile_CreateFile                      (struct ParseState *Parser, struct Value *ReturnValue, str
+                         +uct Value **Param, int NumArgs)
+    000004A6              _FxlibBfile_CreateFile:          ; function: FxlibBfile_CreateFile
+                                                           ; frame size=16
+         fxlib.c   182    {
+         fxlib.c   183            ReturnValue->Val->Integer = Bfile_CreateFile(Param[0]->Val->Pointer,Param[1]->Val->Integer);
+    000004A6 6163                   MOV         R6,R1
+    000004A8 2F86                   MOV.L       R8,@-R15
+    000004AA 6463                   MOV         R6,R4
+    000004AC 4F22                   STS.L       PR,@-R15
+    000004AE 7FF8                   ADD         #-8,R15
+    000004B0 1F51                   MOV.L       R5,@(4,R15)
+    000004B2 2F62                   MOV.L       R6,@R15
+    000004B4 53F1                   MOV.L       @(4,R15),R3
+    000004B6 5831                   MOV.L       @(4,R3),R8
+    000004B8 5511                   MOV.L       @(4,R1),R5
+    000004BA 5551                   MOV.L       @(4,R5),R5
+    000004BC 6442                   MOV.L       @R4,R4
+    000004BE 6552                   MOV.L       @R5,R5
+    000004C0 5441                   MOV.L       @(4,R4),R4
+    000004C2 D381                   MOV.L       L1017+26,R3; _Bfile_CreateFile
+    000004C4 430B                   JSR         @R3
+    000004C6 6442                   MOV.L       @R4,R4
+    000004C8 2802                   MOV.L       R0,@R8
+         fxlib.c   184    }
+    000004CA 7F08                   ADD         #8,R15
+    000004CC 4F26                   LDS.L       @R15+,PR
+    000004CE 000B                   RTS
+    000004D0 68F6                   MOV.L       @R15+,R8
+         fxlib.c   185    void FxlibBfile_CreateDirectory         (struct ParseState *Parser, struct Value *ReturnValue, struct Valu
+                         +e **Param, int NumArgs)
+    000004D2              _FxlibBfile_CreateDirectory:     ; function: FxlibBfile_CreateDirectory
+                                                           ; frame size=16
+         fxlib.c   186    {
+         fxlib.c   187            ReturnValue->Val->Integer = Bfile_CreateDirectory(Param[0]->Val->Pointer);
+    000004D2 6463                   MOV         R6,R4
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE   17
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000004D4 2F86                   MOV.L       R8,@-R15
+    000004D6 4F22                   STS.L       PR,@-R15
+    000004D8 7FF8                   ADD         #-8,R15
+    000004DA 1F51                   MOV.L       R5,@(4,R15)
+    000004DC 2F62                   MOV.L       R6,@R15
+    000004DE 53F1                   MOV.L       @(4,R15),R3
+    000004E0 6442                   MOV.L       @R4,R4
+    000004E2 5831                   MOV.L       @(4,R3),R8
+    000004E4 5441                   MOV.L       @(4,R4),R4
+    000004E6 D379                   MOV.L       L1017+30,R3; _Bfile_CreateDirectory
+    000004E8 430B                   JSR         @R3
+    000004EA 6442                   MOV.L       @R4,R4
+    000004EC 2802                   MOV.L       R0,@R8
+         fxlib.c   188    }
+    000004EE 7F08                   ADD         #8,R15
+    000004F0 4F26                   LDS.L       @R15+,PR
+    000004F2 000B                   RTS
+    000004F4 68F6                   MOV.L       @R15+,R8
+         fxlib.c   189    void FxlibBfile_CreateMainMemory        (struct ParseState *Parser, struct Value *ReturnValue, struct Valu
+                         +e **Param, int NumArgs)
+    000004F6              _FxlibBfile_CreateMainMemory:    ; function: FxlibBfile_CreateMainMemory
+                                                           ; frame size=16
+         fxlib.c   190    {
+         fxlib.c   191            ReturnValue->Val->Integer = Bfile_CreateMainMemory(Param[0]->Val->Pointer);
+    000004F6 6463                   MOV         R6,R4
+    000004F8 2F86                   MOV.L       R8,@-R15
+    000004FA 4F22                   STS.L       PR,@-R15
+    000004FC 7FF8                   ADD         #-8,R15
+    000004FE 1F51                   MOV.L       R5,@(4,R15)
+    00000500 2F62                   MOV.L       R6,@R15
+    00000502 53F1                   MOV.L       @(4,R15),R3
+    00000504 6442                   MOV.L       @R4,R4
+    00000506 5831                   MOV.L       @(4,R3),R8
+    00000508 5441                   MOV.L       @(4,R4),R4
+    0000050A D371                   MOV.L       L1017+34,R3; _Bfile_CreateMainMemory
+    0000050C 430B                   JSR         @R3
+    0000050E 6442                   MOV.L       @R4,R4
+    00000510 2802                   MOV.L       R0,@R8
+         fxlib.c   192    }
+    00000512 7F08                   ADD         #8,R15
+    00000514 4F26                   LDS.L       @R15+,PR
+    00000516 000B                   RTS
+    00000518 68F6                   MOV.L       @R15+,R8
+         fxlib.c   193    void FxlibBfile_RenameMainMemory        (struct ParseState *Parser, struct Value *ReturnValue, struct Valu
+                         +e **Param, int NumArgs)
+    0000051A              _FxlibBfile_RenameMainMemory:    ; function: FxlibBfile_RenameMainMemory
+                                                           ; frame size=16
+         fxlib.c   194    {
+         fxlib.c   195            ReturnValue->Val->Integer = Bfile_RenameMainMemory(Param[0]->Val->Pointer,Param[1]->Val->Pointer);
+    0000051A 6163                   MOV         R6,R1
+    0000051C 2F86                   MOV.L       R8,@-R15
+    0000051E 6463                   MOV         R6,R4
+    00000520 4F22                   STS.L       PR,@-R15
+    00000522 7FF8                   ADD         #-8,R15
+    00000524 1F51                   MOV.L       R5,@(4,R15)
+    00000526 2F62                   MOV.L       R6,@R15
+    00000528 53F1                   MOV.L       @(4,R15),R3
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE   18
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    0000052A 5831                   MOV.L       @(4,R3),R8
+    0000052C 5511                   MOV.L       @(4,R1),R5
+    0000052E 5551                   MOV.L       @(4,R5),R5
+    00000530 6442                   MOV.L       @R4,R4
+    00000532 6552                   MOV.L       @R5,R5
+    00000534 5441                   MOV.L       @(4,R4),R4
+    00000536 D367                   MOV.L       L1017+38,R3; _Bfile_RenameMainMemory
+    00000538 430B                   JSR         @R3
+    0000053A 6442                   MOV.L       @R4,R4
+    0000053C 2802                   MOV.L       R0,@R8
+         fxlib.c   196    }
+    0000053E 7F08                   ADD         #8,R15
+    00000540 4F26                   LDS.L       @R15+,PR
+    00000542 000B                   RTS
+    00000544 68F6                   MOV.L       @R15+,R8
+         fxlib.c   197    void FxlibBfile_DeleteFile                      (struct ParseState *Parser, struct Value *ReturnValue, str
+                         +uct Value **Param, int NumArgs)
+    00000546              _FxlibBfile_DeleteFile:          ; function: FxlibBfile_DeleteFile
+                                                           ; frame size=16
+         fxlib.c   198    {
+         fxlib.c   199            ReturnValue->Val->Integer = Bfile_DeleteFile(Param[0]->Val->Pointer);
+    00000546 6463                   MOV         R6,R4
+    00000548 2F86                   MOV.L       R8,@-R15
+    0000054A 4F22                   STS.L       PR,@-R15
+    0000054C 7FF8                   ADD         #-8,R15
+    0000054E 1F51                   MOV.L       R5,@(4,R15)
+    00000550 2F62                   MOV.L       R6,@R15
+    00000552 53F1                   MOV.L       @(4,R15),R3
+    00000554 6442                   MOV.L       @R4,R4
+    00000556 5831                   MOV.L       @(4,R3),R8
+    00000558 5441                   MOV.L       @(4,R4),R4
+    0000055A D35F                   MOV.L       L1017+42,R3; _Bfile_DeleteFile
+    0000055C 430B                   JSR         @R3
+    0000055E 6442                   MOV.L       @R4,R4
+    00000560 2802                   MOV.L       R0,@R8
+         fxlib.c   200    }
+    00000562 7F08                   ADD         #8,R15
+    00000564 4F26                   LDS.L       @R15+,PR
+    00000566 000B                   RTS
+    00000568 68F6                   MOV.L       @R15+,R8
+         fxlib.c   201    void FxlibBfile_DeleteDirectory         (struct ParseState *Parser, struct Value *ReturnValue, struct Valu
+                         +e **Param, int NumArgs)
+    0000056A              _FxlibBfile_DeleteDirectory:     ; function: FxlibBfile_DeleteDirectory
+                                                           ; frame size=16
+         fxlib.c   202    {
+         fxlib.c   203            ReturnValue->Val->Integer = Bfile_DeleteDirectory(Param[0]->Val->Pointer);
+    0000056A 6463                   MOV         R6,R4
+    0000056C 2F86                   MOV.L       R8,@-R15
+    0000056E 4F22                   STS.L       PR,@-R15
+    00000570 7FF8                   ADD         #-8,R15
+    00000572 1F51                   MOV.L       R5,@(4,R15)
+    00000574 2F62                   MOV.L       R6,@R15
+    00000576 53F1                   MOV.L       @(4,R15),R3
+    00000578 6442                   MOV.L       @R4,R4
+    0000057A 5831                   MOV.L       @(4,R3),R8
+    0000057C 5441                   MOV.L       @(4,R4),R4
+    0000057E D357                   MOV.L       L1017+46,R3; _Bfile_DeleteDirectory
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE   19
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000580 430B                   JSR         @R3
+    00000582 6442                   MOV.L       @R4,R4
+    00000584 2802                   MOV.L       R0,@R8
+         fxlib.c   204    }
+    00000586 7F08                   ADD         #8,R15
+    00000588 4F26                   LDS.L       @R15+,PR
+    0000058A 000B                   RTS
+    0000058C 68F6                   MOV.L       @R15+,R8
+         fxlib.c   205    void FxlibBfile_DeleteMainMemory        (struct ParseState *Parser, struct Value *ReturnValue, struct Valu
+                         +e **Param, int NumArgs)
+    0000058E              _FxlibBfile_DeleteMainMemory:    ; function: FxlibBfile_DeleteMainMemory
+                                                           ; frame size=16
+         fxlib.c   206    {
+         fxlib.c   207            ReturnValue->Val->Integer = Bfile_DeleteMainMemory(Param[0]->Val->Pointer);
+    0000058E 6463                   MOV         R6,R4
+    00000590 2F86                   MOV.L       R8,@-R15
+    00000592 4F22                   STS.L       PR,@-R15
+    00000594 7FF8                   ADD         #-8,R15
+    00000596 1F51                   MOV.L       R5,@(4,R15)
+    00000598 2F62                   MOV.L       R6,@R15
+    0000059A 53F1                   MOV.L       @(4,R15),R3
+    0000059C 6442                   MOV.L       @R4,R4
+    0000059E 5831                   MOV.L       @(4,R3),R8
+    000005A0 5441                   MOV.L       @(4,R4),R4
+    000005A2 D34F                   MOV.L       L1017+50,R3; _Bfile_DeleteMainMemory
+    000005A4 430B                   JSR         @R3
+    000005A6 6442                   MOV.L       @R4,R4
+    000005A8 2802                   MOV.L       R0,@R8
+         fxlib.c   208    }
+    000005AA 7F08                   ADD         #8,R15
+    000005AC 4F26                   LDS.L       @R15+,PR
+    000005AE 000B                   RTS
+    000005B0 68F6                   MOV.L       @R15+,R8
+         fxlib.c   209    void FxlibBfile_FindFirst                       (struct ParseState *Parser, struct Value *ReturnValue, str
+                         +uct Value **Param, int NumArgs)
+    000005B2              _FxlibBfile_FindFirst:           ; function: FxlibBfile_FindFirst
+                                                           ; frame size=16
+         fxlib.c   210    {
+         fxlib.c   211            ReturnValue->Val->Integer = Bfile_FindFirst(Param[0]->Val->Pointer,Param[1]->Val->Pointer,Param[2]
+                         +->Val->Pointer,Param[3]->Val->Pointer);
+    000005B2 6353                   MOV         R5,R3
+    000005B4 2FE6                   MOV.L       R14,@-R15
+    000005B6 6E63                   MOV         R6,R14
+    000005B8 2F86                   MOV.L       R8,@-R15
+    000005BA 4F22                   STS.L       PR,@-R15
+    000005BC 7FFC                   ADD         #-4,R15
+    000005BE 2F52                   MOV.L       R5,@R15
+    000005C0 5831                   MOV.L       @(4,R3),R8
+    000005C2 57E3                   MOV.L       @(12,R14),R7
+    000005C4 56E2                   MOV.L       @(8,R14),R6
+    000005C6 5771                   MOV.L       @(4,R7),R7
+    000005C8 5661                   MOV.L       @(4,R6),R6
+    000005CA 6772                   MOV.L       @R7,R7
+    000005CC 6662                   MOV.L       @R6,R6
+    000005CE 55E1                   MOV.L       @(4,R14),R5
+    000005D0 64E2                   MOV.L       @R14,R4
+    000005D2 5551                   MOV.L       @(4,R5),R5
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE   20
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000005D4 5441                   MOV.L       @(4,R4),R4
+    000005D6 6552                   MOV.L       @R5,R5
+    000005D8 D342                   MOV.L       L1017+54,R3; _Bfile_FindFirst
+    000005DA 430B                   JSR         @R3
+    000005DC 6442                   MOV.L       @R4,R4
+    000005DE 2802                   MOV.L       R0,@R8
+         fxlib.c   212    }
+    000005E0 7F04                   ADD         #4,R15
+    000005E2 4F26                   LDS.L       @R15+,PR
+    000005E4 68F6                   MOV.L       @R15+,R8
+    000005E6 000B                   RTS
+    000005E8 6EF6                   MOV.L       @R15+,R14
+         fxlib.c   213    void FxlibBfile_FindNext                        (struct ParseState *Parser, struct Value *ReturnValue, str
+                         +uct Value **Param, int NumArgs)
+    000005EA              _FxlibBfile_FindNext:            ; function: FxlibBfile_FindNext
+                                                           ; frame size=16
+         fxlib.c   214    {
+         fxlib.c   215            ReturnValue->Val->Integer = Bfile_FindNext(Param[0]->Val->Integer, Param[1]->Val->Pointer, Param[2
+                         +]->Val->Pointer);
+    000005EA 6353                   MOV         R5,R3
+    000005EC 2FE6                   MOV.L       R14,@-R15
+    000005EE 6E63                   MOV         R6,R14
+    000005F0 2F86                   MOV.L       R8,@-R15
+    000005F2 4F22                   STS.L       PR,@-R15
+    000005F4 7FFC                   ADD         #-4,R15
+    000005F6 2F52                   MOV.L       R5,@R15
+    000005F8 5831                   MOV.L       @(4,R3),R8
+    000005FA 56E2                   MOV.L       @(8,R14),R6
+    000005FC 55E1                   MOV.L       @(4,R14),R5
+    000005FE 5661                   MOV.L       @(4,R6),R6
+    00000600 5551                   MOV.L       @(4,R5),R5
+    00000602 6662                   MOV.L       @R6,R6
+    00000604 6552                   MOV.L       @R5,R5
+    00000606 64E2                   MOV.L       @R14,R4
+    00000608 D337                   MOV.L       L1017+58,R3; _Bfile_FindNext
+    0000060A 5441                   MOV.L       @(4,R4),R4
+    0000060C 430B                   JSR         @R3
+    0000060E 6442                   MOV.L       @R4,R4
+    00000610 2802                   MOV.L       R0,@R8
+         fxlib.c   216    }
+    00000612 7F04                   ADD         #4,R15
+    00000614 4F26                   LDS.L       @R15+,PR
+    00000616 68F6                   MOV.L       @R15+,R8
+    00000618 000B                   RTS
+    0000061A 6EF6                   MOV.L       @R15+,R14
+         fxlib.c   217    void FxlibBfile_FindClose                       (struct ParseState *Parser, struct Value *ReturnValue, str
+                         +uct Value **Param, int NumArgs)
+    0000061C              _FxlibBfile_FindClose:           ; function: FxlibBfile_FindClose
+                                                           ; frame size=16
+    0000061C 2F86                   MOV.L       R8,@-R15
+         fxlib.c   218    {
+         fxlib.c   219            ReturnValue->Val->Integer = Bfile_FindClose(Param[0]->Val->Integer);
+    0000061E 6463                   MOV         R6,R4
+    00000620 4F22                   STS.L       PR,@-R15
+    00000622 7FF8                   ADD         #-8,R15
+    00000624 1F51                   MOV.L       R5,@(4,R15)
+    00000626 2F62                   MOV.L       R6,@R15
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE   21
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000628 53F1                   MOV.L       @(4,R15),R3
+    0000062A 5831                   MOV.L       @(4,R3),R8
+    0000062C 6442                   MOV.L       @R4,R4
+    0000062E 5441                   MOV.L       @(4,R4),R4
+    00000630 D32E                   MOV.L       L1017+62,R3; _Bfile_FindClose
+    00000632 430B                   JSR         @R3
+    00000634 6442                   MOV.L       @R4,R4
+    00000636 2802                   MOV.L       R0,@R8
+         fxlib.c   220    }
+    00000638 7F08                   ADD         #8,R15
+    0000063A 4F26                   LDS.L       @R15+,PR
+    0000063C 000B                   RTS
+    0000063E 68F6                   MOV.L       @R15+,R8
+         fxlib.c   221    
+         fxlib.c   222    void FxlibBkey_Set_RepeatTime                   (struct ParseState *Parser, struct Value *ReturnValue, str
+                         +uct Value **Param, int NumArgs)
+    00000640              _FxlibBkey_Set_RepeatTime:       ; function: FxlibBkey_Set_RepeatTime
+                                                           ; frame size=4
+    00000640 2F66                   MOV.L       R6,@-R15
+         fxlib.c   223    {
+         fxlib.c   224            Bkey_Set_RepeatTime(Param[0]->Val->Integer,Param[1]->Val->Integer);
+    00000642 6363                   MOV         R6,R3
+    00000644 5531                   MOV.L       @(4,R3),R5
+    00000646 6463                   MOV         R6,R4
+    00000648 5551                   MOV.L       @(4,R5),R5
+    0000064A 6552                   MOV.L       @R5,R5
+    0000064C 6442                   MOV.L       @R4,R4
+    0000064E 5441                   MOV.L       @(4,R4),R4
+    00000650 D327                   MOV.L       L1017+66,R3; _Bkey_Set_RepeatTime
+    00000652 6442                   MOV.L       @R4,R4
+    00000654 432B                   JMP         @R3
+    00000656 7F04                   ADD         #4,R15
+         fxlib.c   225    }
+         fxlib.c   226    void FxlibBkey_Get_RepeatTime                   (struct ParseState *Parser, struct Value *ReturnValue, str
+                         +uct Value **Param, int NumArgs)
+    00000658              _FxlibBkey_Get_RepeatTime:       ; function: FxlibBkey_Get_RepeatTime
+                                                           ; frame size=4
+    00000658 2F66                   MOV.L       R6,@-R15
+         fxlib.c   227    {
+         fxlib.c   228            Bkey_Get_RepeatTime(Param[0]->Val->Pointer,Param[1]->Val->Pointer);
+    0000065A 6363                   MOV         R6,R3
+    0000065C 5531                   MOV.L       @(4,R3),R5
+    0000065E 6463                   MOV         R6,R4
+    00000660 5551                   MOV.L       @(4,R5),R5
+    00000662 6552                   MOV.L       @R5,R5
+    00000664 6442                   MOV.L       @R4,R4
+    00000666 5441                   MOV.L       @(4,R4),R4
+    00000668 D322                   MOV.L       L1017+70,R3; _Bkey_Get_RepeatTime
+    0000066A 6442                   MOV.L       @R4,R4
+    0000066C 432B                   JMP         @R3
+    0000066E 7F04                   ADD         #4,R15
+         fxlib.c   229    }
+         fxlib.c   230    void FxlibBkey_Set_RepeatTime_Default   (struct ParseState *Parser, struct Value *ReturnValue, struct Valu
+                         +e **Param, int NumArgs)
+    00000670              _FxlibBkey_Set_RepeatTime_Default:
+                                                           ; function: FxlibBkey_Set_RepeatTime_Default
+                                                           ; frame size=0
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE   22
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+         fxlib.c   231    {
+         fxlib.c   232            Bkey_Set_RepeatTime_Default();
+    00000670 D321                   MOV.L       L1017+74,R3; _Bkey_Set_RepeatTime_Default
+    00000672 432B                   JMP         @R3
+    00000674 0009                   NOP
+         fxlib.c   233    }
+         fxlib.c   234    void FxlibGetKey                                                (struct ParseState *Parser, struct Value *
+                         +ReturnValue, struct Value **Param, int NumArgs)
+    00000676              _FxlibGetKey:                    ; function: FxlibGetKey
+                                                           ; frame size=16
+         fxlib.c   235    {
+         fxlib.c   236            ReturnValue->Val->Integer = GetKey(Param[0]->Val->Pointer);
+    00000676 6463                   MOV         R6,R4
+    00000678 2F86                   MOV.L       R8,@-R15
+    0000067A 4F22                   STS.L       PR,@-R15
+    0000067C 7FF8                   ADD         #-8,R15
+    0000067E 1F51                   MOV.L       R5,@(4,R15)
+    00000680 2F62                   MOV.L       R6,@R15
+    00000682 53F1                   MOV.L       @(4,R15),R3
+    00000684 6442                   MOV.L       @R4,R4
+    00000686 5831                   MOV.L       @(4,R3),R8
+    00000688 5441                   MOV.L       @(4,R4),R4
+    0000068A D31C                   MOV.L       L1017+78,R3; _GetKey
+    0000068C 430B                   JSR         @R3
+    0000068E 6442                   MOV.L       @R4,R4
+    00000690 2802                   MOV.L       R0,@R8
+         fxlib.c   237    }
+    00000692 7F08                   ADD         #8,R15
+    00000694 4F26                   LDS.L       @R15+,PR
+    00000696 000B                   RTS
+    00000698 68F6                   MOV.L       @R15+,R8
+         fxlib.c   238    void FxlibSleep(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    0000069A              _FxlibSleep:                     ; function: FxlibSleep
+                                                           ; frame size=4
+         fxlib.c   239    {
+         fxlib.c   240            Sleep(Param[0]->Val->Integer);
+    0000069A 6463                   MOV         R6,R4
+    0000069C D318                   MOV.L       L1017+82,R3; _Sleep
+    0000069E 2F66                   MOV.L       R6,@-R15
+    000006A0 6442                   MOV.L       @R4,R4
+    000006A2 5441                   MOV.L       @(4,R4),R4
+    000006A4 6442                   MOV.L       @R4,R4
+    000006A6 432B                   JMP         @R3
+    000006A8 7F04                   ADD         #4,R15
+         fxlib.c   241    }
+         fxlib.c   242    
+         fxlib.c   243    const char FxlibDefs[] = "\
+         fxlib.c   244    typedef struct {int left;int top;int right;int bottom;} DISPBOX;\
+         fxlib.c   245    typedef struct tag_GRAPHDATA{\
+         fxlib.c   246            int  width;\
+         fxlib.c   247            int  height;\
+         fxlib.c   248            unsigned char  *pBitmap;\
+         fxlib.c   249    } GRAPHDATA;\
+         fxlib.c   250    typedef struct tag_DISPGRAPH{\
+         fxlib.c   251            int                             x;\
+         fxlib.c   252            int                             y;\
+         fxlib.c   253            GRAPHDATA               GraphData;\
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE   23
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+         fxlib.c   254            unsigned char   WriteModify;\
+         fxlib.c   255            unsigned char   WriteKind;\
+         fxlib.c   256    } DISPGRAPH;\
+         fxlib.c   257    typedef struct tag_FILE_INFO{\
+         fxlib.c   258        unsigned short  id;\
+         fxlib.c   259        unsigned short  type;\
+         fxlib.c   260        unsigned long   fsize;\
+         fxlib.c   261        unsigned long   dsize;\
+         fxlib.c   262        unsigned int    property;\
+         fxlib.c   263        unsigned long   address;\
+         fxlib.c   264    } FILE_INFO;\
+         fxlib.c   265    typedef unsigned short FONTCHARACTER;\
+         fxlib.c   266    ";
+         fxlib.c   267    
+         fxlib.c   268    struct LibraryFunction FxlibFunctions[] =
+         fxlib.c   269    {
+         fxlib.c   270            { FxlibBdisp_AllClr_DD                  ,"void Bdisp_AllClr_DD(); "},
+         fxlib.c   271            { FxlibBdisp_AllClr_VRAM                ,"void Bdisp_AllClr_VRAM(); "},
+         fxlib.c   272            { FxlibBdisp_AllClr_DDVRAM              ,"void Bdisp_AllClr_DDVRAM(); "},
+         fxlib.c   273    
+         fxlib.c   274            { FxlibBdisp_AreaClr_DD                 ,"void Bdisp_AreaClr_DD(DISPBOX *); "},
+         fxlib.c   275            { FxlibBdisp_AreaClr_VRAM               ,"void Bdisp_AreaClr_VRAM(DISPBOX *); "},
+         fxlib.c   276            { FxlibBdisp_AreaClr_DDVRAM             ,"void Bdisp_AreaClr_DDVRAM(DISPBOX *); "},
+         fxlib.c   277    
+         fxlib.c   278            { FxlibBdisp_AreaReverseVRAM    ,"void Bdisp_AreaReverseVRAM(int,int,int,int);"},
+         fxlib.c   279    
+         fxlib.c   280            { FxlibBdisp_GetDisp_DD                 ,"void Bdisp_GetDisp_DD(unsigned char *);"},
+         fxlib.c   281            { FxlibBdisp_GetDisp_VRAM               ,"void Bdisp_GetDisp_VRAM(unsigned char *);"},
+         fxlib.c   282    
+         fxlib.c   283            { FxlibBdisp_PutDisp_DD                 ,"void Bdisp_PutDisp_DD();"},
+         fxlib.c   284            { FxlibBdisp_PutDispArea_DD             ,"void Bdisp_PutDispArea_DD(DISPBOX*);"},
+         fxlib.c   285            
+         fxlib.c   286            { FxlibBdisp_SetPoint_DD                ,"void Bdisp_SetPoint_DD(int,int,unsigned char);"},
+         fxlib.c   287            { FxlibBdisp_SetPoint_VRAM              ,"void Bdisp_SetPoint_VRAM(int,int,unsigned char);"},
+         fxlib.c   288            { FxlibBdisp_SetPoint_DDVRAM    ,"void Bdisp_SetPoint_DDVRAM(int,int, unsigned char);"},
+         fxlib.c   289            { FxlibBdisp_GetPoint_VRAM              ,"int  Bdisp_GetPoint_VRAM(int,int);"},
+         fxlib.c   290    
+         fxlib.c   291            { FxlibBdisp_WriteGraph_DD              ,"void Bdisp_WriteGraph_DD(DISPGRAPH*); "},
+         fxlib.c   292            { FxlibBdisp_WriteGraph_VRAM    ,"void Bdisp_WriteGraph_VRAM(DISPGRAPH *); "},
+         fxlib.c   293            { FxlibBdisp_WriteGraph_DDVRAM  ,"void Bdisp_WriteGraph_DDVRAM(DISPGRAPH *); "},
+         fxlib.c   294    
+         fxlib.c   295            { FxlibBdisp_ReadArea_DD                ,"void Bdisp_ReadArea_DD(DISPBOX *,unsigned char *);"},
+         fxlib.c   296            { FxlibBdisp_ReadArea_VRAM              ,"void Bdisp_ReadArea_VRAM(DISPBOX *,unsigned char *);"},
+         fxlib.c   297    
+         fxlib.c   298            { FxlibBdisp_DrawLineVRAM               ,"void Bdisp_DrawLineVRAM(int,int,int,int);"},
+         fxlib.c   299            { FxlibBdisp_ClearLineVRAM              ,"void Bdisp_ClearLineVRAM(int,int,int,int);"},
+         fxlib.c   300    
+         fxlib.c   301            { FxlibLocate                                   ,"void locate(int,int);"},
+         fxlib.c   302            { FxlibPrint                                    ,"void Print(unsigned char*);"},
+         fxlib.c   303            { FxlibPrintRev                                 ,"void PrintRev(unsigned char*);"},
+         fxlib.c   304            { FxlibPrintC                                   ,"void PrintC(unsigned char*);"},
+         fxlib.c   305            { FxlibPrintRevC                                ,"void PrintRevC(unsigned char*);"},
+         fxlib.c   306            { FxlibPrintLine                                ,"void PrintLine(unsigned char*,int);"},
+         fxlib.c   307            { FxlibPrintRLine                               ,"void PrintRLine(unsigned char*,int);"},
+         fxlib.c   308            { FxlibPrintXY                                  ,"void PrintXY(int,int,unsigned char*,int);"},
+         fxlib.c   309            { FxlibPrintMini                                ,"void PrintMini(int,int,unsigned char*,int);"},
+         fxlib.c   310            
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE   24
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+         fxlib.c   311            { FxlibSaveDisp                                 ,"void SaveDisp(unsigned char);"},
+         fxlib.c   312            { FxlibRestoreDisp                              ,"void RestoreDisp(unsigned char);"},
+         fxlib.c   313            { FxlibPopUpWin                                 ,"void PopUpWin(int);"},
+         fxlib.c   314    
+         fxlib.c   315            { FxlibBfile_OpenFile                   ,"int Bfile_OpenFile(FONTCHARACTER*,int);"},
+         fxlib.c   316            { FxlibBfile_OpenMainMemory             ,"int Bfile_OpenMainMemory(unsigned char *);"},
+         fxlib.c   317            { FxlibBfile_ReadFile                   ,"int Bfile_ReadFile(int,void*,int,int);"},
+         fxlib.c   318            { FxlibBfile_WriteFile                  ,"int Bfile_WriteFile(int,void *,int);"},
+         fxlib.c   319            { FxlibBfile_SeekFile                   ,"int Bfile_SeekFile(int,int);"},
+         fxlib.c   320            { FxlibBfile_CloseFile                  ,"int Bfile_CloseFile(int);"},
+         fxlib.c   321            { FxlibBfile_GetMediaFree               ,"int Bfile_GetMediaFree(int,int*);"},
+         fxlib.c   322            { FxlibBfile_GetFileSize                ,"int Bfile_GetFileSize(int);"},
+         fxlib.c   323            { FxlibBfile_CreateFile                 ,"int Bfile_CreateFile(FONTCHARACTER *);"},
+         fxlib.c   324            { FxlibBfile_CreateDirectory    ,"int Bfile_CreateDirectory(FONTCHARACTER *);"},
+         fxlib.c   325            { FxlibBfile_CreateMainMemory   ,"int Bfile_CreateMainMemory(unsigned char *);"},
+         fxlib.c   326            { FxlibBfile_RenameMainMemory   ,"int Bfile_RenameMainMemory(unsigned char *,unsigned char *);"},
+         fxlib.c   327            { FxlibBfile_DeleteFile                 ,"int Bfile_DeleteFile(FONTCHARACTER *);"},
+         fxlib.c   328            { FxlibBfile_DeleteDirectory    ,"int Bfile_DeleteDirectory(FONTCHARACTER *);"},
+         fxlib.c   329            { FxlibBfile_DeleteMainMemory   ,"int Bfile_DeleteMainMemory(unsigned char *);"},
+         fxlib.c   330            { FxlibBfile_FindFirst                  ,"int Bfile_FindFirst(FONTCHARACTER *,int *,FONTCHARACTER 
+                         +*,FILE_INFO *);"},
+         fxlib.c   331            { FxlibBfile_FindNext                   ,"int Bfile_FindNext(int,FONTCHARACTER *, FILE_INFO *);"},
+         fxlib.c   332            { FxlibBfile_FindClose                  ,"int Bfile_FindClose(int);"},
+         fxlib.c   333    
+         fxlib.c   334            { FxlibBkey_Set_RepeatTime                      ,"void Bkey_Set_RepeatTime(long,long);"},
+         fxlib.c   335            { FxlibBkey_Get_RepeatTime                      ,"void Bkey_Get_RepeatTime(long *, long *);"},
+         fxlib.c   336            { FxlibBkey_Set_RepeatTime_Default      ,"void Bkey_Set_RepeatTime_Default();"},
+         fxlib.c   337            { FxlibGetKey                                           ,"int GetKey(unsigned int *);"},
+         fxlib.c   338    
+         fxlib.c   339            { FxlibSleep                                    , "void Sleep(int);"},
+         fxlib.c   340    
+         fxlib.c   341            { NULL,         NULL }
+         fxlib.c   342    };
+         fxlib.c   343    
+         fxlib.c   344    
+         fxlib.c   345    void FxlibSetupFunc(void)
+    000006AA              _FxlibSetupFunc:                 ; function: FxlibSetupFunc
+                                                           ; frame size=0
+         fxlib.c   346    {
+         fxlib.c   347    }
+    000006AA 000B                   RTS
+    000006AC 0009                   NOP
+    000006AE              L1017:                            
+    000006AE 0000                   .DATA.W     0
+    000006B0 <00000000>             .DATA.L     _Bfile_ReadFile
+    000006B4 <00000000>             .DATA.L     _Bfile_WriteFile
+    000006B8 <00000000>             .DATA.L     _Bfile_SeekFile
+    000006BC <00000000>             .DATA.L     _Bfile_CloseFile
+    000006C0 <00000000>             .DATA.L     _Bfile_GetMediaFree
+    000006C4 <00000000>             .DATA.L     _Bfile_GetFileSize
+    000006C8 <00000000>             .DATA.L     _Bfile_CreateFile
+    000006CC <00000000>             .DATA.L     _Bfile_CreateDirectory
+    000006D0 <00000000>             .DATA.L     _Bfile_CreateMainMemory
+    000006D4 <00000000>             .DATA.L     _Bfile_RenameMainMemory
+    000006D8 <00000000>             .DATA.L     _Bfile_DeleteFile
+    000006DC <00000000>             .DATA.L     _Bfile_DeleteDirectory
+    000006E0 <00000000>             .DATA.L     _Bfile_DeleteMainMemory
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE   25
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000006E4 <00000000>             .DATA.L     _Bfile_FindFirst
+    000006E8 <00000000>             .DATA.L     _Bfile_FindNext
+    000006EC <00000000>             .DATA.L     _Bfile_FindClose
+    000006F0 <00000000>             .DATA.L     _Bkey_Set_RepeatTime
+    000006F4 <00000000>             .DATA.L     _Bkey_Get_RepeatTime
+    000006F8 <00000000>             .DATA.L     _Bkey_Set_RepeatTime_Default
+    000006FC <00000000>             .DATA.L     _GetKey
+    00000700 <00000000>             .DATA.L     _Sleep
+D   00000000              __$ZeroValue:                    ; static: ZeroValue
+    00000000 00000000               .DATA.L     H'00000000
+    00000004              _FxlibFunctions:                 ; static: FxlibFunctions
+    00000004 <00000000>             .DATA.L     _FxlibBdisp_AllClr_DD,L900,_FxlibBdisp_AllClr_VRAM,L901,_FxlibBdisp_AllClr_DDVRAM,
+             <00000000> +                       L902,_FxlibBdisp_AreaClr_DD,L903,_FxlibBdisp_AreaClr_VRAM,L904,
+             <00000000> +                       _FxlibBdisp_AreaClr_DDVRAM,L905,_FxlibBdisp_AreaReverseVRAM,L906,
+             <00000000> +                       _FxlibBdisp_GetDisp_DD,L907,_FxlibBdisp_GetDisp_VRAM,L908,_FxlibBdisp_PutDisp_DD,
+             <00000000> +                       L909,_FxlibBdisp_PutDispArea_DD,L910,_FxlibBdisp_SetPoint_DD,L911,
+             <00000000> +                       _FxlibBdisp_SetPoint_VRAM,L912,_FxlibBdisp_SetPoint_DDVRAM,L913,
+             <00000000> +                       _FxlibBdisp_GetPoint_VRAM,L914,_FxlibBdisp_WriteGraph_DD,L915,
+             <00000000> +                       _FxlibBdisp_WriteGraph_VRAM,L916,_FxlibBdisp_WriteGraph_DDVRAM,L917,
+             <00000000> +                       _FxlibBdisp_ReadArea_DD,L918,_FxlibBdisp_ReadArea_VRAM,L919,
+             <00000000> +                       _FxlibBdisp_DrawLineVRAM,L920,_FxlibBdisp_ClearLineVRAM,L921,_FxlibLocate,L922,
+             <00000000> +                       _FxlibPrint,L923,_FxlibPrintRev,L924,_FxlibPrintC,L925,_FxlibPrintRevC,L926,
+             <00000000> +                       _FxlibPrintLine,L927,_FxlibPrintRLine,L928,_FxlibPrintXY,L929,_FxlibPrintMini,L930,
+             <00000000> +                       _FxlibSaveDisp,L931,_FxlibRestoreDisp,L932,_FxlibPopUpWin,L933,_FxlibBfile_OpenFile,
+             <00000000> +                       L934,_FxlibBfile_OpenMainMemory,L935,_FxlibBfile_ReadFile,L936,
+             <00000000> +                       _FxlibBfile_WriteFile,L937,_FxlibBfile_SeekFile,L938,_FxlibBfile_CloseFile,L939,
+             <00000000> +                       _FxlibBfile_GetMediaFree,L940,_FxlibBfile_GetFileSize,L941,_FxlibBfile_CreateFile,
+             <00000000> +                       L942,_FxlibBfile_CreateDirectory,L943,_FxlibBfile_CreateMainMemory,L944,
+             <00000000> +                       _FxlibBfile_RenameMainMemory,L945,_FxlibBfile_DeleteFile,L946,
+             <00000000> +                       _FxlibBfile_DeleteDirectory,L947,_FxlibBfile_DeleteMainMemory,L948,
+             <00000000> +                       _FxlibBfile_FindFirst,L949,_FxlibBfile_FindNext,L950,_FxlibBfile_FindClose,L951,
+             <00000000> +                       _FxlibBkey_Set_RepeatTime,L952,_FxlibBkey_Get_RepeatTime,L953,
+             <00000000> +                       _FxlibBkey_Set_RepeatTime_Default,L954,_FxlibGetKey,L955,_FxlibSleep,L956
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE   26
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE   27
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+    000001CC 0000000000             .DATA.L     H'00000000,H'00000000
+             000000       
+C   00000000              _FxlibDefs:                      ; static: FxlibDefs
+    00000000 7479706564             .SDATA      "typedef struct {int left;int top;int right;int bottom;} DISPBOX;typedef struct tag"
+             6566207374   
+             7275637420   
+             7B696E7420   
+             6C6566743B   
+             696E742074   
+             6F703B696E   
+             7420726967   
+             68743B696E   
+             7420626F74   
+             746F6D3B7D   
+             2044495350   
+             424F583B74   
+             7970656465   
+             6620737472   
+             7563742074   
+             6167         
+    00000052 5F47524150             .SDATA      "_GRAPHDATA{"
+             4844415441   
+             7B           
+    0000005D 09                     .DATA.B     H'09
+    0000005E 696E742020             .SDATA      "int  width;"
+             7769647468   
+             3B           
+    00000069 09                     .DATA.B     H'09
+    0000006A 696E742020             .SDATA      "int  height;"
+             6865696768   
+             743B         
+    00000076 09                     .DATA.B     H'09
+    00000077 756E736967             .SDATA      "unsigned char  *pBitmap;} GRAPHDATA;typedef struct tag_DISPGRAPH{"
+             6E65642063   
+             6861722020   
+             2A70426974   
+             6D61703B7D   
+             2047524150   
+             4844415441   
+             3B74797065   
+             6465662073   
+             7472756374   
+             207461675F   
+             4449535047   
+             524150487B   
+    000000B8 09                     .DATA.B     H'09
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE   28
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000000B9 696E74                 .SDATA      "int"
+    000000BC 09090909               .DATA.B     H'09,H'09,H'09,H'09
+    000000C0 783B                   .SDATA      "x;"
+    000000C2 09                     .DATA.B     H'09
+    000000C3 696E74                 .SDATA      "int"
+    000000C6 09090909               .DATA.B     H'09,H'09,H'09,H'09
+    000000CA 793B                   .SDATA      "y;"
+    000000CC 09                     .DATA.B     H'09
+    000000CD 4752415048             .SDATA      "GRAPHDATA"
+             44415441     
+    000000D6 0909                   .DATA.B     H'09,H'09
+    000000D8 4772617068             .SDATA      "GraphData;"
+             446174613B   
+    000000E2 09                     .DATA.B     H'09
+    000000E3 756E736967             .SDATA      "unsigned char"
+             6E65642063   
+             686172       
+    000000F0 09                     .DATA.B     H'09
+    000000F1 5772697465             .SDATA      "WriteModify;"
+             4D6F646966   
+             793B         
+    000000FD 09                     .DATA.B     H'09
+    000000FE 756E736967             .SDATA      "unsigned char"
+             6E65642063   
+             686172       
+    0000010B 09                     .DATA.B     H'09
+    0000010C 5772697465             .SDATA      "WriteKind;} DISPGRAPH;typedef struct tag_FILE_INFO{    unsigned short  id;    unsi"
+             4B696E643B   
+             7D20444953   
+             5047524150   
+             483B747970   
+             6564656620   
+             7374727563   
+             7420746167   
+             5F46494C45   
+             5F494E464F   
+             7B20202020   
+             756E736967   
+             6E65642073   
+             686F727420   
+             2069643B20   
+             202020756E   
+             7369         
+    0000015E 676E656420             .SDATA      "gned short  type;    unsigned long   fsize;    unsigned long   dsize;    unsigned "
+             73686F7274   
+             2020747970   
+             653B202020   
+             20756E7369   
+             676E656420   
+             6C6F6E6720   
+             2020667369   
+             7A653B2020   
+             2020756E73   
+             69676E6564   
+             206C6F6E67   
+             2020206473   
+             697A653B20   
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE   29
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+             202020756E   
+             7369676E65   
+             6420         
+    000001B0 696E742020             .SDATA      "int    property;    unsigned long   address;} FILE_INFO;typedef unsigned short FON"
+             202070726F   
+             7065727479   
+             3B20202020   
+             756E736967   
+             6E6564206C   
+             6F6E672020   
+             2061646472   
+             6573733B7D   
+             2046494C45   
+             5F494E464F   
+             3B74797065   
+             6465662075   
+             6E7369676E   
+             6564207368   
+             6F72742046   
+             4F4E         
+    00000202 5443484152             .SDATA      "TCHARACTER;"
+             4143544552   
+             3B           
+    0000020D 00                     .DATA.B     H'00
+    0000020E 00000002               .RES.W      1
+    00000210              L900:
+    00000210 766F696420             .SDATA      "void Bdisp_AllClr_DD(); "
+             4264697370   
+             5F416C6C43   
+             6C725F4444   
+             28293B20     
+    00000228 00                     .DATA.B     H'00
+    00000229 00000001               .RES.B      1
+    0000022A 00000002               .RES.W      1
+    0000022C              L901:
+    0000022C 766F696420             .SDATA      "void Bdisp_AllClr_VRAM(); "
+             4264697370   
+             5F416C6C43   
+             6C725F5652   
+             414D28293B   
+             20           
+    00000246 00                     .DATA.B     H'00
+    00000247 00000001               .RES.B      1
+    00000248              L902:
+    00000248 766F696420             .SDATA      "void Bdisp_AllClr_DDVRAM(); "
+             4264697370   
+             5F416C6C43   
+             6C725F4444   
+             5652414D28   
+             293B20       
+    00000264 00                     .DATA.B     H'00
+    00000265 00000001               .RES.B      1
+    00000266 00000002               .RES.W      1
+    00000268              L903:
+    00000268 766F696420             .SDATA      "void Bdisp_AreaClr_DD(DISPBOX *); "
+             4264697370   
+             5F41726561   
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE   30
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+             436C725F44   
+             4428444953   
+             50424F5820   
+             2A293B20     
+    0000028A 00                     .DATA.B     H'00
+    0000028B 00000001               .RES.B      1
+    0000028C              L904:
+    0000028C 766F696420             .SDATA      "void Bdisp_AreaClr_VRAM(DISPBOX *); "
+             4264697370   
+             5F41726561   
+             436C725F56   
+             52414D2844   
+             495350424F   
+             58202A293B   
+             20           
+    000002B0 00                     .DATA.B     H'00
+    000002B1 00000001               .RES.B      1
+    000002B2 00000002               .RES.W      1
+    000002B4              L905:
+    000002B4 766F696420             .SDATA      "void Bdisp_AreaClr_DDVRAM(DISPBOX *); "
+             4264697370   
+             5F41726561   
+             436C725F44   
+             445652414D   
+             2844495350   
+             424F58202A   
+             293B20       
+    000002DA 00                     .DATA.B     H'00
+    000002DB 00000001               .RES.B      1
+    000002DC              L906:
+    000002DC 766F696420             .SDATA      "void Bdisp_AreaReverseVRAM(int,int,int,int);"
+             4264697370   
+             5F41726561   
+             5265766572   
+             7365565241   
+             4D28696E74   
+             2C696E742C   
+             696E742C69   
+             6E74293B     
+    00000308 00                     .DATA.B     H'00
+    00000309 00000001               .RES.B      1
+    0000030A 00000002               .RES.W      1
+    0000030C              L907:
+    0000030C 766F696420             .SDATA      "void Bdisp_GetDisp_DD(unsigned char *);"
+             4264697370   
+             5F47657444   
+             6973705F44   
+             4428756E73   
+             69676E6564   
+             2063686172   
+             202A293B     
+    00000333 00                     .DATA.B     H'00
+    00000334              L908:
+    00000334 766F696420             .SDATA      "void Bdisp_GetDisp_VRAM(unsigned char *);"
+             4264697370   
+             5F47657444   
+             6973705F56   
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE   31
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+             52414D2875   
+             6E7369676E   
+             6564206368   
+             6172202A29   
+             3B           
+    0000035D 00                     .DATA.B     H'00
+    0000035E 00000002               .RES.W      1
+    00000360              L909:
+    00000360 766F696420             .SDATA      "void Bdisp_PutDisp_DD();"
+             4264697370   
+             5F50757444   
+             6973705F44   
+             4428293B     
+    00000378 00                     .DATA.B     H'00
+    00000379 00000001               .RES.B      1
+    0000037A 00000002               .RES.W      1
+    0000037C              L910:
+    0000037C 766F696420             .SDATA      "void Bdisp_PutDispArea_DD(DISPBOX*);"
+             4264697370   
+             5F50757444   
+             6973704172   
+             65615F4444   
+             2844495350   
+             424F582A29   
+             3B           
+    000003A0 00                     .DATA.B     H'00
+    000003A1 00000001               .RES.B      1
+    000003A2 00000002               .RES.W      1
+    000003A4              L911:
+    000003A4 766F696420             .SDATA      "void Bdisp_SetPoint_DD(int,int,unsigned char);"
+             4264697370   
+             5F53657450   
+             6F696E745F   
+             444428696E   
+             742C696E74   
+             2C756E7369   
+             676E656420   
+             6368617229   
+             3B           
+    000003D2 00                     .DATA.B     H'00
+    000003D3 00000001               .RES.B      1
+    000003D4              L912:
+    000003D4 766F696420             .SDATA      "void Bdisp_SetPoint_VRAM(int,int,unsigned char);"
+             4264697370   
+             5F53657450   
+             6F696E745F   
+             5652414D28   
+             696E742C69   
+             6E742C756E   
+             7369676E65   
+             6420636861   
+             72293B       
+    00000404 00                     .DATA.B     H'00
+    00000405 00000001               .RES.B      1
+    00000406 00000002               .RES.W      1
+    00000408              L913:
+    00000408 766F696420             .SDATA      "void Bdisp_SetPoint_DDVRAM(int,int, unsigned char);"
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE   32
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+             4264697370   
+             5F53657450   
+             6F696E745F   
+             4444565241   
+             4D28696E74   
+             2C696E742C   
+             20756E7369   
+             676E656420   
+             6368617229   
+             3B           
+    0000043B 00                     .DATA.B     H'00
+    0000043C              L914:
+    0000043C 696E742020             .SDATA      "int  Bdisp_GetPoint_VRAM(int,int);"
+             4264697370   
+             5F47657450   
+             6F696E745F   
+             5652414D28   
+             696E742C69   
+             6E74293B     
+    0000045E 00                     .DATA.B     H'00
+    0000045F 00000001               .RES.B      1
+    00000460              L915:
+    00000460 766F696420             .SDATA      "void Bdisp_WriteGraph_DD(DISPGRAPH*); "
+             4264697370   
+             5F57726974   
+             6547726170   
+             685F444428   
+             4449535047   
+             524150482A   
+             293B20       
+    00000486 00                     .DATA.B     H'00
+    00000487 00000001               .RES.B      1
+    00000488              L916:
+    00000488 766F696420             .SDATA      "void Bdisp_WriteGraph_VRAM(DISPGRAPH *); "
+             4264697370   
+             5F57726974   
+             6547726170   
+             685F565241   
+             4D28444953   
+             5047524150   
+             48202A293B   
+             20           
+    000004B1 00                     .DATA.B     H'00
+    000004B2 00000002               .RES.W      1
+    000004B4              L917:
+    000004B4 766F696420             .SDATA      "void Bdisp_WriteGraph_DDVRAM(DISPGRAPH *); "
+             4264697370   
+             5F57726974   
+             6547726170   
+             685F444456   
+             52414D2844   
+             4953504752   
+             415048202A   
+             293B20       
+    000004DF 00                     .DATA.B     H'00
+    000004E0              L918:
+    000004E0 766F696420             .SDATA      "void Bdisp_ReadArea_DD(DISPBOX *,unsigned char *);"
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE   33
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+             4264697370   
+             5F52656164   
+             417265615F   
+             4444284449   
+             5350424F58   
+             202A2C756E   
+             7369676E65   
+             6420636861   
+             72202A293B   
+    00000512 00                     .DATA.B     H'00
+    00000513 00000001               .RES.B      1
+    00000514              L919:
+    00000514 766F696420             .SDATA      "void Bdisp_ReadArea_VRAM(DISPBOX *,unsigned char *);"
+             4264697370   
+             5F52656164   
+             417265615F   
+             5652414D28   
+             4449535042   
+             4F58202A2C   
+             756E736967   
+             6E65642063   
+             686172202A   
+             293B         
+    00000548 00                     .DATA.B     H'00
+    00000549 00000001               .RES.B      1
+    0000054A 00000002               .RES.W      1
+    0000054C              L920:
+    0000054C 766F696420             .SDATA      "void Bdisp_DrawLineVRAM(int,int,int,int);"
+             4264697370   
+             5F44726177   
+             4C696E6556   
+             52414D2869   
+             6E742C696E   
+             742C696E74   
+             2C696E7429   
+             3B           
+    00000575 00                     .DATA.B     H'00
+    00000576 00000002               .RES.W      1
+    00000578              L921:
+    00000578 766F696420             .SDATA      "void Bdisp_ClearLineVRAM(int,int,int,int);"
+             4264697370   
+             5F436C6561   
+             724C696E65   
+             5652414D28   
+             696E742C69   
+             6E742C696E   
+             742C696E74   
+             293B         
+    000005A2 00                     .DATA.B     H'00
+    000005A3 00000001               .RES.B      1
+    000005A4              L922:
+    000005A4 766F696420             .SDATA      "void locate(int,int);"
+             6C6F636174   
+             6528696E74   
+             2C696E7429   
+             3B           
+    000005B9 00                     .DATA.B     H'00
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE   34
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000005BA 00000002               .RES.W      1
+    000005BC              L923:
+    000005BC 766F696420             .SDATA      "void Print(unsigned char*);"
+             5072696E74   
+             28756E7369   
+             676E656420   
+             636861722A   
+             293B         
+    000005D7 00                     .DATA.B     H'00
+    000005D8              L924:
+    000005D8 766F696420             .SDATA      "void PrintRev(unsigned char*);"
+             5072696E74   
+             5265762875   
+             6E7369676E   
+             6564206368   
+             61722A293B   
+    000005F6 00                     .DATA.B     H'00
+    000005F7 00000001               .RES.B      1
+    000005F8              L925:
+    000005F8 766F696420             .SDATA      "void PrintC(unsigned char*);"
+             5072696E74   
+             4328756E73   
+             69676E6564   
+             2063686172   
+             2A293B       
+    00000614 00                     .DATA.B     H'00
+    00000615 00000001               .RES.B      1
+    00000616 00000002               .RES.W      1
+    00000618              L926:
+    00000618 766F696420             .SDATA      "void PrintRevC(unsigned char*);"
+             5072696E74   
+             5265764328   
+             756E736967   
+             6E65642063   
+             6861722A29   
+             3B           
+    00000637 00                     .DATA.B     H'00
+    00000638              L927:
+    00000638 766F696420             .SDATA      "void PrintLine(unsigned char*,int);"
+             5072696E74   
+             4C696E6528   
+             756E736967   
+             6E65642063   
+             6861722A2C   
+             696E74293B   
+    0000065B 00                     .DATA.B     H'00
+    0000065C              L928:
+    0000065C 766F696420             .SDATA      "void PrintRLine(unsigned char*,int);"
+             5072696E74   
+             524C696E65   
+             28756E7369   
+             676E656420   
+             636861722A   
+             2C696E7429   
+             3B           
+    00000680 00                     .DATA.B     H'00
+    00000681 00000001               .RES.B      1
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE   35
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000682 00000002               .RES.W      1
+    00000684              L929:
+    00000684 766F696420             .SDATA      "void PrintXY(int,int,unsigned char*,int);"
+             5072696E74   
+             585928696E   
+             742C696E74   
+             2C756E7369   
+             676E656420   
+             636861722A   
+             2C696E7429   
+             3B           
+    000006AD 00                     .DATA.B     H'00
+    000006AE 00000002               .RES.W      1
+    000006B0              L930:
+    000006B0 766F696420             .SDATA      "void PrintMini(int,int,unsigned char*,int);"
+             5072696E74   
+             4D696E6928   
+             696E742C69   
+             6E742C756E   
+             7369676E65   
+             6420636861   
+             722A2C696E   
+             74293B       
+    000006DB 00                     .DATA.B     H'00
+    000006DC              L931:
+    000006DC 766F696420             .SDATA      "void SaveDisp(unsigned char);"
+             5361766544   
+             6973702875   
+             6E7369676E   
+             6564206368   
+             6172293B     
+    000006F9 00                     .DATA.B     H'00
+    000006FA 00000002               .RES.W      1
+    000006FC              L932:
+    000006FC 766F696420             .SDATA      "void RestoreDisp(unsigned char);"
+             526573746F   
+             7265446973   
+             7028756E73   
+             69676E6564   
+             2063686172   
+             293B         
+    0000071C 00                     .DATA.B     H'00
+    0000071D 00000001               .RES.B      1
+    0000071E 00000002               .RES.W      1
+    00000720              L933:
+    00000720 766F696420             .SDATA      "void PopUpWin(int);"
+             506F705570   
+             57696E2869   
+             6E74293B     
+    00000733 00                     .DATA.B     H'00
+    00000734              L934:
+    00000734 696E742042             .SDATA      "int Bfile_OpenFile(FONTCHARACTER*,int);"
+             66696C655F   
+             4F70656E46   
+             696C652846   
+             4F4E544348   
+             4152414354   
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE   36
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+             45522A2C69   
+             6E74293B     
+    0000075B 00                     .DATA.B     H'00
+    0000075C              L935:
+    0000075C 696E742042             .SDATA      "int Bfile_OpenMainMemory(unsigned char *);"
+             66696C655F   
+             4F70656E4D   
+             61696E4D65   
+             6D6F727928   
+             756E736967   
+             6E65642063   
+             686172202A   
+             293B         
+    00000786 00                     .DATA.B     H'00
+    00000787 00000001               .RES.B      1
+    00000788              L936:
+    00000788 696E742042             .SDATA      "int Bfile_ReadFile(int,void*,int,int);"
+             66696C655F   
+             5265616446   
+             696C652869   
+             6E742C766F   
+             69642A2C69   
+             6E742C696E   
+             74293B       
+    000007AE 00                     .DATA.B     H'00
+    000007AF 00000001               .RES.B      1
+    000007B0              L937:
+    000007B0 696E742042             .SDATA      "int Bfile_WriteFile(int,void *,int);"
+             66696C655F   
+             5772697465   
+             46696C6528   
+             696E742C76   
+             6F6964202A   
+             2C696E7429   
+             3B           
+    000007D4 00                     .DATA.B     H'00
+    000007D5 00000001               .RES.B      1
+    000007D6 00000002               .RES.W      1
+    000007D8              L938:
+    000007D8 696E742042             .SDATA      "int Bfile_SeekFile(int,int);"
+             66696C655F   
+             5365656B46   
+             696C652869   
+             6E742C696E   
+             74293B       
+    000007F4 00                     .DATA.B     H'00
+    000007F5 00000001               .RES.B      1
+    000007F6 00000002               .RES.W      1
+    000007F8              L939:
+    000007F8 696E742042             .SDATA      "int Bfile_CloseFile(int);"
+             66696C655F   
+             436C6F7365   
+             46696C6528   
+             696E74293B   
+    00000811 00                     .DATA.B     H'00
+    00000812 00000002               .RES.W      1
+    00000814              L940:
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE   37
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000814 696E742042             .SDATA      "int Bfile_GetMediaFree(int,int*);"
+             66696C655F   
+             4765744D65   
+             6469614672   
+             656528696E   
+             742C696E74   
+             2A293B       
+    00000835 00                     .DATA.B     H'00
+    00000836 00000002               .RES.W      1
+    00000838              L941:
+    00000838 696E742042             .SDATA      "int Bfile_GetFileSize(int);"
+             66696C655F   
+             4765744669   
+             6C6553697A   
+             6528696E74   
+             293B         
+    00000853 00                     .DATA.B     H'00
+    00000854              L942:
+    00000854 696E742042             .SDATA      "int Bfile_CreateFile(FONTCHARACTER *);"
+             66696C655F   
+             4372656174   
+             6546696C65   
+             28464F4E54   
+             4348415241   
+             4354455220   
+             2A293B       
+    0000087A 00                     .DATA.B     H'00
+    0000087B 00000001               .RES.B      1
+    0000087C              L943:
+    0000087C 696E742042             .SDATA      "int Bfile_CreateDirectory(FONTCHARACTER *);"
+             66696C655F   
+             4372656174   
+             6544697265   
+             63746F7279   
+             28464F4E54   
+             4348415241   
+             4354455220   
+             2A293B       
+    000008A7 00                     .DATA.B     H'00
+    000008A8              L944:
+    000008A8 696E742042             .SDATA      "int Bfile_CreateMainMemory(unsigned char *);"
+             66696C655F   
+             4372656174   
+             654D61696E   
+             4D656D6F72   
+             7928756E73   
+             69676E6564   
+             2063686172   
+             202A293B     
+    000008D4 00                     .DATA.B     H'00
+    000008D5 00000001               .RES.B      1
+    000008D6 00000002               .RES.W      1
+    000008D8              L945:
+    000008D8 696E742042             .SDATA      "int Bfile_RenameMainMemory(unsigned char *,unsigned char *);"
+             66696C655F   
+             52656E616D   
+             654D61696E   
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE   38
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+             4D656D6F72   
+             7928756E73   
+             69676E6564   
+             2063686172   
+             202A2C756E   
+             7369676E65   
+             6420636861   
+             72202A293B   
+    00000914 00                     .DATA.B     H'00
+    00000915 00000001               .RES.B      1
+    00000916 00000002               .RES.W      1
+    00000918              L946:
+    00000918 696E742042             .SDATA      "int Bfile_DeleteFile(FONTCHARACTER *);"
+             66696C655F   
+             44656C6574   
+             6546696C65   
+             28464F4E54   
+             4348415241   
+             4354455220   
+             2A293B       
+    0000093E 00                     .DATA.B     H'00
+    0000093F 00000001               .RES.B      1
+    00000940              L947:
+    00000940 696E742042             .SDATA      "int Bfile_DeleteDirectory(FONTCHARACTER *);"
+             66696C655F   
+             44656C6574   
+             6544697265   
+             63746F7279   
+             28464F4E54   
+             4348415241   
+             4354455220   
+             2A293B       
+    0000096B 00                     .DATA.B     H'00
+    0000096C              L948:
+    0000096C 696E742042             .SDATA      "int Bfile_DeleteMainMemory(unsigned char *);"
+             66696C655F   
+             44656C6574   
+             654D61696E   
+             4D656D6F72   
+             7928756E73   
+             69676E6564   
+             2063686172   
+             202A293B     
+    00000998 00                     .DATA.B     H'00
+    00000999 00000001               .RES.B      1
+    0000099A 00000002               .RES.W      1
+    0000099C              L949:
+    0000099C 696E742042             .SDATA      "int Bfile_FindFirst(FONTCHARACTER *,int *,FONTCHARACTER *,FILE_INFO *);"
+             66696C655F   
+             46696E6446   
+             6972737428   
+             464F4E5443   
+             4841524143   
+             544552202A   
+             2C696E7420   
+             2A2C464F4E   
+             5443484152   
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE   39
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+             4143544552   
+             202A2C4649   
+             4C455F494E   
+             464F202A29   
+             3B           
+    000009E3 00                     .DATA.B     H'00
+    000009E4              L950:
+    000009E4 696E742042             .SDATA      "int Bfile_FindNext(int,FONTCHARACTER *, FILE_INFO *);"
+             66696C655F   
+             46696E644E   
+             6578742869   
+             6E742C464F   
+             4E54434841   
+             5241435445   
+             52202A2C20   
+             46494C455F   
+             494E464F20   
+             2A293B       
+    00000A19 00                     .DATA.B     H'00
+    00000A1A 00000002               .RES.W      1
+    00000A1C              L951:
+    00000A1C 696E742042             .SDATA      "int Bfile_FindClose(int);"
+             66696C655F   
+             46696E6443   
+             6C6F736528   
+             696E74293B   
+    00000A35 00                     .DATA.B     H'00
+    00000A36 00000002               .RES.W      1
+    00000A38              L952:
+    00000A38 766F696420             .SDATA      "void Bkey_Set_RepeatTime(long,long);"
+             426B65795F   
+             5365745F52   
+             6570656174   
+             54696D6528   
+             6C6F6E672C   
+             6C6F6E6729   
+             3B           
+    00000A5C 00                     .DATA.B     H'00
+    00000A5D 00000001               .RES.B      1
+    00000A5E 00000002               .RES.W      1
+    00000A60              L953:
+    00000A60 766F696420             .SDATA      "void Bkey_Get_RepeatTime(long *, long *);"
+             426B65795F   
+             4765745F52   
+             6570656174   
+             54696D6528   
+             6C6F6E6720   
+             2A2C206C6F   
+             6E67202A29   
+             3B           
+    00000A89 00                     .DATA.B     H'00
+    00000A8A 00000002               .RES.W      1
+    00000A8C              L954:
+    00000A8C 766F696420             .SDATA      "void Bkey_Set_RepeatTime_Default();"
+             426B65795F   
+             5365745F52   
+             6570656174   
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE   40
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+             54696D655F   
+             4465666175   
+             6C7428293B   
+    00000AAF 00                     .DATA.B     H'00
+    00000AB0              L955:
+    00000AB0 696E742047             .SDATA      "int GetKey(unsigned int *);"
+             65744B6579   
+             28756E7369   
+             676E656420   
+             696E74202A   
+             293B         
+    00000ACB 00                     .DATA.B     H'00
+    00000ACC              L956:
+    00000ACC 766F696420             .SDATA      "void Sleep(int);"
+             536C656570   
+             28696E7429   
+             3B           
+    00000ADC 00                     .DATA.B     H'00
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:38  PAGE    1
+
+
+******** STATISTICS INFORMATION ********
+
+
+********** ERROR INFORMATION ***********
+
+NUMBER OF ERRORS:           0
+NUMBER OF WARNINGS:         0
+
+
+
+
+******* SOURCE LINE INFORMATION ********
+
+COMPILED SOURCE LINE:      347
+
+
+
+******* SECTION SIZE INFORMATION *******
+
+PROGRAM  SECTION (P):                               00000704 Byte(s)
+CONSTANT SECTION (C):                               00000ADD Byte(s)
+DATA     SECTION (D):                               000001D4 Byte(s)
+BSS      SECTION (B):                               00000000 Byte(s)
+
+ TOTAL PROGRAM SIZE: 000013B5 Byte(s)
+
+
+
+********** LABEL INFORMATION ***********
+
+NUMBER OF EXTERNAL REFERENCE SYMBOLS:           57
+NUMBER OF EXTERNAL DEFINITION SYMBOLS:          60
+NUMBER OF INTERNAL/EXTERNAL SYMBOLS:           176
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*** COMMAND PARAMETER ***
+
+
+  -subcommand=C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\hmk355.tmp 
+

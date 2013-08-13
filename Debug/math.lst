@@ -1,0 +1,1523 @@
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:30  PAGE    1
+
+************ OBJECT LISTING ************
+
+FILE NAME: E:\Anderain\fx-9860\dPicoc\cstdlib\math.c
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+          math.c     1    /* stdio.h library for large systems - small embedded systems use clibrary.c instead */
+          math.c     2    #include "../interpreter.h"
+          math.c     3    
+          math.c     4    #ifndef BUILTIN_MINI_STDLIB
+          math.c     5    #ifndef NO_FP
+          math.c     6    
+          math.c     7    static double M_EValue =        2.7182818284590452354;   /* e */
+          math.c     8    static double M_LOG2EValue =    1.4426950408889634074;   /* log_2 e */
+          math.c     9    static double M_LOG10EValue =   0.43429448190325182765;  /* log_10 e */
+          math.c    10    static double M_LN2Value =      0.69314718055994530942;  /* log_e 2 */
+          math.c    11    static double M_LN10Value =     2.30258509299404568402;  /* log_e 10 */
+          math.c    12    static double M_PIValue =       3.14159265358979323846;  /* pi */
+          math.c    13    static double M_PI_2Value =     1.57079632679489661923;  /* pi/2 */
+          math.c    14    static double M_PI_4Value =     0.78539816339744830962;  /* pi/4 */
+          math.c    15    static double M_1_PIValue =     0.31830988618379067154;  /* 1/pi */
+          math.c    16    static double M_2_PIValue =     0.63661977236758134308;  /* 2/pi */
+          math.c    17    static double M_2_SQRTPIValue = 1.12837916709551257390;  /* 2/sqrt(pi) */
+          math.c    18    static double M_SQRT2Value =    1.41421356237309504880;  /* sqrt(2) */
+          math.c    19    static double M_SQRT1_2Value =  0.70710678118654752440;  /* 1/sqrt(2) */
+          math.c    20    
+          math.c    21    
+          math.c    22    void MathSin(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+P   00000000              _MathSin:                        ; function: MathSin
+                                                           ; frame size=28
+    00000000 2F86                   MOV.L       R8,@-R15
+          math.c    23    {
+          math.c    24        ReturnValue->Val->FP = sin(Param[0]->Val->FP);
+    00000002 6163                   MOV         R6,R1
+    00000004 4F22                   STS.L       PR,@-R15
+    00000006 7FF8                   ADD         #-8,R15
+    00000008 1F51                   MOV.L       R5,@(4,R15)
+    0000000A 2F62                   MOV.L       R6,@R15
+    0000000C 53F1                   MOV.L       @(4,R15),R3
+    0000000E 5831                   MOV.L       @(4,R3),R8
+    00000010 6312                   MOV.L       @R1,R3
+    00000012 5231                   MOV.L       @(4,R3),R2
+    00000014 D3D2                   MOV.L       L730,R3    ; _sin
+    00000016 5121                   MOV.L       @(4,R2),R1
+    00000018 2F16                   MOV.L       R1,@-R15
+    0000001A 6122                   MOV.L       @R2,R1
+    0000001C 2F16                   MOV.L       R1,@-R15
+    0000001E 430B                   JSR         @R3
+    00000020 2F86                   MOV.L       R8,@-R15
+          math.c    25    }
+    00000022 7F14                   ADD         #20,R15
+    00000024 4F26                   LDS.L       @R15+,PR
+    00000026 000B                   RTS
+    00000028 68F6                   MOV.L       @R15+,R8
+          math.c    26    
+          math.c    27    void MathCos(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    0000002A              _MathCos:                        ; function: MathCos
+                                                           ; frame size=28
+          math.c    28    {
+          math.c    29        ReturnValue->Val->FP = cos(Param[0]->Val->FP);
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:30  PAGE    2
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    0000002A 6163                   MOV         R6,R1
+    0000002C 2F86                   MOV.L       R8,@-R15
+    0000002E 4F22                   STS.L       PR,@-R15
+    00000030 7FF8                   ADD         #-8,R15
+    00000032 1F51                   MOV.L       R5,@(4,R15)
+    00000034 2F62                   MOV.L       R6,@R15
+    00000036 53F1                   MOV.L       @(4,R15),R3
+    00000038 5831                   MOV.L       @(4,R3),R8
+    0000003A 6312                   MOV.L       @R1,R3
+    0000003C 5231                   MOV.L       @(4,R3),R2
+    0000003E 5121                   MOV.L       @(4,R2),R1
+    00000040 D3C8                   MOV.L       L730+4,R3  ; _cos
+    00000042 2F16                   MOV.L       R1,@-R15
+    00000044 6122                   MOV.L       @R2,R1
+    00000046 2F16                   MOV.L       R1,@-R15
+    00000048 430B                   JSR         @R3
+    0000004A 2F86                   MOV.L       R8,@-R15
+          math.c    30    }
+    0000004C 7F14                   ADD         #20,R15
+    0000004E 4F26                   LDS.L       @R15+,PR
+    00000050 000B                   RTS
+    00000052 68F6                   MOV.L       @R15+,R8
+          math.c    31    
+          math.c    32    void MathTan(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    00000054              _MathTan:                        ; function: MathTan
+                                                           ; frame size=28
+    00000054 2F86                   MOV.L       R8,@-R15
+          math.c    33    {
+          math.c    34        ReturnValue->Val->FP = tan(Param[0]->Val->FP);
+    00000056 6163                   MOV         R6,R1
+    00000058 4F22                   STS.L       PR,@-R15
+    0000005A 7FF8                   ADD         #-8,R15
+    0000005C 1F51                   MOV.L       R5,@(4,R15)
+    0000005E 2F62                   MOV.L       R6,@R15
+    00000060 53F1                   MOV.L       @(4,R15),R3
+    00000062 5831                   MOV.L       @(4,R3),R8
+    00000064 6312                   MOV.L       @R1,R3
+    00000066 5231                   MOV.L       @(4,R3),R2
+    00000068 D3BF                   MOV.L       L730+8,R3  ; _tan
+    0000006A 5121                   MOV.L       @(4,R2),R1
+    0000006C 2F16                   MOV.L       R1,@-R15
+    0000006E 6122                   MOV.L       @R2,R1
+    00000070 2F16                   MOV.L       R1,@-R15
+    00000072 430B                   JSR         @R3
+    00000074 2F86                   MOV.L       R8,@-R15
+          math.c    35    }
+    00000076 7F14                   ADD         #20,R15
+    00000078 4F26                   LDS.L       @R15+,PR
+    0000007A 000B                   RTS
+    0000007C 68F6                   MOV.L       @R15+,R8
+          math.c    36    
+          math.c    37    void MathAsin(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    0000007E              _MathAsin:                       ; function: MathAsin
+                                                           ; frame size=28
+          math.c    38    {
+          math.c    39        ReturnValue->Val->FP = asin(Param[0]->Val->FP);
+    0000007E 6163                   MOV         R6,R1
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:30  PAGE    3
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000080 2F86                   MOV.L       R8,@-R15
+    00000082 4F22                   STS.L       PR,@-R15
+    00000084 7FF8                   ADD         #-8,R15
+    00000086 1F51                   MOV.L       R5,@(4,R15)
+    00000088 2F62                   MOV.L       R6,@R15
+    0000008A 53F1                   MOV.L       @(4,R15),R3
+    0000008C 5831                   MOV.L       @(4,R3),R8
+    0000008E 6312                   MOV.L       @R1,R3
+    00000090 5231                   MOV.L       @(4,R3),R2
+    00000092 5121                   MOV.L       @(4,R2),R1
+    00000094 D3B5                   MOV.L       L730+12,R3 ; _asin
+    00000096 2F16                   MOV.L       R1,@-R15
+    00000098 6122                   MOV.L       @R2,R1
+    0000009A 2F16                   MOV.L       R1,@-R15
+    0000009C 430B                   JSR         @R3
+    0000009E 2F86                   MOV.L       R8,@-R15
+          math.c    40    }
+    000000A0 7F14                   ADD         #20,R15
+    000000A2 4F26                   LDS.L       @R15+,PR
+    000000A4 000B                   RTS
+    000000A6 68F6                   MOV.L       @R15+,R8
+          math.c    41    
+          math.c    42    void MathAcos(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    000000A8              _MathAcos:                       ; function: MathAcos
+                                                           ; frame size=28
+    000000A8 2F86                   MOV.L       R8,@-R15
+          math.c    43    {
+          math.c    44        ReturnValue->Val->FP = acos(Param[0]->Val->FP);
+    000000AA 6163                   MOV         R6,R1
+    000000AC 4F22                   STS.L       PR,@-R15
+    000000AE 7FF8                   ADD         #-8,R15
+    000000B0 1F51                   MOV.L       R5,@(4,R15)
+    000000B2 2F62                   MOV.L       R6,@R15
+    000000B4 53F1                   MOV.L       @(4,R15),R3
+    000000B6 5831                   MOV.L       @(4,R3),R8
+    000000B8 6312                   MOV.L       @R1,R3
+    000000BA 5231                   MOV.L       @(4,R3),R2
+    000000BC D3AC                   MOV.L       L730+16,R3 ; _acos
+    000000BE 5121                   MOV.L       @(4,R2),R1
+    000000C0 2F16                   MOV.L       R1,@-R15
+    000000C2 6122                   MOV.L       @R2,R1
+    000000C4 2F16                   MOV.L       R1,@-R15
+    000000C6 430B                   JSR         @R3
+    000000C8 2F86                   MOV.L       R8,@-R15
+          math.c    45    }
+    000000CA 7F14                   ADD         #20,R15
+    000000CC 4F26                   LDS.L       @R15+,PR
+    000000CE 000B                   RTS
+    000000D0 68F6                   MOV.L       @R15+,R8
+          math.c    46    
+          math.c    47    void MathAtan(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    000000D2              _MathAtan:                       ; function: MathAtan
+                                                           ; frame size=28
+          math.c    48    {
+          math.c    49        ReturnValue->Val->FP = atan(Param[0]->Val->FP);
+    000000D2 6163                   MOV         R6,R1
+    000000D4 2F86                   MOV.L       R8,@-R15
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:30  PAGE    4
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000000D6 4F22                   STS.L       PR,@-R15
+    000000D8 7FF8                   ADD         #-8,R15
+    000000DA 1F51                   MOV.L       R5,@(4,R15)
+    000000DC 2F62                   MOV.L       R6,@R15
+    000000DE 53F1                   MOV.L       @(4,R15),R3
+    000000E0 5831                   MOV.L       @(4,R3),R8
+    000000E2 6312                   MOV.L       @R1,R3
+    000000E4 5231                   MOV.L       @(4,R3),R2
+    000000E6 5121                   MOV.L       @(4,R2),R1
+    000000E8 D3A2                   MOV.L       L730+20,R3 ; _atan
+    000000EA 2F16                   MOV.L       R1,@-R15
+    000000EC 6122                   MOV.L       @R2,R1
+    000000EE 2F16                   MOV.L       R1,@-R15
+    000000F0 430B                   JSR         @R3
+    000000F2 2F86                   MOV.L       R8,@-R15
+          math.c    50    }
+    000000F4 7F14                   ADD         #20,R15
+    000000F6 4F26                   LDS.L       @R15+,PR
+    000000F8 000B                   RTS
+    000000FA 68F6                   MOV.L       @R15+,R8
+          math.c    51    
+          math.c    52    void MathAtan2(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    000000FC              _MathAtan2:                      ; function: MathAtan2
+                                                           ; frame size=36
+    000000FC 2F86                   MOV.L       R8,@-R15
+          math.c    53    {
+          math.c    54        ReturnValue->Val->FP = atan2(Param[0]->Val->FP, Param[1]->Val->FP);
+    000000FE 6163                   MOV         R6,R1
+    00000100 4F22                   STS.L       PR,@-R15
+    00000102 7FF8                   ADD         #-8,R15
+    00000104 1F51                   MOV.L       R5,@(4,R15)
+    00000106 2F62                   MOV.L       R6,@R15
+    00000108 53F1                   MOV.L       @(4,R15),R3
+    0000010A 5831                   MOV.L       @(4,R3),R8
+    0000010C 5311                   MOV.L       @(4,R1),R3
+    0000010E 5231                   MOV.L       @(4,R3),R2
+    00000110 5121                   MOV.L       @(4,R2),R1
+    00000112 2F16                   MOV.L       R1,@-R15
+    00000114 6122                   MOV.L       @R2,R1
+    00000116 2F16                   MOV.L       R1,@-R15
+    00000118 53F2                   MOV.L       @(8,R15),R3
+    0000011A 6232                   MOV.L       @R3,R2
+    0000011C 5121                   MOV.L       @(4,R2),R1
+    0000011E 5311                   MOV.L       @(4,R1),R3
+    00000120 D295                   MOV.L       L730+24,R2 ; _atan2
+    00000122 2F36                   MOV.L       R3,@-R15
+    00000124 6312                   MOV.L       @R1,R3
+    00000126 2F36                   MOV.L       R3,@-R15
+    00000128 420B                   JSR         @R2
+    0000012A 2F86                   MOV.L       R8,@-R15
+          math.c    55    }
+    0000012C 7F1C                   ADD         #28,R15
+    0000012E 4F26                   LDS.L       @R15+,PR
+    00000130 000B                   RTS
+    00000132 68F6                   MOV.L       @R15+,R8
+          math.c    56    
+          math.c    57    void MathSinh(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:30  PAGE    5
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000134              _MathSinh:                       ; function: MathSinh
+                                                           ; frame size=28
+    00000134 2F86                   MOV.L       R8,@-R15
+          math.c    58    {
+          math.c    59        ReturnValue->Val->FP = sinh(Param[0]->Val->FP);
+    00000136 6163                   MOV         R6,R1
+    00000138 4F22                   STS.L       PR,@-R15
+    0000013A 7FF8                   ADD         #-8,R15
+    0000013C 1F51                   MOV.L       R5,@(4,R15)
+    0000013E 2F62                   MOV.L       R6,@R15
+    00000140 53F1                   MOV.L       @(4,R15),R3
+    00000142 5831                   MOV.L       @(4,R3),R8
+    00000144 6312                   MOV.L       @R1,R3
+    00000146 5231                   MOV.L       @(4,R3),R2
+    00000148 D38C                   MOV.L       L730+28,R3 ; _sinh
+    0000014A 5121                   MOV.L       @(4,R2),R1
+    0000014C 2F16                   MOV.L       R1,@-R15
+    0000014E 6122                   MOV.L       @R2,R1
+    00000150 2F16                   MOV.L       R1,@-R15
+    00000152 430B                   JSR         @R3
+    00000154 2F86                   MOV.L       R8,@-R15
+          math.c    60    }
+    00000156 7F14                   ADD         #20,R15
+    00000158 4F26                   LDS.L       @R15+,PR
+    0000015A 000B                   RTS
+    0000015C 68F6                   MOV.L       @R15+,R8
+          math.c    61    
+          math.c    62    void MathCosh(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    0000015E              _MathCosh:                       ; function: MathCosh
+                                                           ; frame size=28
+          math.c    63    {
+          math.c    64        ReturnValue->Val->FP = cosh(Param[0]->Val->FP);
+    0000015E 6163                   MOV         R6,R1
+    00000160 2F86                   MOV.L       R8,@-R15
+    00000162 4F22                   STS.L       PR,@-R15
+    00000164 7FF8                   ADD         #-8,R15
+    00000166 1F51                   MOV.L       R5,@(4,R15)
+    00000168 2F62                   MOV.L       R6,@R15
+    0000016A 53F1                   MOV.L       @(4,R15),R3
+    0000016C 5831                   MOV.L       @(4,R3),R8
+    0000016E 6312                   MOV.L       @R1,R3
+    00000170 5231                   MOV.L       @(4,R3),R2
+    00000172 5121                   MOV.L       @(4,R2),R1
+    00000174 D382                   MOV.L       L730+32,R3 ; _cosh
+    00000176 2F16                   MOV.L       R1,@-R15
+    00000178 6122                   MOV.L       @R2,R1
+    0000017A 2F16                   MOV.L       R1,@-R15
+    0000017C 430B                   JSR         @R3
+    0000017E 2F86                   MOV.L       R8,@-R15
+          math.c    65    }
+    00000180 7F14                   ADD         #20,R15
+    00000182 4F26                   LDS.L       @R15+,PR
+    00000184 000B                   RTS
+    00000186 68F6                   MOV.L       @R15+,R8
+          math.c    66    
+          math.c    67    void MathTanh(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    00000188              _MathTanh:                       ; function: MathTanh
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:30  PAGE    6
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+                                                           ; frame size=28
+    00000188 2F86                   MOV.L       R8,@-R15
+          math.c    68    {
+          math.c    69        ReturnValue->Val->FP = tanh(Param[0]->Val->FP);
+    0000018A 6163                   MOV         R6,R1
+    0000018C 4F22                   STS.L       PR,@-R15
+    0000018E 7FF8                   ADD         #-8,R15
+    00000190 1F51                   MOV.L       R5,@(4,R15)
+    00000192 2F62                   MOV.L       R6,@R15
+    00000194 53F1                   MOV.L       @(4,R15),R3
+    00000196 5831                   MOV.L       @(4,R3),R8
+    00000198 6312                   MOV.L       @R1,R3
+    0000019A 5231                   MOV.L       @(4,R3),R2
+    0000019C D379                   MOV.L       L730+36,R3 ; _tanh
+    0000019E 5121                   MOV.L       @(4,R2),R1
+    000001A0 2F16                   MOV.L       R1,@-R15
+    000001A2 6122                   MOV.L       @R2,R1
+    000001A4 2F16                   MOV.L       R1,@-R15
+    000001A6 430B                   JSR         @R3
+    000001A8 2F86                   MOV.L       R8,@-R15
+          math.c    70    }
+    000001AA 7F14                   ADD         #20,R15
+    000001AC 4F26                   LDS.L       @R15+,PR
+    000001AE 000B                   RTS
+    000001B0 68F6                   MOV.L       @R15+,R8
+          math.c    71    
+          math.c    72    void MathExp(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    000001B2              _MathExp:                        ; function: MathExp
+                                                           ; frame size=28
+          math.c    73    {
+          math.c    74        ReturnValue->Val->FP = exp(Param[0]->Val->FP);
+    000001B2 6163                   MOV         R6,R1
+    000001B4 2F86                   MOV.L       R8,@-R15
+    000001B6 4F22                   STS.L       PR,@-R15
+    000001B8 7FF8                   ADD         #-8,R15
+    000001BA 1F51                   MOV.L       R5,@(4,R15)
+    000001BC 2F62                   MOV.L       R6,@R15
+    000001BE 53F1                   MOV.L       @(4,R15),R3
+    000001C0 5831                   MOV.L       @(4,R3),R8
+    000001C2 6312                   MOV.L       @R1,R3
+    000001C4 5231                   MOV.L       @(4,R3),R2
+    000001C6 5121                   MOV.L       @(4,R2),R1
+    000001C8 D36F                   MOV.L       L730+40,R3 ; _exp
+    000001CA 2F16                   MOV.L       R1,@-R15
+    000001CC 6122                   MOV.L       @R2,R1
+    000001CE 2F16                   MOV.L       R1,@-R15
+    000001D0 430B                   JSR         @R3
+    000001D2 2F86                   MOV.L       R8,@-R15
+          math.c    75    }
+    000001D4 7F14                   ADD         #20,R15
+    000001D6 4F26                   LDS.L       @R15+,PR
+    000001D8 000B                   RTS
+    000001DA 68F6                   MOV.L       @R15+,R8
+          math.c    76    
+          math.c    77    void MathFabs(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    000001DC              _MathFabs:                       ; function: MathFabs
+                                                           ; frame size=28
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:30  PAGE    7
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000001DC 2F86                   MOV.L       R8,@-R15
+          math.c    78    {
+          math.c    79        ReturnValue->Val->FP = fabs(Param[0]->Val->FP);
+    000001DE 6163                   MOV         R6,R1
+    000001E0 4F22                   STS.L       PR,@-R15
+    000001E2 7FF8                   ADD         #-8,R15
+    000001E4 1F51                   MOV.L       R5,@(4,R15)
+    000001E6 2F62                   MOV.L       R6,@R15
+    000001E8 53F1                   MOV.L       @(4,R15),R3
+    000001EA 5831                   MOV.L       @(4,R3),R8
+    000001EC 6312                   MOV.L       @R1,R3
+    000001EE 5231                   MOV.L       @(4,R3),R2
+    000001F0 D366                   MOV.L       L730+44,R3 ; _fabs
+    000001F2 5121                   MOV.L       @(4,R2),R1
+    000001F4 2F16                   MOV.L       R1,@-R15
+    000001F6 6122                   MOV.L       @R2,R1
+    000001F8 2F16                   MOV.L       R1,@-R15
+    000001FA 430B                   JSR         @R3
+    000001FC 2F86                   MOV.L       R8,@-R15
+          math.c    80    }
+    000001FE 7F14                   ADD         #20,R15
+    00000200 4F26                   LDS.L       @R15+,PR
+    00000202 000B                   RTS
+    00000204 68F6                   MOV.L       @R15+,R8
+          math.c    81    
+          math.c    82    void MathFmod(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    00000206              _MathFmod:                       ; function: MathFmod
+                                                           ; frame size=36
+          math.c    83    {
+          math.c    84        ReturnValue->Val->FP = fmod(Param[0]->Val->FP, Param[1]->Val->FP);
+    00000206 6163                   MOV         R6,R1
+    00000208 2F86                   MOV.L       R8,@-R15
+    0000020A 4F22                   STS.L       PR,@-R15
+    0000020C 7FF8                   ADD         #-8,R15
+    0000020E 1F51                   MOV.L       R5,@(4,R15)
+    00000210 2F62                   MOV.L       R6,@R15
+    00000212 53F1                   MOV.L       @(4,R15),R3
+    00000214 5831                   MOV.L       @(4,R3),R8
+    00000216 5311                   MOV.L       @(4,R1),R3
+    00000218 5231                   MOV.L       @(4,R3),R2
+    0000021A 5121                   MOV.L       @(4,R2),R1
+    0000021C 2F16                   MOV.L       R1,@-R15
+    0000021E 6122                   MOV.L       @R2,R1
+    00000220 2F16                   MOV.L       R1,@-R15
+    00000222 53F2                   MOV.L       @(8,R15),R3
+    00000224 6232                   MOV.L       @R3,R2
+    00000226 5121                   MOV.L       @(4,R2),R1
+    00000228 D259                   MOV.L       L730+48,R2 ; _fmod
+    0000022A 5311                   MOV.L       @(4,R1),R3
+    0000022C 2F36                   MOV.L       R3,@-R15
+    0000022E 6312                   MOV.L       @R1,R3
+    00000230 2F36                   MOV.L       R3,@-R15
+    00000232 420B                   JSR         @R2
+    00000234 2F86                   MOV.L       R8,@-R15
+          math.c    85    }
+    00000236 7F1C                   ADD         #28,R15
+    00000238 4F26                   LDS.L       @R15+,PR
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:30  PAGE    8
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    0000023A 000B                   RTS
+    0000023C 68F6                   MOV.L       @R15+,R8
+          math.c    86    
+          math.c    87    void MathFrexp(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    0000023E              _MathFrexp:                      ; function: MathFrexp
+                                                           ; frame size=28
+          math.c    88    {
+          math.c    89        ReturnValue->Val->FP = frexp(Param[0]->Val->FP, Param[1]->Val->Pointer);
+    0000023E 6163                   MOV         R6,R1
+    00000240 2F86                   MOV.L       R8,@-R15
+    00000242 4F22                   STS.L       PR,@-R15
+    00000244 7FF8                   ADD         #-8,R15
+    00000246 1F51                   MOV.L       R5,@(4,R15)
+    00000248 2F62                   MOV.L       R6,@R15
+    0000024A 53F1                   MOV.L       @(4,R15),R3
+    0000024C 5831                   MOV.L       @(4,R3),R8
+    0000024E 6312                   MOV.L       @R1,R3
+    00000250 5231                   MOV.L       @(4,R3),R2
+    00000252 5121                   MOV.L       @(4,R2),R1
+    00000254 2F16                   MOV.L       R1,@-R15
+    00000256 6122                   MOV.L       @R2,R1
+    00000258 D24E                   MOV.L       L730+52,R2 ; _frexp
+    0000025A 2F16                   MOV.L       R1,@-R15
+    0000025C 53F2                   MOV.L       @(8,R15),R3
+    0000025E 5431                   MOV.L       @(4,R3),R4
+    00000260 5441                   MOV.L       @(4,R4),R4
+    00000262 6442                   MOV.L       @R4,R4
+    00000264 420B                   JSR         @R2
+    00000266 2F86                   MOV.L       R8,@-R15
+          math.c    90    }
+    00000268 7F14                   ADD         #20,R15
+    0000026A 4F26                   LDS.L       @R15+,PR
+    0000026C 000B                   RTS
+    0000026E 68F6                   MOV.L       @R15+,R8
+          math.c    91    
+          math.c    92    void MathLdexp(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    00000270              _MathLdexp:                      ; function: MathLdexp
+                                                           ; frame size=28
+    00000270 2F86                   MOV.L       R8,@-R15
+          math.c    93    {
+          math.c    94        ReturnValue->Val->FP = ldexp(Param[0]->Val->FP, Param[1]->Val->Integer);
+    00000272 6163                   MOV         R6,R1
+    00000274 4F22                   STS.L       PR,@-R15
+    00000276 7FF8                   ADD         #-8,R15
+    00000278 1F51                   MOV.L       R5,@(4,R15)
+    0000027A 2F62                   MOV.L       R6,@R15
+    0000027C 53F1                   MOV.L       @(4,R15),R3
+    0000027E 5831                   MOV.L       @(4,R3),R8
+    00000280 6312                   MOV.L       @R1,R3
+    00000282 5231                   MOV.L       @(4,R3),R2
+    00000284 5121                   MOV.L       @(4,R2),R1
+    00000286 2F16                   MOV.L       R1,@-R15
+    00000288 6122                   MOV.L       @R2,R1
+    0000028A 2F16                   MOV.L       R1,@-R15
+    0000028C 53F2                   MOV.L       @(8,R15),R3
+    0000028E 5431                   MOV.L       @(4,R3),R4
+    00000290 D241                   MOV.L       L730+56,R2 ; _ldexp
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:30  PAGE    9
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000292 5441                   MOV.L       @(4,R4),R4
+    00000294 6442                   MOV.L       @R4,R4
+    00000296 420B                   JSR         @R2
+    00000298 2F86                   MOV.L       R8,@-R15
+          math.c    95    }
+    0000029A 7F14                   ADD         #20,R15
+    0000029C 4F26                   LDS.L       @R15+,PR
+    0000029E 000B                   RTS
+    000002A0 68F6                   MOV.L       @R15+,R8
+          math.c    96    
+          math.c    97    void MathLog(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    000002A2              _MathLog:                        ; function: MathLog
+                                                           ; frame size=28
+          math.c    98    {
+          math.c    99        ReturnValue->Val->FP = log(Param[0]->Val->FP);
+    000002A2 6163                   MOV         R6,R1
+    000002A4 2F86                   MOV.L       R8,@-R15
+    000002A6 4F22                   STS.L       PR,@-R15
+    000002A8 7FF8                   ADD         #-8,R15
+    000002AA 1F51                   MOV.L       R5,@(4,R15)
+    000002AC 2F62                   MOV.L       R6,@R15
+    000002AE 53F1                   MOV.L       @(4,R15),R3
+    000002B0 5831                   MOV.L       @(4,R3),R8
+    000002B2 6312                   MOV.L       @R1,R3
+    000002B4 5231                   MOV.L       @(4,R3),R2
+    000002B6 5121                   MOV.L       @(4,R2),R1
+    000002B8 D338                   MOV.L       L730+60,R3 ; _log
+    000002BA 2F16                   MOV.L       R1,@-R15
+    000002BC 6122                   MOV.L       @R2,R1
+    000002BE 2F16                   MOV.L       R1,@-R15
+    000002C0 430B                   JSR         @R3
+    000002C2 2F86                   MOV.L       R8,@-R15
+          math.c   100    }
+    000002C4 7F14                   ADD         #20,R15
+    000002C6 4F26                   LDS.L       @R15+,PR
+    000002C8 000B                   RTS
+    000002CA 68F6                   MOV.L       @R15+,R8
+          math.c   101    
+          math.c   102    void MathLog10(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    000002CC              _MathLog10:                      ; function: MathLog10
+                                                           ; frame size=28
+    000002CC 2F86                   MOV.L       R8,@-R15
+          math.c   103    {
+          math.c   104        ReturnValue->Val->FP = log10(Param[0]->Val->FP);
+    000002CE 6163                   MOV         R6,R1
+    000002D0 4F22                   STS.L       PR,@-R15
+    000002D2 7FF8                   ADD         #-8,R15
+    000002D4 1F51                   MOV.L       R5,@(4,R15)
+    000002D6 2F62                   MOV.L       R6,@R15
+    000002D8 53F1                   MOV.L       @(4,R15),R3
+    000002DA 5831                   MOV.L       @(4,R3),R8
+    000002DC 6312                   MOV.L       @R1,R3
+    000002DE 5231                   MOV.L       @(4,R3),R2
+    000002E0 D32F                   MOV.L       L730+64,R3 ; _log10
+    000002E2 5121                   MOV.L       @(4,R2),R1
+    000002E4 2F16                   MOV.L       R1,@-R15
+    000002E6 6122                   MOV.L       @R2,R1
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:30  PAGE   10
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000002E8 2F16                   MOV.L       R1,@-R15
+    000002EA 430B                   JSR         @R3
+    000002EC 2F86                   MOV.L       R8,@-R15
+          math.c   105    }
+    000002EE 7F14                   ADD         #20,R15
+    000002F0 4F26                   LDS.L       @R15+,PR
+    000002F2 000B                   RTS
+    000002F4 68F6                   MOV.L       @R15+,R8
+          math.c   106    
+          math.c   107    void MathModf(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    000002F6              _MathModf:                       ; function: MathModf
+                                                           ; frame size=36
+          math.c   108    {
+          math.c   109        ReturnValue->Val->FP = modf(Param[0]->Val->FP, Param[0]->Val->Pointer);
+    000002F6 6163                   MOV         R6,R1
+    000002F8 2F86                   MOV.L       R8,@-R15
+    000002FA 4F22                   STS.L       PR,@-R15
+    000002FC 7FF0                   ADD         #-16,R15
+    000002FE 1F52                   MOV.L       R5,@(8,R15)
+    00000300 1F61                   MOV.L       R6,@(4,R15)
+    00000302 53F2                   MOV.L       @(8,R15),R3
+    00000304 5831                   MOV.L       @(4,R3),R8
+    00000306 6312                   MOV.L       @R1,R3
+    00000308 2F32                   MOV.L       R3,@R15
+    0000030A 5231                   MOV.L       @(4,R3),R2
+    0000030C 1F23                   MOV.L       R2,@(12,R15)
+    0000030E 5321                   MOV.L       @(4,R2),R3
+    00000310 2F36                   MOV.L       R3,@-R15
+    00000312 6322                   MOV.L       @R2,R3
+    00000314 D223                   MOV.L       L730+68,R2 ; _modf
+    00000316 2F36                   MOV.L       R3,@-R15
+    00000318 54F5                   MOV.L       @(20,R15),R4
+    0000031A 6442                   MOV.L       @R4,R4
+    0000031C 420B                   JSR         @R2
+    0000031E 2F86                   MOV.L       R8,@-R15
+          math.c   110    }
+    00000320 7F1C                   ADD         #28,R15
+    00000322 4F26                   LDS.L       @R15+,PR
+    00000324 000B                   RTS
+    00000326 68F6                   MOV.L       @R15+,R8
+          math.c   111    
+          math.c   112    void MathPow(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    00000328              _MathPow:                        ; function: MathPow
+                                                           ; frame size=36
+    00000328 2F86                   MOV.L       R8,@-R15
+          math.c   113    {
+          math.c   114        ReturnValue->Val->FP = pow(Param[0]->Val->FP, Param[1]->Val->FP);
+    0000032A 6163                   MOV         R6,R1
+    0000032C 4F22                   STS.L       PR,@-R15
+    0000032E 7FF8                   ADD         #-8,R15
+    00000330 1F51                   MOV.L       R5,@(4,R15)
+    00000332 2F62                   MOV.L       R6,@R15
+    00000334 53F1                   MOV.L       @(4,R15),R3
+    00000336 5831                   MOV.L       @(4,R3),R8
+    00000338 5311                   MOV.L       @(4,R1),R3
+    0000033A 5231                   MOV.L       @(4,R3),R2
+    0000033C 5121                   MOV.L       @(4,R2),R1
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:30  PAGE   11
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    0000033E 2F16                   MOV.L       R1,@-R15
+    00000340 6122                   MOV.L       @R2,R1
+    00000342 2F16                   MOV.L       R1,@-R15
+    00000344 53F2                   MOV.L       @(8,R15),R3
+    00000346 6232                   MOV.L       @R3,R2
+    00000348 5121                   MOV.L       @(4,R2),R1
+    0000034A 5311                   MOV.L       @(4,R1),R3
+    0000034C D216                   MOV.L       L730+72,R2 ; _pow
+    0000034E 2F36                   MOV.L       R3,@-R15
+    00000350 6312                   MOV.L       @R1,R3
+    00000352 2F36                   MOV.L       R3,@-R15
+    00000354 420B                   JSR         @R2
+    00000356 2F86                   MOV.L       R8,@-R15
+          math.c   115    }
+    00000358 7F1C                   ADD         #28,R15
+    0000035A 4F26                   LDS.L       @R15+,PR
+    0000035C 000B                   RTS
+    0000035E 68F6                   MOV.L       @R15+,R8
+    00000360              L730:                             
+    00000360 <00000000>             .DATA.L     _sin
+    00000364 <00000000>             .DATA.L     _cos
+    00000368 <00000000>             .DATA.L     _tan
+    0000036C <00000000>             .DATA.L     _asin
+    00000370 <00000000>             .DATA.L     _acos
+    00000374 <00000000>             .DATA.L     _atan
+    00000378 <00000000>             .DATA.L     _atan2
+    0000037C <00000000>             .DATA.L     _sinh
+    00000380 <00000000>             .DATA.L     _cosh
+    00000384 <00000000>             .DATA.L     _tanh
+    00000388 <00000000>             .DATA.L     _exp
+    0000038C <00000000>             .DATA.L     _fabs
+    00000390 <00000000>             .DATA.L     _fmod
+    00000394 <00000000>             .DATA.L     _frexp
+    00000398 <00000000>             .DATA.L     _ldexp
+    0000039C <00000000>             .DATA.L     _log
+    000003A0 <00000000>             .DATA.L     _log10
+    000003A4 <00000000>             .DATA.L     _modf
+    000003A8 <00000000>             .DATA.L     _pow
+          math.c   116    
+          math.c   117    void MathSqrt(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    000003AC              _MathSqrt:                       ; function: MathSqrt
+                                                           ; frame size=28
+    000003AC 2F86                   MOV.L       R8,@-R15
+          math.c   118    {
+          math.c   119        ReturnValue->Val->FP = sqrt(Param[0]->Val->FP);
+    000003AE 6163                   MOV         R6,R1
+    000003B0 4F22                   STS.L       PR,@-R15
+    000003B2 7FF8                   ADD         #-8,R15
+    000003B4 1F51                   MOV.L       R5,@(4,R15)
+    000003B6 2F62                   MOV.L       R6,@R15
+    000003B8 53F1                   MOV.L       @(4,R15),R3
+    000003BA 5831                   MOV.L       @(4,R3),R8
+    000003BC 6312                   MOV.L       @R1,R3
+    000003BE 5231                   MOV.L       @(4,R3),R2
+    000003C0 D35A                   MOV.L       L731,R3    ; _sqrt
+    000003C2 5121                   MOV.L       @(4,R2),R1
+    000003C4 2F16                   MOV.L       R1,@-R15
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:30  PAGE   12
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000003C6 6122                   MOV.L       @R2,R1
+    000003C8 2F16                   MOV.L       R1,@-R15
+    000003CA 430B                   JSR         @R3
+    000003CC 2F86                   MOV.L       R8,@-R15
+          math.c   120    }
+    000003CE 7F14                   ADD         #20,R15
+    000003D0 4F26                   LDS.L       @R15+,PR
+    000003D2 000B                   RTS
+    000003D4 68F6                   MOV.L       @R15+,R8
+          math.c   121    
+          math.c   122    void MathRound(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    000003D6              _MathRound:                      ; function: MathRound
+                                                           ; frame size=44
+                                                           ; used runtime library name:
+                                                           ; __addd
+          math.c   123    {
+          math.c   124        /* this awkward definition of "round()" due to it being inconsistently
+          math.c   125         * declared in math.h */
+          math.c   126        ReturnValue->Val->FP = ceil(Param[0]->Val->FP - 0.5);
+    000003D6 6163                   MOV         R6,R1
+    000003D8 2F86                   MOV.L       R8,@-R15
+    000003DA 4F22                   STS.L       PR,@-R15
+    000003DC 7FF8                   ADD         #-8,R15
+    000003DE 1F51                   MOV.L       R5,@(4,R15)
+    000003E0 2F62                   MOV.L       R6,@R15
+    000003E2 53F1                   MOV.L       @(4,R15),R3
+    000003E4 5831                   MOV.L       @(4,R3),R8
+    000003E6 7FF8                   ADD         #-8,R15
+    000003E8 6312                   MOV.L       @R1,R3
+    000003EA 5231                   MOV.L       @(4,R3),R2
+    000003EC 5121                   MOV.L       @(4,R2),R1
+    000003EE E300                   MOV         #0,R3
+    000003F0 2F16                   MOV.L       R1,@-R15
+    000003F2 6122                   MOV.L       @R2,R1
+    000003F4 2F16                   MOV.L       R1,@-R15
+    000003F6 2F36                   MOV.L       R3,@-R15
+    000003F8 D34D                   MOV.L       L731+4,R3  ; H'BFE00000
+    000003FA 2F36                   MOV.L       R3,@-R15
+    000003FC D14D                   MOV.L       L731+8,R1  ; __addd
+    000003FE 62F3                   MOV         R15,R2
+    00000400 7210                   ADD         #16,R2
+    00000402 410B                   JSR         @R1
+    00000404 2F26                   MOV.L       R2,@-R15
+    00000406 D34C                   MOV.L       L731+12,R3 ; _ceil
+    00000408 430B                   JSR         @R3
+    0000040A 2F86                   MOV.L       R8,@-R15
+          math.c   127    }
+    0000040C 7F14                   ADD         #20,R15
+    0000040E 4F26                   LDS.L       @R15+,PR
+    00000410 000B                   RTS
+    00000412 68F6                   MOV.L       @R15+,R8
+          math.c   128    
+          math.c   129    void MathCeil(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    00000414              _MathCeil:                       ; function: MathCeil
+                                                           ; frame size=28
+    00000414 2F86                   MOV.L       R8,@-R15
+          math.c   130    {
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:30  PAGE   13
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+          math.c   131        ReturnValue->Val->FP = ceil(Param[0]->Val->FP);
+    00000416 6163                   MOV         R6,R1
+    00000418 4F22                   STS.L       PR,@-R15
+    0000041A 7FF8                   ADD         #-8,R15
+    0000041C 1F51                   MOV.L       R5,@(4,R15)
+    0000041E 2F62                   MOV.L       R6,@R15
+    00000420 53F1                   MOV.L       @(4,R15),R3
+    00000422 5831                   MOV.L       @(4,R3),R8
+    00000424 6312                   MOV.L       @R1,R3
+    00000426 5231                   MOV.L       @(4,R3),R2
+    00000428 D343                   MOV.L       L731+12,R3 ; _ceil
+    0000042A 5121                   MOV.L       @(4,R2),R1
+    0000042C 2F16                   MOV.L       R1,@-R15
+    0000042E 6122                   MOV.L       @R2,R1
+    00000430 2F16                   MOV.L       R1,@-R15
+    00000432 430B                   JSR         @R3
+    00000434 2F86                   MOV.L       R8,@-R15
+          math.c   132    }
+    00000436 7F14                   ADD         #20,R15
+    00000438 4F26                   LDS.L       @R15+,PR
+    0000043A 000B                   RTS
+    0000043C 68F6                   MOV.L       @R15+,R8
+          math.c   133    
+          math.c   134    void MathFloor(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    0000043E              _MathFloor:                      ; function: MathFloor
+                                                           ; frame size=28
+          math.c   135    {
+          math.c   136        ReturnValue->Val->FP = floor(Param[0]->Val->FP);
+    0000043E 6163                   MOV         R6,R1
+    00000440 2F86                   MOV.L       R8,@-R15
+    00000442 4F22                   STS.L       PR,@-R15
+    00000444 7FF8                   ADD         #-8,R15
+    00000446 1F51                   MOV.L       R5,@(4,R15)
+    00000448 2F62                   MOV.L       R6,@R15
+    0000044A 53F1                   MOV.L       @(4,R15),R3
+    0000044C 5831                   MOV.L       @(4,R3),R8
+    0000044E 6312                   MOV.L       @R1,R3
+    00000450 5231                   MOV.L       @(4,R3),R2
+    00000452 5121                   MOV.L       @(4,R2),R1
+    00000454 D339                   MOV.L       L731+16,R3 ; _floor
+    00000456 2F16                   MOV.L       R1,@-R15
+    00000458 6122                   MOV.L       @R2,R1
+    0000045A 2F16                   MOV.L       R1,@-R15
+    0000045C 430B                   JSR         @R3
+    0000045E 2F86                   MOV.L       R8,@-R15
+          math.c   137    }
+    00000460 7F14                   ADD         #20,R15
+    00000462 4F26                   LDS.L       @R15+,PR
+    00000464 000B                   RTS
+    00000466 68F6                   MOV.L       @R15+,R8
+          math.c   138    
+          math.c   139    /* all math.h functions */
+          math.c   140    struct LibraryFunction MathFunctions[] =
+          math.c   141    {
+          math.c   142        { MathAcos,         "float acos(float);" },
+          math.c   143        { MathAsin,         "float asin(float);" },
+          math.c   144        { MathAtan,         "float atan(float);" },
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:30  PAGE   14
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+          math.c   145        { MathAtan2,        "float atan2(float, float);" },
+          math.c   146        { MathCeil,         "float ceil(float);" },
+          math.c   147        { MathCos,          "float cos(float);" },
+          math.c   148        { MathCosh,         "float cosh(float);" },
+          math.c   149        { MathExp,          "float exp(float);" },
+          math.c   150        { MathFabs,         "float fabs(float);" },
+          math.c   151        { MathFloor,        "float floor(float);" },
+          math.c   152        { MathFmod,         "float fmod(float, float);" },
+          math.c   153        { MathFrexp,        "float frexp(float, int *);" },
+          math.c   154        { MathLdexp,        "float ldexp(float, int);" },
+          math.c   155        { MathLog,          "float log(float);" },
+          math.c   156        { MathLog10,        "float log10(float);" },
+          math.c   157        { MathModf,         "float modf(float, float *);" },
+          math.c   158        { MathPow,          "float pow(float,float);" },
+          math.c   159        { MathRound,        "float round(float);" },
+          math.c   160        { MathSin,          "float sin(float);" },
+          math.c   161        { MathSinh,         "float sinh(float);" },
+          math.c   162        { MathSqrt,         "float sqrt(float);" },
+          math.c   163        { MathTan,          "float tan(float);" },
+          math.c   164        { MathTanh,         "float tanh(float);" },
+          math.c   165        { NULL,             NULL }
+          math.c   166    };
+          math.c   167    
+          math.c   168    /* creates various system-dependent definitions */
+          math.c   169    void MathSetupFunc(void)
+    00000468              _MathSetupFunc:                  ; function: MathSetupFunc
+                                                           ; frame size=60
+    00000468 2FE6                   MOV.L       R14,@-R15
+          math.c   170    {
+          math.c   171        VariableDefinePlatformVar(NULL, "M_E", &FPType, (union AnyValue *)&M_EValue, FALSE);
+    0000046A E300                   MOV         #0,R3
+    0000046C D735                   MOV.L       L731+24,R7 ; __$M_EValue
+    0000046E 4F22                   STS.L       PR,@-R15
+    00000470 DE33                   MOV.L       L731+20,R14; _VariableDefinePlatformVar
+    00000472 2F36                   MOV.L       R3,@-R15
+    00000474 D634                   MOV.L       L731+28,R6 ; _FPType
+    00000476 D535                   MOV.L       L731+32,R5 ; L668
+    00000478 4E0B                   JSR         @R14
+    0000047A 6433                   MOV         R3,R4
+          math.c   172        VariableDefinePlatformVar(NULL, "M_LOG2E", &FPType, (union AnyValue *)&M_LOG2EValue, FALSE);
+    0000047C D734                   MOV.L       L731+36,R7 ; __$M_LOG2EValue
+    0000047E E200                   MOV         #0,R2
+    00000480 D631                   MOV.L       L731+28,R6 ; _FPType
+    00000482 2F26                   MOV.L       R2,@-R15
+    00000484 D533                   MOV.L       L731+40,R5 ; L669
+    00000486 4E0B                   JSR         @R14
+    00000488 6423                   MOV         R2,R4
+          math.c   173        VariableDefinePlatformVar(NULL, "M_LOG10E", &FPType, (union AnyValue *)&M_LOG10EValue, FALSE);
+    0000048A E300                   MOV         #0,R3
+    0000048C D732                   MOV.L       L731+44,R7 ; __$M_LOG10EValue
+    0000048E 2F36                   MOV.L       R3,@-R15
+    00000490 D62D                   MOV.L       L731+28,R6 ; _FPType
+    00000492 D532                   MOV.L       L731+48,R5 ; L670
+    00000494 4E0B                   JSR         @R14
+    00000496 6433                   MOV         R3,R4
+          math.c   174        VariableDefinePlatformVar(NULL, "M_LN2", &FPType, (union AnyValue *)&M_LN2Value, FALSE);
+    00000498 D731                   MOV.L       L731+52,R7 ; __$M_LN2Value
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:30  PAGE   15
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    0000049A E200                   MOV         #0,R2
+    0000049C D62A                   MOV.L       L731+28,R6 ; _FPType
+    0000049E 2F26                   MOV.L       R2,@-R15
+    000004A0 D530                   MOV.L       L731+56,R5 ; L671
+    000004A2 4E0B                   JSR         @R14
+    000004A4 6423                   MOV         R2,R4
+          math.c   175        VariableDefinePlatformVar(NULL, "M_LN10", &FPType, (union AnyValue *)&M_LN10Value, FALSE);
+    000004A6 E300                   MOV         #0,R3
+    000004A8 D72F                   MOV.L       L731+60,R7 ; __$M_LN10Value
+    000004AA 2F36                   MOV.L       R3,@-R15
+    000004AC D626                   MOV.L       L731+28,R6 ; _FPType
+    000004AE D52F                   MOV.L       L731+64,R5 ; L672
+    000004B0 4E0B                   JSR         @R14
+    000004B2 6433                   MOV         R3,R4
+          math.c   176        VariableDefinePlatformVar(NULL, "M_PI", &FPType, (union AnyValue *)&M_PIValue, FALSE);
+    000004B4 D72E                   MOV.L       L731+68,R7 ; __$M_PIValue
+    000004B6 E200                   MOV         #0,R2
+    000004B8 D623                   MOV.L       L731+28,R6 ; _FPType
+    000004BA 2F26                   MOV.L       R2,@-R15
+    000004BC D52D                   MOV.L       L731+72,R5 ; L673
+    000004BE 4E0B                   JSR         @R14
+    000004C0 6423                   MOV         R2,R4
+          math.c   177        VariableDefinePlatformVar(NULL, "M_PI_2", &FPType, (union AnyValue *)&M_PI_2Value, FALSE);
+    000004C2 E300                   MOV         #0,R3
+    000004C4 D72C                   MOV.L       L731+76,R7 ; __$M_PI_2Value
+    000004C6 2F36                   MOV.L       R3,@-R15
+    000004C8 D61F                   MOV.L       L731+28,R6 ; _FPType
+    000004CA D52C                   MOV.L       L731+80,R5 ; L674
+    000004CC 4E0B                   JSR         @R14
+    000004CE 6433                   MOV         R3,R4
+          math.c   178        VariableDefinePlatformVar(NULL, "M_PI_4", &FPType, (union AnyValue *)&M_PI_4Value, FALSE);
+    000004D0 D72B                   MOV.L       L731+84,R7 ; __$M_PI_4Value
+    000004D2 E200                   MOV         #0,R2
+    000004D4 D61C                   MOV.L       L731+28,R6 ; _FPType
+    000004D6 2F26                   MOV.L       R2,@-R15
+    000004D8 D52A                   MOV.L       L731+88,R5 ; L675
+    000004DA 4E0B                   JSR         @R14
+    000004DC 6423                   MOV         R2,R4
+          math.c   179        VariableDefinePlatformVar(NULL, "M_1_PI", &FPType, (union AnyValue *)&M_1_PIValue, FALSE);
+    000004DE E300                   MOV         #0,R3
+    000004E0 D729                   MOV.L       L731+92,R7 ; __$M_1_PIValue
+    000004E2 2F36                   MOV.L       R3,@-R15
+    000004E4 D618                   MOV.L       L731+28,R6 ; _FPType
+    000004E6 D529                   MOV.L       L731+96,R5 ; L676
+    000004E8 4E0B                   JSR         @R14
+    000004EA 6433                   MOV         R3,R4
+          math.c   180        VariableDefinePlatformVar(NULL, "M_2_PI", &FPType, (union AnyValue *)&M_2_PIValue, FALSE);
+    000004EC D728                   MOV.L       L731+100,R7; __$M_2_PIValue
+    000004EE E200                   MOV         #0,R2
+    000004F0 D615                   MOV.L       L731+28,R6 ; _FPType
+    000004F2 2F26                   MOV.L       R2,@-R15
+    000004F4 D527                   MOV.L       L731+104,R5; L677
+    000004F6 4E0B                   JSR         @R14
+    000004F8 6423                   MOV         R2,R4
+          math.c   181        VariableDefinePlatformVar(NULL, "M_2_SQRTPI", &FPType, (union AnyValue *)&M_2_SQRTPIValue, FALSE);
+    000004FA E300                   MOV         #0,R3
+    000004FC D726                   MOV.L       L731+108,R7; __$M_2_SQRTPIValue
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:30  PAGE   16
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000004FE 2F36                   MOV.L       R3,@-R15
+    00000500 D611                   MOV.L       L731+28,R6 ; _FPType
+    00000502 D526                   MOV.L       L731+112,R5; L678
+    00000504 4E0B                   JSR         @R14
+    00000506 6433                   MOV         R3,R4
+          math.c   182        VariableDefinePlatformVar(NULL, "M_SQRT2", &FPType, (union AnyValue *)&M_SQRT2Value, FALSE);
+    00000508 D725                   MOV.L       L731+116,R7; __$M_SQRT2Value
+    0000050A E200                   MOV         #0,R2
+    0000050C D60E                   MOV.L       L731+28,R6 ; _FPType
+    0000050E 2F26                   MOV.L       R2,@-R15
+    00000510 D524                   MOV.L       L731+120,R5; L679
+    00000512 4E0B                   JSR         @R14
+    00000514 6423                   MOV         R2,R4
+          math.c   183        VariableDefinePlatformVar(NULL, "M_SQRT1_2", &FPType, (union AnyValue *)&M_SQRT1_2Value, FALSE);
+    00000516 E300                   MOV         #0,R3
+    00000518 D723                   MOV.L       L731+124,R7; __$M_SQRT1_2Value
+    0000051A 2F36                   MOV.L       R3,@-R15
+    0000051C D60A                   MOV.L       L731+28,R6 ; _FPType
+    0000051E D523                   MOV.L       L731+128,R5; L680
+    00000520 4E0B                   JSR         @R14
+    00000522 6433                   MOV         R3,R4
+          math.c   184    }
+    00000524 7F34                   ADD         #52,R15
+    00000526 4F26                   LDS.L       @R15+,PR
+    00000528 000B                   RTS
+    0000052A 6EF6                   MOV.L       @R15+,R14
+    0000052C              L731:                             
+    0000052C <00000000>             .DATA.L     _sqrt
+    00000530 BFE00000               .DATA.L     H'BFE00000
+    00000534 <00000000>             .DATA.L     __addd
+    00000538 <00000000>             .DATA.L     _ceil
+    0000053C <00000000>             .DATA.L     _floor
+    00000540 <00000000>             .DATA.L     _VariableDefinePlatformVar
+    00000544 <00000000>             .DATA.L     __$M_EValue
+    00000548 <00000000>             .DATA.L     _FPType
+    0000054C <00000000>             .DATA.L     L668
+    00000550 <00000000>             .DATA.L     __$M_LOG2EValue
+    00000554 <00000000>             .DATA.L     L669
+    00000558 <00000000>             .DATA.L     __$M_LOG10EValue
+    0000055C <00000000>             .DATA.L     L670
+    00000560 <00000000>             .DATA.L     __$M_LN2Value
+    00000564 <00000000>             .DATA.L     L671
+    00000568 <00000000>             .DATA.L     __$M_LN10Value
+    0000056C <00000000>             .DATA.L     L672
+    00000570 <00000000>             .DATA.L     __$M_PIValue
+    00000574 <00000000>             .DATA.L     L673
+    00000578 <00000000>             .DATA.L     __$M_PI_2Value
+    0000057C <00000000>             .DATA.L     L674
+    00000580 <00000000>             .DATA.L     __$M_PI_4Value
+    00000584 <00000000>             .DATA.L     L675
+    00000588 <00000000>             .DATA.L     __$M_1_PIValue
+    0000058C <00000000>             .DATA.L     L676
+    00000590 <00000000>             .DATA.L     __$M_2_PIValue
+    00000594 <00000000>             .DATA.L     L677
+    00000598 <00000000>             .DATA.L     __$M_2_SQRTPIValue
+    0000059C <00000000>             .DATA.L     L678
+    000005A0 <00000000>             .DATA.L     __$M_SQRT2Value
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:30  PAGE   17
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000005A4 <00000000>             .DATA.L     L679
+    000005A8 <00000000>             .DATA.L     __$M_SQRT1_2Value
+    000005AC <00000000>             .DATA.L     L680
+          math.c   185    
+          math.c   186    #endif /* !NO_FP */
+          math.c   187    #endif /* !BUILTIN_MINI_STDLIB */
+D   00000000              __$M_EValue:                     ; static: M_EValue
+    00000000 4005BF0A8B             .DATA.L     H'4005BF0A,H'8B145769
+             145769       
+    00000008              __$M_LOG2EValue:                 ; static: M_LOG2EValue
+    00000008 3FF7154765             .DATA.L     H'3FF71547,H'652B82FE
+             2B82FE       
+    00000010              __$M_LOG10EValue:                ; static: M_LOG10EValue
+    00000010 3FDBCB7B15             .DATA.L     H'3FDBCB7B,H'1526E50E
+             26E50E       
+    00000018              __$M_LN2Value:                   ; static: M_LN2Value
+    00000018 3FE62E42FE             .DATA.L     H'3FE62E42,H'FEFA39EF
+             FA39EF       
+    00000020              __$M_LN10Value:                  ; static: M_LN10Value
+    00000020 40026BB1BB             .DATA.L     H'40026BB1,H'BBB55516
+             B55516       
+    00000028              __$M_PIValue:                    ; static: M_PIValue
+    00000028 400921FB54             .DATA.L     H'400921FB,H'54442D18
+             442D18       
+    00000030              __$M_PI_2Value:                  ; static: M_PI_2Value
+    00000030 3FF921FB54             .DATA.L     H'3FF921FB,H'54442D18
+             442D18       
+    00000038              __$M_PI_4Value:                  ; static: M_PI_4Value
+    00000038 3FE921FB54             .DATA.L     H'3FE921FB,H'54442D18
+             442D18       
+    00000040              __$M_1_PIValue:                  ; static: M_1_PIValue
+    00000040 3FD45F306D             .DATA.L     H'3FD45F30,H'6DC9C883
+             C9C883       
+    00000048              __$M_2_PIValue:                  ; static: M_2_PIValue
+    00000048 3FE45F306D             .DATA.L     H'3FE45F30,H'6DC9C883
+             C9C883       
+    00000050              __$M_2_SQRTPIValue:              ; static: M_2_SQRTPIValue
+    00000050 3FF20DD750             .DATA.L     H'3FF20DD7,H'50429B6D
+             429B6D       
+    00000058              __$M_SQRT2Value:                 ; static: M_SQRT2Value
+    00000058 3FF6A09E66             .DATA.L     H'3FF6A09E,H'667F3BCC
+             7F3BCC       
+    00000060              __$M_SQRT1_2Value:               ; static: M_SQRT1_2Value
+    00000060 3FE6A09E66             .DATA.L     H'3FE6A09E,H'667F3BCD
+             7F3BCD       
+    00000068              _MathFunctions:                  ; static: MathFunctions
+    00000068 <00000000>             .DATA.L     _MathAcos,L644,_MathAsin,L645,_MathAtan,L646,_MathAtan2,L647,_MathCeil,L648,
+             <00000000> +                       _MathCos,L649,_MathCosh,L650,_MathExp,L651,_MathFabs,L652,_MathFloor,L653,_MathFmod,
+             <00000000> +                       L654,_MathFrexp,L655,_MathLdexp,L656,_MathLog,L657,_MathLog10,L658,_MathModf,L659,
+             <00000000> +                       _MathPow,L660,_MathRound,L661,_MathSin,L662,_MathSinh,L663,_MathSqrt,L664,_MathTan,
+             <00000000> +                       L665,_MathTanh,L666
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:30  PAGE   18
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+    00000120 0000000000             .DATA.L     H'00000000,H'00000000
+             000000       
+C   00000000              L668:
+    00000000 4D5F45                 .SDATA      "M_E"
+    00000003 00                     .DATA.B     H'00
+    00000004              L669:
+    00000004 4D5F4C4F47             .SDATA      "M_LOG2E"
+             3245         
+    0000000B 00                     .DATA.B     H'00
+    0000000C              L670:
+    0000000C 4D5F4C4F47             .SDATA      "M_LOG10E"
+             313045       
+    00000014 00                     .DATA.B     H'00
+    00000015 00000001               .RES.B      1
+    00000016 00000002               .RES.W      1
+    00000018              L671:
+    00000018 4D5F4C4E32             .SDATA      "M_LN2"
+    0000001D 00                     .DATA.B     H'00
+    0000001E 00000002               .RES.W      1
+    00000020              L672:
+    00000020 4D5F4C4E31             .SDATA      "M_LN10"
+             30           
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:30  PAGE   19
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000026 00                     .DATA.B     H'00
+    00000027 00000001               .RES.B      1
+    00000028              L673:
+    00000028 4D5F5049               .SDATA      "M_PI"
+    0000002C 00                     .DATA.B     H'00
+    0000002D 00000001               .RES.B      1
+    0000002E 00000002               .RES.W      1
+    00000030              L674:
+    00000030 4D5F50495F             .SDATA      "M_PI_2"
+             32           
+    00000036 00                     .DATA.B     H'00
+    00000037 00000001               .RES.B      1
+    00000038              L675:
+    00000038 4D5F50495F             .SDATA      "M_PI_4"
+             34           
+    0000003E 00                     .DATA.B     H'00
+    0000003F 00000001               .RES.B      1
+    00000040              L676:
+    00000040 4D5F315F50             .SDATA      "M_1_PI"
+             49           
+    00000046 00                     .DATA.B     H'00
+    00000047 00000001               .RES.B      1
+    00000048              L677:
+    00000048 4D5F325F50             .SDATA      "M_2_PI"
+             49           
+    0000004E 00                     .DATA.B     H'00
+    0000004F 00000001               .RES.B      1
+    00000050              L678:
+    00000050 4D5F325F53             .SDATA      "M_2_SQRTPI"
+             5152545049   
+    0000005A 00                     .DATA.B     H'00
+    0000005B 00000001               .RES.B      1
+    0000005C              L679:
+    0000005C 4D5F535152             .SDATA      "M_SQRT2"
+             5432         
+    00000063 00                     .DATA.B     H'00
+    00000064              L680:
+    00000064 4D5F535152             .SDATA      "M_SQRT1_2"
+             54315F32     
+    0000006D 00                     .DATA.B     H'00
+    0000006E 00000002               .RES.W      1
+    00000070              L644:
+    00000070 666C6F6174             .SDATA      "float acos(float);"
+             2061636F73   
+             28666C6F61   
+             74293B       
+    00000082 00                     .DATA.B     H'00
+    00000083 00000001               .RES.B      1
+    00000084              L645:
+    00000084 666C6F6174             .SDATA      "float asin(float);"
+             206173696E   
+             28666C6F61   
+             74293B       
+    00000096 00                     .DATA.B     H'00
+    00000097 00000001               .RES.B      1
+    00000098              L646:
+    00000098 666C6F6174             .SDATA      "float atan(float);"
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:30  PAGE   20
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+             206174616E   
+             28666C6F61   
+             74293B       
+    000000AA 00                     .DATA.B     H'00
+    000000AB 00000001               .RES.B      1
+    000000AC              L647:
+    000000AC 666C6F6174             .SDATA      "float atan2(float, float);"
+             206174616E   
+             3228666C6F   
+             61742C2066   
+             6C6F617429   
+             3B           
+    000000C6 00                     .DATA.B     H'00
+    000000C7 00000001               .RES.B      1
+    000000C8              L648:
+    000000C8 666C6F6174             .SDATA      "float ceil(float);"
+             206365696C   
+             28666C6F61   
+             74293B       
+    000000DA 00                     .DATA.B     H'00
+    000000DB 00000001               .RES.B      1
+    000000DC              L649:
+    000000DC 666C6F6174             .SDATA      "float cos(float);"
+             20636F7328   
+             666C6F6174   
+             293B         
+    000000ED 00                     .DATA.B     H'00
+    000000EE 00000002               .RES.W      1
+    000000F0              L650:
+    000000F0 666C6F6174             .SDATA      "float cosh(float);"
+             20636F7368   
+             28666C6F61   
+             74293B       
+    00000102 00                     .DATA.B     H'00
+    00000103 00000001               .RES.B      1
+    00000104              L651:
+    00000104 666C6F6174             .SDATA      "float exp(float);"
+             2065787028   
+             666C6F6174   
+             293B         
+    00000115 00                     .DATA.B     H'00
+    00000116 00000002               .RES.W      1
+    00000118              L652:
+    00000118 666C6F6174             .SDATA      "float fabs(float);"
+             2066616273   
+             28666C6F61   
+             74293B       
+    0000012A 00                     .DATA.B     H'00
+    0000012B 00000001               .RES.B      1
+    0000012C              L653:
+    0000012C 666C6F6174             .SDATA      "float floor(float);"
+             20666C6F6F   
+             7228666C6F   
+             6174293B     
+    0000013F 00                     .DATA.B     H'00
+    00000140              L654:
+    00000140 666C6F6174             .SDATA      "float fmod(float, float);"
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:30  PAGE   21
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+             20666D6F64   
+             28666C6F61   
+             742C20666C   
+             6F6174293B   
+    00000159 00                     .DATA.B     H'00
+    0000015A 00000002               .RES.W      1
+    0000015C              L655:
+    0000015C 666C6F6174             .SDATA      "float frexp(float, int *);"
+             2066726578   
+             7028666C6F   
+             61742C2069   
+             6E74202A29   
+             3B           
+    00000176 00                     .DATA.B     H'00
+    00000177 00000001               .RES.B      1
+    00000178              L656:
+    00000178 666C6F6174             .SDATA      "float ldexp(float, int);"
+             206C646578   
+             7028666C6F   
+             61742C2069   
+             6E74293B     
+    00000190 00                     .DATA.B     H'00
+    00000191 00000001               .RES.B      1
+    00000192 00000002               .RES.W      1
+    00000194              L657:
+    00000194 666C6F6174             .SDATA      "float log(float);"
+             206C6F6728   
+             666C6F6174   
+             293B         
+    000001A5 00                     .DATA.B     H'00
+    000001A6 00000002               .RES.W      1
+    000001A8              L658:
+    000001A8 666C6F6174             .SDATA      "float log10(float);"
+             206C6F6731   
+             3028666C6F   
+             6174293B     
+    000001BB 00                     .DATA.B     H'00
+    000001BC              L659:
+    000001BC 666C6F6174             .SDATA      "float modf(float, float *);"
+             206D6F6466   
+             28666C6F61   
+             742C20666C   
+             6F6174202A   
+             293B         
+    000001D7 00                     .DATA.B     H'00
+    000001D8              L660:
+    000001D8 666C6F6174             .SDATA      "float pow(float,float);"
+             20706F7728   
+             666C6F6174   
+             2C666C6F61   
+             74293B       
+    000001EF 00                     .DATA.B     H'00
+    000001F0              L661:
+    000001F0 666C6F6174             .SDATA      "float round(float);"
+             20726F756E   
+             6428666C6F   
+             6174293B     
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:30  PAGE   22
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000203 00                     .DATA.B     H'00
+    00000204              L662:
+    00000204 666C6F6174             .SDATA      "float sin(float);"
+             2073696E28   
+             666C6F6174   
+             293B         
+    00000215 00                     .DATA.B     H'00
+    00000216 00000002               .RES.W      1
+    00000218              L663:
+    00000218 666C6F6174             .SDATA      "float sinh(float);"
+             2073696E68   
+             28666C6F61   
+             74293B       
+    0000022A 00                     .DATA.B     H'00
+    0000022B 00000001               .RES.B      1
+    0000022C              L664:
+    0000022C 666C6F6174             .SDATA      "float sqrt(float);"
+             2073717274   
+             28666C6F61   
+             74293B       
+    0000023E 00                     .DATA.B     H'00
+    0000023F 00000001               .RES.B      1
+    00000240              L665:
+    00000240 666C6F6174             .SDATA      "float tan(float);"
+             2074616E28   
+             666C6F6174   
+             293B         
+    00000251 00                     .DATA.B     H'00
+    00000252 00000002               .RES.W      1
+    00000254              L666:
+    00000254 666C6F6174             .SDATA      "float tanh(float);"
+             2074616E68   
+             28666C6F61   
+             74293B       
+    00000266 00                     .DATA.B     H'00
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:30  PAGE    1
+
+
+******** STATISTICS INFORMATION ********
+
+
+********** ERROR INFORMATION ***********
+
+NUMBER OF ERRORS:           0
+NUMBER OF WARNINGS:        13
+
+
+
+
+******* SOURCE LINE INFORMATION ********
+
+COMPILED SOURCE LINE:      185
+
+
+
+******* SECTION SIZE INFORMATION *******
+
+PROGRAM  SECTION (P):                               000005B0 Byte(s)
+CONSTANT SECTION (C):                               00000267 Byte(s)
+DATA     SECTION (D):                               00000128 Byte(s)
+BSS      SECTION (B):                               00000000 Byte(s)
+
+ TOTAL PROGRAM SIZE: 0000093F Byte(s)
+
+
+
+********** LABEL INFORMATION ***********
+
+NUMBER OF EXTERNAL REFERENCE SYMBOLS:           25
+NUMBER OF EXTERNAL DEFINITION SYMBOLS:          25
+NUMBER OF INTERNAL/EXTERNAL SYMBOLS:            88
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*** COMMAND PARAMETER ***
+
+
+  -subcommand=C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\hmk34D.tmp 
+

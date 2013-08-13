@@ -1,0 +1,599 @@
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:22  PAGE    1
+
+************ OBJECT LISTING ************
+
+FILE NAME: E:\Anderain\fx-9860\dPicoc\include.c
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+       include.c     1    #include "picoc.h"
+       include.c     2    #include "interpreter.h"
+       include.c     3    
+       include.c     4    /* a list of libraries we can include */
+       include.c     5    struct IncludeLibrary
+       include.c     6    {
+       include.c     7        char *IncludeName;
+       include.c     8        void (*SetupFunction)(void);
+       include.c     9        struct LibraryFunction *FuncList;
+       include.c    10        const char *SetupCSource;
+       include.c    11        struct IncludeLibrary *NextLib;
+       include.c    12    };
+       include.c    13    
+       include.c    14    struct IncludeLibrary *IncludeLibList = NULL;
+       include.c    15    
+       include.c    16    
+       include.c    17    /* initialise the built-in include libraries */
+       include.c    18    void IncludeInit()
+P   00000000              _IncludeInit:                    ; function: IncludeInit
+                                                           ; frame size=4
+    00000000 4F22                   STS.L       PR,@-R15
+       include.c    19    {
+       include.c    20        IncludeRegister("ctype.h", NULL, &StdCtypeFunctions[0], NULL);
+    00000002 E700                   MOV         #0,R7
+    00000004 D661                   MOV.L       L550+2,R6  ; _StdCtypeFunctions
+    00000006 D462                   MOV.L       L550+6,R4  ; L504
+    00000008 B038                   BSR         _IncludeRegister
+    0000000A 6573                   MOV         R7,R5
+       include.c    21        IncludeRegister("errno.h", &StdErrnoSetupFunc, NULL, NULL);
+    0000000C D561                   MOV.L       L550+10,R5 ; _StdErrnoSetupFunc
+    0000000E E700                   MOV         #0,R7
+    00000010 D461                   MOV.L       L550+14,R4 ; L505
+    00000012 B033                   BSR         _IncludeRegister
+    00000014 6673                   MOV         R7,R6
+       include.c    22            IncludeRegister("fxlib.h", &FxlibSetupFunc, &FxlibFunctions[0], FxlibDefs);
+    00000016 D761                   MOV.L       L550+18,R7 ; _FxlibDefs
+    00000018 D661                   MOV.L       L550+22,R6 ; _FxlibFunctions
+    0000001A D562                   MOV.L       L550+26,R5 ; _FxlibSetupFunc
+    0000001C D462                   MOV.L       L550+30,R4 ; L506
+    0000001E B02D                   BSR         _IncludeRegister
+    00000020 0009                   NOP
+       include.c    23        IncludeRegister("math.h", &MathSetupFunc, &MathFunctions[0], NULL);
+    00000022 D662                   MOV.L       L550+34,R6 ; _MathFunctions
+    00000024 D562                   MOV.L       L550+38,R5 ; _MathSetupFunc
+    00000026 D463                   MOV.L       L550+42,R4 ; L507
+    00000028 B028                   BSR         _IncludeRegister
+    0000002A E700                   MOV         #0,R7
+       include.c    24        IncludeRegister("stdbool.h", &StdboolSetupFunc, NULL, StdboolDefs);
+    0000002C D762                   MOV.L       L550+46,R7 ; _StdboolDefs
+    0000002E D563                   MOV.L       L550+50,R5 ; _StdboolSetupFunc
+    00000030 D463                   MOV.L       L550+54,R4 ; L508
+    00000032 B023                   BSR         _IncludeRegister
+    00000034 E600                   MOV         #0,R6
+       include.c    25        IncludeRegister("stdio.h", &StdioSetupFunc, &StdioFunctions[0], NULL);
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:22  PAGE    2
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000036 D663                   MOV.L       L550+58,R6 ; _StdioFunctions
+    00000038 D563                   MOV.L       L550+62,R5 ; _StdioSetupFunc
+    0000003A D464                   MOV.L       L550+66,R4 ; L509
+    0000003C B01E                   BSR         _IncludeRegister
+    0000003E E700                   MOV         #0,R7
+       include.c    26        IncludeRegister("stdlib.h", &StdlibSetupFunc, &StdlibFunctions[0], NULL);
+    00000040 D663                   MOV.L       L550+70,R6 ; _StdlibFunctions
+    00000042 D564                   MOV.L       L550+74,R5 ; _StdlibSetupFunc
+    00000044 D464                   MOV.L       L550+78,R4 ; L510
+    00000046 B019                   BSR         _IncludeRegister
+    00000048 E700                   MOV         #0,R7
+       include.c    27        IncludeRegister("string.h", &StringSetupFunc, &StringFunctions[0], NULL);
+    0000004A E700                   MOV         #0,R7
+    0000004C D663                   MOV.L       L550+82,R6 ; _StringFunctions
+    0000004E D564                   MOV.L       L550+86,R5 ; _StringSetupFunc
+    00000050 D464                   MOV.L       L550+90,R4 ; L511
+    00000052 A013                   BRA         _IncludeRegister
+    00000054 4F26                   LDS.L       @R15+,PR
+       include.c    28    }
+       include.c    29    
+       include.c    30    /* clean up space used by the include system */
+       include.c    31    void IncludeCleanup()
+    00000056              _IncludeCleanup:                 ; function: IncludeCleanup
+                                                           ; frame size=12
+    00000056 2FE6                   MOV.L       R14,@-R15
+    00000058 2FD6                   MOV.L       R13,@-R15
+    0000005A 4F22                   STS.L       PR,@-R15
+       include.c    32    {
+       include.c    33        struct IncludeLibrary *ThisInclude = IncludeLibList;
+    0000005C D362                   MOV.L       L550+94,R3 ; _IncludeLibList
+    0000005E DD63                   MOV.L       L550+98,R13; _HeapFreeMem
+       include.c    34        struct IncludeLibrary *NextInclude;
+       include.c    35        
+       include.c    36        while (ThisInclude != NULL)
+    00000060 A003                   BRA         L538
+    00000062 6432                   MOV.L       @R3,R4
+    00000064              L539:                             
+       include.c    37        {
+       include.c    38            NextInclude = ThisInclude->NextLib;
+       include.c    39            HeapFreeMem(ThisInclude);
+    00000064 4D0B                   JSR         @R13
+    00000066 5E44                   MOV.L       @(16,R4),R14
+       include.c    40            ThisInclude = NextInclude;
+    00000068 64E3                   MOV         R14,R4
+    0000006A              L538:                             
+    0000006A 2448                   TST         R4,R4
+    0000006C 8BFA                   BF          L539
+       include.c    41        }
+       include.c    42    
+       include.c    43        IncludeLibList = NULL;
+    0000006E E200                   MOV         #0,R2
+    00000070 D35D                   MOV.L       L550+94,R3 ; _IncludeLibList
+    00000072 2322                   MOV.L       R2,@R3
+       include.c    44    }
+    00000074 4F26                   LDS.L       @R15+,PR
+    00000076 6DF6                   MOV.L       @R15+,R13
+    00000078 000B                   RTS
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:22  PAGE    3
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    0000007A 6EF6                   MOV.L       @R15+,R14
+       include.c    45    
+       include.c    46    /* register a new build-in include file */
+       include.c    47    void IncludeRegister(const char *IncludeName, void (*SetupFunction)(void), struct LibraryFunction *FuncLis
+                         +t, const char *SetupCSource)
+    0000007C              _IncludeRegister:                ; function: IncludeRegister
+                                                           ; frame size=24
+    0000007C 2FE6                   MOV.L       R14,@-R15
+    0000007E 4F22                   STS.L       PR,@-R15
+       include.c    48    {
+       include.c    49        struct IncludeLibrary *NewLib = HeapAllocMem(sizeof(struct IncludeLibrary));
+    00000080 D35B                   MOV.L       L550+102,R3; _HeapAllocMem
+    00000082 7FF0                   ADD         #-16,R15
+    00000084 1F43                   MOV.L       R4,@(12,R15)
+    00000086 1F52                   MOV.L       R5,@(8,R15)
+    00000088 1F61                   MOV.L       R6,@(4,R15)
+    0000008A 2F72                   MOV.L       R7,@R15
+    0000008C 430B                   JSR         @R3
+    0000008E E414                   MOV         #20,R4
+       include.c    50        NewLib->IncludeName = TableStrRegister(IncludeName);
+    00000090 D358                   MOV.L       L550+106,R3; _TableStrRegister
+    00000092 6E03                   MOV         R0,R14
+    00000094 430B                   JSR         @R3
+    00000096 54F3                   MOV.L       @(12,R15),R4
+    00000098 2E02                   MOV.L       R0,@R14
+       include.c    51        NewLib->SetupFunction = SetupFunction;
+    0000009A 52F2                   MOV.L       @(8,R15),R2
+       include.c    52        NewLib->FuncList = FuncList;
+       include.c    53        NewLib->SetupCSource = SetupCSource;
+       include.c    54        NewLib->NextLib = IncludeLibList;
+    0000009C D452                   MOV.L       L550+94,R4 ; _IncludeLibList
+    0000009E 1E21                   MOV.L       R2,@(4,R14)
+    000000A0 53F1                   MOV.L       @(4,R15),R3
+    000000A2 1E32                   MOV.L       R3,@(8,R14)
+    000000A4 62F2                   MOV.L       @R15,R2
+    000000A6 1E23                   MOV.L       R2,@(12,R14)
+    000000A8 6342                   MOV.L       @R4,R3
+    000000AA 1E34                   MOV.L       R3,@(16,R14)
+       include.c    55        IncludeLibList = NewLib;
+    000000AC 24E2                   MOV.L       R14,@R4
+       include.c    56    }
+    000000AE 7F10                   ADD         #16,R15
+    000000B0 4F26                   LDS.L       @R15+,PR
+    000000B2 000B                   RTS
+    000000B4 6EF6                   MOV.L       @R15+,R14
+       include.c    57    
+       include.c    58    /* include all of the system headers */
+       include.c    59    void PicocIncludeAllSystemHeaders()
+    000000B6              _PicocIncludeAllSystemHeaders:   ; function: PicocIncludeAllSystemHeaders
+                                                           ; frame size=8
+    000000B6 2FE6                   MOV.L       R14,@-R15
+    000000B8 4F22                   STS.L       PR,@-R15
+       include.c    60    {
+       include.c    61        struct IncludeLibrary *ThisInclude = IncludeLibList;
+    000000BA D34B                   MOV.L       L550+94,R3 ; _IncludeLibList
+       include.c    62        
+       include.c    63        for (; ThisInclude != NULL; ThisInclude = ThisInclude->NextLib)
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:22  PAGE    4
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000000BC A003                   BRA         L540
+    000000BE 6E32                   MOV.L       @R3,R14
+    000000C0              L541:                             
+       include.c    64            IncludeFile(ThisInclude->IncludeName);
+    000000C0 B006                   BSR         _IncludeFile
+    000000C2 64E2                   MOV.L       @R14,R4
+    000000C4 5EE4                   MOV.L       @(16,R14),R14
+    000000C6              L540:                             
+    000000C6 2EE8                   TST         R14,R14
+    000000C8 8BFA                   BF          L541
+       include.c    65    }
+    000000CA 4F26                   LDS.L       @R15+,PR
+    000000CC 000B                   RTS
+    000000CE 6EF6                   MOV.L       @R15+,R14
+       include.c    66    
+       include.c    67    /* include one of a number of predefined libraries, or perhaps an actual file */
+       include.c    68    void IncludeFile(char *FileName)
+    000000D0              _IncludeFile:                    ; function: IncludeFile
+                                                           ; frame size=40
+                                                           ; used runtime library name:
+                                                           ; __slow_strcmp1
+    000000D0 2FE6                   MOV.L       R14,@-R15
+    000000D2 2FD6                   MOV.L       R13,@-R15
+    000000D4 2FC6                   MOV.L       R12,@-R15
+    000000D6 6D43                   MOV         R4,R13
+       include.c    69    {
+       include.c    70        struct IncludeLibrary *LInclude;
+       include.c    71        
+       include.c    72        /* scan for the include file name to see if it's in our list of predefined includes */
+       include.c    73        for (LInclude = IncludeLibList; LInclude != NULL; LInclude = LInclude->NextLib)
+    000000D8 D343                   MOV.L       L550+94,R3 ; _IncludeLibList
+    000000DA EC00                   MOV         #0,R12
+    000000DC 2FB6                   MOV.L       R11,@-R15
+    000000DE EB01                   MOV         #1,R11
+    000000E0 2FA6                   MOV.L       R10,@-R15
+    000000E2 2F96                   MOV.L       R9,@-R15
+    000000E4 2F86                   MOV.L       R8,@-R15
+    000000E6 4F22                   STS.L       PR,@-R15
+    000000E8 D843                   MOV.L       L550+110,R8; _PicocParse
+    000000EA D944                   MOV.L       L550+114,R9; _VariableDefine
+    000000EC DA44                   MOV.L       L550+118,R10; _VariableDefined
+    000000EE A036                   BRA         L542
+    000000F0 6E32                   MOV.L       @R3,R14
+    000000F2              L543:                             
+       include.c    74        {
+       include.c    75            if (strcmp(LInclude->IncludeName, FileName) == 0)
+    000000F2 65D3                   MOV         R13,R5
+    000000F4 D343                   MOV.L       L550+122,R3; __slow_strcmp1
+    000000F6 430B                   JSR         @R3
+    000000F8 64E2                   MOV.L       @R14,R4
+    000000FA 2008                   TST         R0,R0
+    000000FC 8B2E                   BF          L544
+       include.c    76            {
+       include.c    77                /* found it - protect against multiple inclusion */
+       include.c    78                if (!VariableDefined(FileName))
+    000000FE 4A0B                   JSR         @R10
+    00000100 64D3                   MOV         R13,R4
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:22  PAGE    5
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000102 2008                   TST         R0,R0
+    00000104 8B38                   BF          L549
+       include.c    79                {
+       include.c    80                    VariableDefine(NULL, FileName, NULL, &VoidType, FALSE);
+    00000106 E600                   MOV         #0,R6
+    00000108 2FC6                   MOV.L       R12,@-R15
+    0000010A 65D3                   MOV         R13,R5
+    0000010C D73E                   MOV.L       L550+126,R7; _VoidType
+    0000010E 490B                   JSR         @R9
+    00000110 6463                   MOV         R6,R4
+       include.c    81                    
+       include.c    82                    /* run an extra startup function if there is one */
+       include.c    83                    if (LInclude->SetupFunction != NULL)
+    00000112 52E1                   MOV.L       @(4,R14),R2
+    00000114 2228                   TST         R2,R2
+    00000116 8D03                   BT/S        L546
+    00000118 7F04                   ADD         #4,R15
+       include.c    84                        (*LInclude->SetupFunction)();
+    0000011A 53E1                   MOV.L       @(4,R14),R3
+    0000011C 430B                   JSR         @R3
+    0000011E 0009                   NOP
+    00000120              L546:                             
+       include.c    85                    
+       include.c    86                    /* parse the setup C source code - may define types etc. */
+       include.c    87                    if (LInclude->SetupCSource != NULL)
+    00000120 52E3                   MOV.L       @(12,R14),R2
+    00000122 2228                   TST         R2,R2
+    00000124 890A                   BT          L547
+       include.c    88                        PicocParse(FileName, LInclude->SetupCSource, strlen(LInclude->SetupCSource), TRUE, TRU
+                         +E, FALSE);
+    00000126 2FC6                   MOV.L       R12,@-R15
+    00000128 2FB6                   MOV.L       R11,@-R15
+    0000012A D338                   MOV.L       L550+130,R3; _strlen
+    0000012C 430B                   JSR         @R3
+    0000012E 54E3                   MOV.L       @(12,R14),R4
+    00000130 55E3                   MOV.L       @(12,R14),R5
+    00000132 64D3                   MOV         R13,R4
+    00000134 6603                   MOV         R0,R6
+    00000136 480B                   JSR         @R8
+    00000138 E701                   MOV         #1,R7
+    0000013A 7F08                   ADD         #8,R15
+    0000013C              L547:                             
+       include.c    89                    
+       include.c    90                    /* set up the library functions */
+       include.c    91                    if (LInclude->FuncList != NULL)
+    0000013C 52E2                   MOV.L       @(8,R14),R2
+    0000013E 2228                   TST         R2,R2
+    00000140 891A                   BT          L549
+       include.c    92                        LibraryAdd(&GlobalTable, FileName, LInclude->FuncList);
+    00000142 65D3                   MOV         R13,R5
+    00000144 D432                   MOV.L       L550+134,R4; _GlobalTable
+    00000146 56E2                   MOV.L       @(8,R14),R6
+    00000148 4F26                   LDS.L       @R15+,PR
+    0000014A 68F6                   MOV.L       @R15+,R8
+    0000014C D331                   MOV.L       L550+138,R3; _LibraryAdd
+    0000014E 69F6                   MOV.L       @R15+,R9
+    00000150 6AF6                   MOV.L       @R15+,R10
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:22  PAGE    6
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000152 6BF6                   MOV.L       @R15+,R11
+    00000154 6CF6                   MOV.L       @R15+,R12
+    00000156 6DF6                   MOV.L       @R15+,R13
+    00000158 432B                   JMP         @R3
+    0000015A 6EF6                   MOV.L       @R15+,R14
+    0000015C              L544:                             
+    0000015C 5EE4                   MOV.L       @(16,R14),R14
+    0000015E              L542:                             
+    0000015E 2EE8                   TST         R14,R14
+    00000160 8BC7                   BF          L543
+       include.c    93                }
+       include.c    94                
+       include.c    95                return;
+       include.c    96            }
+       include.c    97        }
+       include.c    98        
+       include.c    99        /* not a predefined file, read a real file */
+       include.c   100        PicocPlatformScanFile(FileName);
+    00000162 64D3                   MOV         R13,R4
+    00000164 4F26                   LDS.L       @R15+,PR
+    00000166 68F6                   MOV.L       @R15+,R8
+    00000168 D32B                   MOV.L       L550+142,R3; _PicocPlatformScanFile
+    0000016A 69F6                   MOV.L       @R15+,R9
+    0000016C 6AF6                   MOV.L       @R15+,R10
+    0000016E 6BF6                   MOV.L       @R15+,R11
+    00000170 6CF6                   MOV.L       @R15+,R12
+    00000172 6DF6                   MOV.L       @R15+,R13
+    00000174 432B                   JMP         @R3
+    00000176 6EF6                   MOV.L       @R15+,R14
+    00000178              L549:                             
+       include.c   101    }
+    00000178 4F26                   LDS.L       @R15+,PR
+    0000017A 68F6                   MOV.L       @R15+,R8
+    0000017C 69F6                   MOV.L       @R15+,R9
+    0000017E 6AF6                   MOV.L       @R15+,R10
+    00000180 6BF6                   MOV.L       @R15+,R11
+    00000182 6CF6                   MOV.L       @R15+,R12
+    00000184 6DF6                   MOV.L       @R15+,R13
+    00000186 000B                   RTS
+    00000188 6EF6                   MOV.L       @R15+,R14
+    0000018A              L550:                             
+    0000018A 0000                   .DATA.W     0
+    0000018C <00000000>             .DATA.L     _StdCtypeFunctions
+    00000190 <00000000>             .DATA.L     L504
+    00000194 <00000000>             .DATA.L     _StdErrnoSetupFunc
+    00000198 <00000000>             .DATA.L     L505
+    0000019C <00000000>             .DATA.L     _FxlibDefs
+    000001A0 <00000000>             .DATA.L     _FxlibFunctions
+    000001A4 <00000000>             .DATA.L     _FxlibSetupFunc
+    000001A8 <00000000>             .DATA.L     L506
+    000001AC <00000000>             .DATA.L     _MathFunctions
+    000001B0 <00000000>             .DATA.L     _MathSetupFunc
+    000001B4 <00000000>             .DATA.L     L507
+    000001B8 <00000000>             .DATA.L     _StdboolDefs
+    000001BC <00000000>             .DATA.L     _StdboolSetupFunc
+    000001C0 <00000000>             .DATA.L     L508
+    000001C4 <00000000>             .DATA.L     _StdioFunctions
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:22  PAGE    7
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000001C8 <00000000>             .DATA.L     _StdioSetupFunc
+    000001CC <00000000>             .DATA.L     L509
+    000001D0 <00000000>             .DATA.L     _StdlibFunctions
+    000001D4 <00000000>             .DATA.L     _StdlibSetupFunc
+    000001D8 <00000000>             .DATA.L     L510
+    000001DC <00000000>             .DATA.L     _StringFunctions
+    000001E0 <00000000>             .DATA.L     _StringSetupFunc
+    000001E4 <00000000>             .DATA.L     L511
+    000001E8 <00000000>             .DATA.L     _IncludeLibList
+    000001EC <00000000>             .DATA.L     _HeapFreeMem
+    000001F0 <00000000>             .DATA.L     _HeapAllocMem
+    000001F4 <00000000>             .DATA.L     _TableStrRegister
+    000001F8 <00000000>             .DATA.L     _PicocParse
+    000001FC <00000000>             .DATA.L     _VariableDefine
+    00000200 <00000000>             .DATA.L     _VariableDefined
+    00000204 <00000000>             .DATA.L     __slow_strcmp1
+    00000208 <00000000>             .DATA.L     _VoidType
+    0000020C <00000000>             .DATA.L     _strlen
+    00000210 <00000000>             .DATA.L     _GlobalTable
+    00000214 <00000000>             .DATA.L     _LibraryAdd
+    00000218 <00000000>             .DATA.L     _PicocPlatformScanFile
+D   00000000              _IncludeLibList:                 ; static: IncludeLibList
+    00000000 00000000               .DATA.L     H'00000000
+C   00000000              L504:
+    00000000 6374797065             .SDATA      "ctype.h"
+             2E68         
+    00000007 00                     .DATA.B     H'00
+    00000008              L505:
+    00000008 6572726E6F             .SDATA      "errno.h"
+             2E68         
+    0000000F 00                     .DATA.B     H'00
+    00000010              L506:
+    00000010 66786C6962             .SDATA      "fxlib.h"
+             2E68         
+    00000017 00                     .DATA.B     H'00
+    00000018              L507:
+    00000018 6D6174682E             .SDATA      "math.h"
+             68           
+    0000001E 00                     .DATA.B     H'00
+    0000001F 00000001               .RES.B      1
+    00000020              L508:
+    00000020 737464626F             .SDATA      "stdbool.h"
+             6F6C2E68     
+    00000029 00                     .DATA.B     H'00
+    0000002A 00000002               .RES.W      1
+    0000002C              L509:
+    0000002C 737464696F             .SDATA      "stdio.h"
+             2E68         
+    00000033 00                     .DATA.B     H'00
+    00000034              L510:
+    00000034 7374646C69             .SDATA      "stdlib.h"
+             622E68       
+    0000003C 00                     .DATA.B     H'00
+    0000003D 00000001               .RES.B      1
+    0000003E 00000002               .RES.W      1
+    00000040              L511:
+    00000040 737472696E             .SDATA      "string.h"
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:22  PAGE    8
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+             672E68       
+    00000048 00                     .DATA.B     H'00
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:22  PAGE    1
+
+
+******** STATISTICS INFORMATION ********
+
+
+********** ERROR INFORMATION ***********
+
+NUMBER OF ERRORS:           0
+NUMBER OF WARNINGS:         0
+
+
+
+
+******* SOURCE LINE INFORMATION ********
+
+COMPILED SOURCE LINE:      101
+
+
+
+******* SECTION SIZE INFORMATION *******
+
+PROGRAM  SECTION (P):                               0000021C Byte(s)
+CONSTANT SECTION (C):                               00000049 Byte(s)
+DATA     SECTION (D):                               00000004 Byte(s)
+BSS      SECTION (B):                               00000000 Byte(s)
+
+ TOTAL PROGRAM SIZE: 00000269 Byte(s)
+
+
+
+********** LABEL INFORMATION ***********
+
+NUMBER OF EXTERNAL REFERENCE SYMBOLS:           27
+NUMBER OF EXTERNAL DEFINITION SYMBOLS:           6
+NUMBER OF INTERNAL/EXTERNAL SYMBOLS:            52
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*** COMMAND PARAMETER ***
+
+
+  -subcommand=C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\hmk342.tmp 
+

@@ -1,0 +1,1589 @@
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-Aug-2013 09:51:57  PAGE    1
+
+************ OBJECT LISTING ************
+
+FILE NAME: E:\Anderain\fx-9860\dPicoc\dPicoc.c
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+        dPicoc.c     1    #include <fxlib.h>
+        dPicoc.c     2    #include "interpreter.h"
+        dPicoc.c     3    #include "dconsole.h"
+        dPicoc.c     4    #include "picoc.h"
+        dPicoc.c     5    
+        dPicoc.c     6    #define PICOC_STACK_SIZE (20*1024)
+        dPicoc.c     7    
+        dPicoc.c     8    #define FILE_EXIT               0
+        dPicoc.c     9    #define FILE_EXE                1
+        dPicoc.c    10    #define FILE_SCRIPT             2
+        dPicoc.c    11    #define FILE_NOFILE     -1
+        dPicoc.c    12    
+        dPicoc.c    13    int file_view (int root,char * cfname);
+        dPicoc.c    14    /*
+        dPicoc.c    15      setup data
+        dPicoc.c    16    */
+        dPicoc.c    17    int stack_size;
+        dPicoc.c    18    
+        dPicoc.c    19    /* in platform_fx9860.c */
+        dPicoc.c    20    
+        dPicoc.c    21    typedef FONTCHARACTER fontc;
+        dPicoc.c    22    
+        dPicoc.c    23    extern fontc *  CharToFont(const char * cfname,fontc * ffname);
+        dPicoc.c    24    extern char  *  FontToChar(const fontc *ffname,char *cfname);
+        dPicoc.c    25    
+        dPicoc.c    26    /* timer for EXIT break */
+        dPicoc.c    27    
+        dPicoc.c    28    #define TIMER_ID 2
+        dPicoc.c    29    
+        dPicoc.c    30    void TimerExitBreak ()
+P   00000000              _TimerExitBreak:                 ; function: TimerExitBreak
+                                                           ; frame size=32
+    00000000 2FE6                   MOV.L       R14,@-R15
+        dPicoc.c    31    {
+        dPicoc.c    32            static times = 0;short unused = 0;
+        dPicoc.c    33            int kcode1 = 0, kcode2 = 0;
+        dPicoc.c    34    
+        dPicoc.c    35            if (Bkey_GetKeyWait(&kcode1, &kcode2, KEYWAIT_HALTOFF_TIMEROFF,0,0, &unused)==KEYREP_KEYEVENT)
+    00000002 E601                   MOV         #1,R6
+    00000004 D237                   MOV.L       L762+4,R2  ; _Bkey_GetKeyWait
+    00000006 EE00                   MOV         #0,R14
+    00000008 2FD6                   MOV.L       R13,@-R15
+    0000000A 60E3                   MOV         R14,R0
+    0000000C 4F22                   STS.L       PR,@-R15
+    0000000E 67E3                   MOV         R14,R7
+    00000010 7FF4                   ADD         #-12,R15
+    00000012 63F3                   MOV         R15,R3
+    00000014 81F4                   MOV.W       R0,@(8,R15)
+    00000016 7308                   ADD         #8,R3
+    00000018 1FE1                   MOV.L       R14,@(4,R15)
+    0000001A 2FE2                   MOV.L       R14,@R15
+    0000001C 2F36                   MOV.L       R3,@-R15
+    0000001E 2FE6                   MOV.L       R14,@-R15
+    00000020 65F3                   MOV         R15,R5
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-Aug-2013 09:51:57  PAGE    2
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000022 7508                   ADD         #8,R5
+    00000024 64F3                   MOV         R15,R4
+    00000026 420B                   JSR         @R2
+    00000028 740C                   ADD         #12,R4
+    0000002A 8801                   CMP/EQ      #1,R0
+    0000002C 8F2D                   BF/S        L706
+    0000002E 7F08                   ADD         #8,R15
+        dPicoc.c    36            {
+        dPicoc.c    37                    if ((kcode1==4)&&(kcode2==8))
+    00000030 D42D                   MOV.L       L762+8,R4  ; __$times$572
+    00000032 50F1                   MOV.L       @(4,R15),R0
+    00000034 8804                   CMP/EQ      #4,R0
+    00000036 8B05                   BF          L707
+    00000038 60F2                   MOV.L       @R15,R0
+    0000003A 8808                   CMP/EQ      #8,R0
+    0000003C 8B02                   BF          L707
+        dPicoc.c    38                            ++times;
+    0000003E 6242                   MOV.L       @R4,R2
+    00000040 7201                   ADD         #1,R2
+    00000042 2422                   MOV.L       R2,@R4
+    00000044              L707:                             
+        dPicoc.c    39                    if (times>=2)
+    00000044 6142                   MOV.L       @R4,R1
+    00000046 E302                   MOV         #2,R3
+    00000048 3133                   CMP/GE      R3,R1
+    0000004A 8B1E                   BF          L706
+        dPicoc.c    40                    {
+        dPicoc.c    41                            // draw a win
+        dPicoc.c    42                            PopUpWin(3);
+    0000004C D127                   MOV.L       L762+12,R1 ; _PopUpWin
+    0000004E 410B                   JSR         @R1
+    00000050 E403                   MOV         #3,R4
+        dPicoc.c    43                            locate(8,3);Print((unsigned char*)"Break!");
+    00000052 E503                   MOV         #3,R5
+    00000054 D326                   MOV.L       L762+16,R3 ; _locate
+    00000056 430B                   JSR         @R3
+    00000058 E408                   MOV         #8,R4
+    0000005A D426                   MOV.L       L762+20,R4 ; L579
+    0000005C D226                   MOV.L       L762+24,R2 ; _Print
+    0000005E 420B                   JSR         @R2
+    00000060 0009                   NOP
+        dPicoc.c    44                            locate(6,5);Print((unsigned char*)"Press [EXE]");
+    00000062 E505                   MOV         #5,R5
+    00000064 D322                   MOV.L       L762+16,R3 ; _locate
+    00000066 430B                   JSR         @R3
+    00000068 E406                   MOV         #6,R4
+    0000006A D424                   MOV.L       L762+28,R4 ; L580
+    0000006C D222                   MOV.L       L762+24,R2 ; _Print
+    0000006E 420B                   JSR         @R2
+    00000070 0009                   NOP
+    00000072 DD23                   MOV.L       L762+32,R13; _WaitKey
+    00000074 9E34                   MOV.W       L762,R14   ; H'7534
+        dPicoc.c    45                            while(WaitKey()!=KEY_CTRL_EXE);
+    00000076              L709:                             
+    00000076 4D0B                   JSR         @R13
+    00000078 0009                   NOP
+    0000007A 30E0                   CMP/EQ      R14,R0
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-Aug-2013 09:51:57  PAGE    3
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    0000007C 8BFB                   BF          L709
+        dPicoc.c    46                            //              
+        dPicoc.c    47                            ProgramFail(0,"error:EXIT Break\n");
+    0000007E D321                   MOV.L       L762+36,R3 ; L582
+    00000080 D221                   MOV.L       L762+40,R2 ; _ProgramFail
+    00000082 2F36                   MOV.L       R3,@-R15
+    00000084 420B                   JSR         @R2
+    00000086 E400                   MOV         #0,R4
+    00000088 7F04                   ADD         #4,R15
+    0000008A              L706:                             
+        dPicoc.c    48                    }
+        dPicoc.c    49            }
+        dPicoc.c    50    }
+    0000008A 7F0C                   ADD         #12,R15
+    0000008C 4F26                   LDS.L       @R15+,PR
+    0000008E 6DF6                   MOV.L       @R15+,R13
+    00000090 000B                   RTS
+    00000092 6EF6                   MOV.L       @R15+,R14
+        dPicoc.c    51    
+        dPicoc.c    52    int AddIn_main(int isAppli, unsigned short OptionNum)
+    00000094              _AddIn_main:                     ; function: AddIn_main
+                                                           ; frame size=84
+    00000094 2FE6                   MOV.L       R14,@-R15
+    00000096 2FD6                   MOV.L       R13,@-R15
+    00000098 2FC6                   MOV.L       R12,@-R15
+    0000009A 4F22                   STS.L       PR,@-R15
+        dPicoc.c    53    {
+        dPicoc.c    54            char file_name[64];
+        dPicoc.c    55            int run_main = 1;
+        dPicoc.c    56    
+        dPicoc.c    57            stack_size = PICOC_STACK_SIZE;
+    0000009C 9321                   MOV.W       L762+2,R3  ; H'5000
+    0000009E 7FC0                   ADD         #-64,R15
+    000000A0 D21A                   MOV.L       L762+44,R2 ; _stack_size
+        dPicoc.c    58    
+        dPicoc.c    59            switch(file_view(0,file_name))
+    000000A2 65F3                   MOV         R15,R5
+    000000A4 DD16                   MOV.L       L762+32,R13; _WaitKey
+    000000A6 2232                   MOV.L       R3,@R2
+    000000A8 9E1A                   MOV.W       L762,R14   ; H'7534
+    000000AA B111                   BSR         _file_view
+    000000AC E400                   MOV         #0,R4
+    000000AE 8800                   CMP/EQ      #0,R0
+    000000B0 8914                   BT          L681
+    000000B2 8801                   CMP/EQ      #1,R0
+    000000B4 8905                   BT          L688
+    000000B6 8802                   CMP/EQ      #2,R0
+    000000B8 8905                   BT          L689
+    000000BA 88FF                   CMP/EQ      #-1,R0
+    000000BC 8905                   BT          L690
+    000000BE A00D                   BRA         L681
+    000000C0 0009                   NOP
+    000000C2              L688:                            ; case label 
+        dPicoc.c    60            {
+        dPicoc.c    61                    case FILE_EXIT:
+        dPicoc.c    62                            return 0;
+        dPicoc.c    63                    case FILE_EXE:
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-Aug-2013 09:51:57  PAGE    4
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+        dPicoc.c    64                            run_main = 1;
+        dPicoc.c    65                            break;
+    000000C2 A029                   BRA         L711
+    000000C4 EC01                   MOV         #1,R12
+    000000C6              L689:                            ; case label 
+        dPicoc.c    66                    case FILE_SCRIPT:
+        dPicoc.c    67                            run_main = 0;
+        dPicoc.c    68                            break;                  
+    000000C6 A027                   BRA         L711
+    000000C8 EC00                   MOV         #0,R12
+    000000CA              L690:                            ; case label 
+        dPicoc.c    69                    case FILE_NOFILE:
+        dPicoc.c    70                            printf("no *.c file exist\npress [EXE]");
+    000000CA D211                   MOV.L       L762+48,R2 ; L590
+    000000CC D311                   MOV.L       L762+52,R3 ; _dPrintf
+    000000CE 430B                   JSR         @R3
+    000000D0 2F26                   MOV.L       R2,@-R15
+    000000D2 7F04                   ADD         #4,R15
+        dPicoc.c    71                            while(WaitKey()!=KEY_CTRL_EXE);
+    000000D4              L713:                             
+    000000D4 4D0B                   JSR         @R13
+    000000D6 0009                   NOP
+    000000D8 30E0                   CMP/EQ      R14,R0
+    000000DA 8BFB                   BF          L713
+    000000DC              L681:
+        dPicoc.c    72                            return 0;
+        dPicoc.c    73                    default:
+        dPicoc.c    74                            return 0;
+    000000DC A04C                   BRA         L712
+    000000DE E000                   MOV         #0,R0
+    000000E0              L762:                             
+    000000E0 7534                   .DATA.W     H'7534
+    000000E2 5000                   .DATA.W     H'5000
+    000000E4 <00000000>             .DATA.L     _Bkey_GetKeyWait
+    000000E8 <00000000>             .DATA.L     __$times$572
+    000000EC <00000000>             .DATA.L     _PopUpWin
+    000000F0 <00000000>             .DATA.L     _locate
+    000000F4 <00000000>             .DATA.L     L579
+    000000F8 <00000000>             .DATA.L     _Print
+    000000FC <00000000>             .DATA.L     L580
+    00000100 <00000000>             .DATA.L     _WaitKey
+    00000104 <00000000>             .DATA.L     L582
+    00000108 <00000000>             .DATA.L     _ProgramFail
+    0000010C <00000000>             .DATA.L     _stack_size
+    00000110 <00000000>             .DATA.L     L590
+    00000114 <00000000>             .DATA.L     _dPrintf
+    00000118              L711:                             
+        dPicoc.c    75            }
+        dPicoc.c    76    
+        dPicoc.c    77            PicocInitialise(PICOC_STACK_SIZE);
+    00000118 9476                   MOV.W       L763,R4    ; H'5000
+    0000011A D33C                   MOV.L       L763+4,R3  ; _PicocInitialise
+    0000011C 430B                   JSR         @R3
+    0000011E 0009                   NOP
+        dPicoc.c    78    
+        dPicoc.c    79            if (PicocPlatformSetExitPoint())
+    00000120 D43B                   MOV.L       L763+8,R4  ; _PicocExitBuf
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-Aug-2013 09:51:57  PAGE    5
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000122 D23C                   MOV.L       L763+12,R2 ; _setjmp
+    00000124 420B                   JSR         @R2
+    00000126 0009                   NOP
+    00000128 2008                   TST         R0,R0
+    0000012A 890C                   BT          L715
+        dPicoc.c    80            {
+        dPicoc.c    81                    KillTimer(TIMER_ID);
+    0000012C D23A                   MOV.L       L763+16,R2 ; _KillTimer
+    0000012E 420B                   JSR         @R2
+    00000130 E402                   MOV         #2,R4
+        dPicoc.c    82                    PicocCleanup();
+    00000132 D33A                   MOV.L       L763+20,R3 ; _PicocCleanup
+    00000134 430B                   JSR         @R3
+    00000136 0009                   NOP
+        dPicoc.c    83                    while(WaitKey()!=KEY_CTRL_EXE);
+    00000138              L716:                             
+    00000138 4D0B                   JSR         @R13
+    0000013A 0009                   NOP
+    0000013C 30E0                   CMP/EQ      R14,R0
+    0000013E 8BFB                   BF          L716
+        dPicoc.c    84                    return PicocExitValue;
+    00000140 D237                   MOV.L       L763+24,R2 ; _PicocExitValue
+    00000142 A019                   BRA         L712
+    00000144 6022                   MOV.L       @R2,R0
+    00000146              L715:                             
+        dPicoc.c    85            }
+        dPicoc.c    86    
+        dPicoc.c    87            SetTimer(TIMER_ID,1000,TimerExitBreak);
+    00000146 D637                   MOV.L       L763+28,R6 ; _TimerExitBreak
+    00000148 955F                   MOV.W       L763+2,R5  ; H'03E8
+    0000014A D337                   MOV.L       L763+32,R3 ; _SetTimer
+    0000014C 430B                   JSR         @R3
+    0000014E E402                   MOV         #2,R4
+        dPicoc.c    88            
+        dPicoc.c    89            if (!run_main)
+    00000150 2CC8                   TST         R12,R12
+    00000152 8B02                   BF          L718
+        dPicoc.c    90                    PicocIncludeAllSystemHeaders();
+    00000154 D335                   MOV.L       L763+36,R3 ; _PicocIncludeAllSystemHeaders
+    00000156 430B                   JSR         @R3
+    00000158 0009                   NOP
+    0000015A              L718:                             
+        dPicoc.c    91    
+        dPicoc.c    92            PicocPlatformScanFile(file_name);
+    0000015A D235                   MOV.L       L763+40,R2 ; _PicocPlatformScanFile
+    0000015C 420B                   JSR         @R2
+    0000015E 64F3                   MOV         R15,R4
+        dPicoc.c    93    
+        dPicoc.c    94            if (run_main)
+    00000160 2CC8                   TST         R12,R12
+    00000162 8903                   BT          L719
+        dPicoc.c    95                    PicocCallMain(0,0);
+    00000164 D233                   MOV.L       L763+44,R2 ; _PicocCallMain
+    00000166 E500                   MOV         #0,R5
+    00000168 420B                   JSR         @R2
+    0000016A 6453                   MOV         R5,R4
+    0000016C              L719:                             
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-Aug-2013 09:51:57  PAGE    6
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+        dPicoc.c    96        
+        dPicoc.c    97            PicocCleanup();
+    0000016C D32B                   MOV.L       L763+20,R3 ; _PicocCleanup
+    0000016E 430B                   JSR         @R3
+    00000170 0009                   NOP
+        dPicoc.c    98    
+        dPicoc.c    99            WaitKey();
+    00000172 4D0B                   JSR         @R13
+    00000174 0009                   NOP
+        dPicoc.c   100            
+        dPicoc.c   101        return 1;
+    00000176 E001                   MOV         #1,R0
+        dPicoc.c   102    }
+    00000178              L712:                             
+    00000178 7F40                   ADD         #64,R15
+    0000017A 4F26                   LDS.L       @R15+,PR
+    0000017C 6CF6                   MOV.L       @R15+,R12
+    0000017E 6DF6                   MOV.L       @R15+,R13
+    00000180 000B                   RTS
+    00000182 6EF6                   MOV.L       @R15+,R14
+        dPicoc.c   103    
+        dPicoc.c   104    
+        dPicoc.c   105    /*
+        dPicoc.c   106            list
+        dPicoc.c   107    */
+        dPicoc.c   108    
+        dPicoc.c   109    typedef struct tag_node
+        dPicoc.c   110    {
+        dPicoc.c   111            char                            str[24] ;
+        dPicoc.c   112            struct tag_node *       next    ;
+        dPicoc.c   113    }
+        dPicoc.c   114    node;
+        dPicoc.c   115    
+        dPicoc.c   116    typedef struct
+        dPicoc.c   117    {
+        dPicoc.c   118            node            *head,*last     ;
+        dPicoc.c   119            int                                     size;
+        dPicoc.c   120    }
+        dPicoc.c   121    list;
+        dPicoc.c   122    
+        dPicoc.c   123    void list_init (list * l)
+    00000184              _list_init:                      ; function: list_init
+                                                           ; frame size=0
+        dPicoc.c   124    {
+        dPicoc.c   125            l->head = NULL;
+    00000184 E500                   MOV         #0,R5
+    00000186 2452                   MOV.L       R5,@R4
+        dPicoc.c   126            l->last = NULL;
+    00000188 1451                   MOV.L       R5,@(4,R4)
+        dPicoc.c   127            l->size = 0;
+        dPicoc.c   128    }
+    0000018A 000B                   RTS
+    0000018C 1452                   MOV.L       R5,@(8,R4)
+        dPicoc.c   129    
+        dPicoc.c   130    void list_destory (list * l)
+    0000018E              _list_destory:                   ; function: list_destory
+                                                           ; frame size=16
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-Aug-2013 09:51:57  PAGE    7
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    0000018E 2FE6                   MOV.L       R14,@-R15
+    00000190 2FD6                   MOV.L       R13,@-R15
+    00000192 6D43                   MOV         R4,R13
+    00000194 2FC6                   MOV.L       R12,@-R15
+    00000196 4F22                   STS.L       PR,@-R15
+    00000198 DC27                   MOV.L       L763+48,R12; _free
+        dPicoc.c   131    {
+        dPicoc.c   132            node *line1,*line2;
+        dPicoc.c   133    
+        dPicoc.c   134            line1 = l->head;
+        dPicoc.c   135            
+        dPicoc.c   136            while (line1)
+    0000019A A003                   BRA         L720
+    0000019C 6ED2                   MOV.L       @R13,R14
+    0000019E              L721:                             
+        dPicoc.c   137            {
+        dPicoc.c   138                    line2 = line1;
+    0000019E 64E3                   MOV         R14,R4
+        dPicoc.c   139                    line1 = line1->next ;
+        dPicoc.c   140    
+        dPicoc.c   141                    free (line2);
+    000001A0 4C0B                   JSR         @R12
+    000001A2 5EE6                   MOV.L       @(24,R14),R14
+    000001A4              L720:                             
+    000001A4 2EE8                   TST         R14,R14
+    000001A6 8BFA                   BF          L721
+        dPicoc.c   142            }
+        dPicoc.c   143    
+        dPicoc.c   144            l->head = l->last = NULL;
+    000001A8 E400                   MOV         #0,R4
+    000001AA 1D41                   MOV.L       R4,@(4,R13)
+    000001AC 2D42                   MOV.L       R4,@R13
+        dPicoc.c   145            l->size = 0;
+    000001AE 1D42                   MOV.L       R4,@(8,R13)
+        dPicoc.c   146    }
+    000001B0 4F26                   LDS.L       @R15+,PR
+    000001B2 6CF6                   MOV.L       @R15+,R12
+    000001B4 6DF6                   MOV.L       @R15+,R13
+    000001B6 000B                   RTS
+    000001B8 6EF6                   MOV.L       @R15+,R14
+        dPicoc.c   147    
+        dPicoc.c   148    void list_push (list * l,const char * str)
+    000001BA              _list_push:                      ; function: list_push
+                                                           ; frame size=16
+                                                           ; used runtime library name:
+                                                           ; __slow_strcpy
+    000001BA 2FE6                   MOV.L       R14,@-R15
+    000001BC 2F86                   MOV.L       R8,@-R15
+    000001BE 6E43                   MOV         R4,R14
+    000001C0 4F22                   STS.L       PR,@-R15
+    000001C2 7FFC                   ADD         #-4,R15
+    000001C4 2F52                   MOV.L       R5,@R15
+        dPicoc.c   149    {
+        dPicoc.c   150            if (l->size == 0)
+    000001C6 53E2                   MOV.L       @(8,R14),R3
+    000001C8 2338                   TST         R3,R3
+    000001CA 8B07                   BF          L722
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-Aug-2013 09:51:57  PAGE    8
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+        dPicoc.c   151            {
+        dPicoc.c   152                    l->head                 = (node*)calloc(sizeof(node),1);
+    000001CC D31B                   MOV.L       L763+52,R3 ; _calloc
+    000001CE E501                   MOV         #1,R5
+    000001D0 430B                   JSR         @R3
+    000001D2 E41C                   MOV         #28,R4
+    000001D4 2E02                   MOV.L       R0,@R14
+        dPicoc.c   153                    l->last                 = l->head;
+    000001D6 6203                   MOV         R0,R2
+    000001D8 A00A                   BRA         L723
+    000001DA 1E01                   MOV.L       R0,@(4,R14)
+    000001DC              L722:                             
+        dPicoc.c   154            }
+        dPicoc.c   155            else
+        dPicoc.c   156            {
+        dPicoc.c   157                    l->last->next   = (node*)calloc(sizeof(node),1);
+    000001DC 58E1                   MOV.L       @(4,R14),R8
+    000001DE E501                   MOV         #1,R5
+    000001E0 D316                   MOV.L       L763+52,R3 ; _calloc
+    000001E2 7818                   ADD         #24,R8
+    000001E4 430B                   JSR         @R3
+    000001E6 E41C                   MOV         #28,R4
+    000001E8 2802                   MOV.L       R0,@R8
+        dPicoc.c   158                    l->last                 = l->last->next;
+    000001EA 53E1                   MOV.L       @(4,R14),R3
+    000001EC 5236                   MOV.L       @(24,R3),R2
+    000001EE 1E21                   MOV.L       R2,@(4,R14)
+    000001F0              L723:                             
+        dPicoc.c   159            }
+        dPicoc.c   160    
+        dPicoc.c   161            strcpy(l->last->str,str);
+    000001F0 50E1                   MOV.L       @(4,R14),R0
+    000001F2 D313                   MOV.L       L763+56,R3 ; __slow_strcpy
+    000001F4 430B                   JSR         @R3
+    000001F6 61F2                   MOV.L       @R15,R1
+        dPicoc.c   162    
+        dPicoc.c   163            l->size ++;
+    000001F8 52E2                   MOV.L       @(8,R14),R2
+    000001FA 7201                   ADD         #1,R2
+    000001FC 1E22                   MOV.L       R2,@(8,R14)
+        dPicoc.c   164    
+        dPicoc.c   165    }
+    000001FE 7F04                   ADD         #4,R15
+    00000200 4F26                   LDS.L       @R15+,PR
+    00000202 68F6                   MOV.L       @R15+,R8
+    00000204 000B                   RTS
+    00000206 6EF6                   MOV.L       @R15+,R14
+    00000208              L763:                             
+    00000208 5000                   .DATA.W     H'5000
+    0000020A 03E8                   .DATA.W     H'03E8
+    0000020C <00000000>             .DATA.L     _PicocInitialise
+    00000210 <00000000>             .DATA.L     _PicocExitBuf
+    00000214 <00000000>             .DATA.L     _setjmp
+    00000218 <00000000>             .DATA.L     _KillTimer
+    0000021C <00000000>             .DATA.L     _PicocCleanup
+    00000220 <00000000>             .DATA.L     _PicocExitValue
+    00000224 <00000000>             .DATA.L     _TimerExitBreak
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-Aug-2013 09:51:57  PAGE    9
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000228 <00000000>             .DATA.L     _SetTimer
+    0000022C <00000000>             .DATA.L     _PicocIncludeAllSystemHeaders
+    00000230 <00000000>             .DATA.L     _PicocPlatformScanFile
+    00000234 <00000000>             .DATA.L     _PicocCallMain
+    00000238 <00000000>             .DATA.L     _free
+    0000023C <00000000>             .DATA.L     _calloc
+    00000240 <00000000>             .DATA.L     __slow_strcpy
+        dPicoc.c   166    /*
+        dPicoc.c   167      graph
+        dPicoc.c   168    */
+        dPicoc.c   169    void area_clear (int left,int top,int right,int bottom,int sel) 
+    00000244              _area_clear:                     ; function: area_clear
+                                                           ; frame size=28
+    00000244 2FE6                   MOV.L       R14,@-R15
+    00000246 4F22                   STS.L       PR,@-R15
+    00000248 7FEC                   ADD         #-20,R15
+        dPicoc.c   170    { 
+        dPicoc.c   171            DISPBOX box; 
+        dPicoc.c   172            box.left = left;box.top = top;box.right = right;box.bottom = bottom; 
+    0000024A 1F41                   MOV.L       R4,@(4,R15)
+    0000024C 1F52                   MOV.L       R5,@(8,R15)
+    0000024E 1F63                   MOV.L       R6,@(12,R15)
+    00000250 1F74                   MOV.L       R7,@(16,R15)
+        dPicoc.c   173            if (sel != 1) 
+    00000252 50F7                   MOV.L       @(28,R15),R0
+    00000254 8801                   CMP/EQ      #1,R0
+    00000256 8903                   BT          L724
+        dPicoc.c   174                    Bdisp_AreaClr_VRAM (&box); 
+    00000258 D24A                   MOV.L       L764+8,R2  ; _Bdisp_AreaClr_VRAM
+    0000025A 64F3                   MOV         R15,R4
+    0000025C 420B                   JSR         @R2
+    0000025E 7404                   ADD         #4,R4
+    00000260              L724:                             
+        dPicoc.c   175            if (sel != 0){ 
+    00000260 53F7                   MOV.L       @(28,R15),R3
+    00000262 2338                   TST         R3,R3
+    00000264 8918                   BT          L725
+        dPicoc.c   176                    Bdisp_DrawLineVRAM (box.left,box.top,box.right,box.top); 
+    00000266 DE48                   MOV.L       L764+12,R14; _Bdisp_DrawLineVRAM
+    00000268 57F2                   MOV.L       @(8,R15),R7
+    0000026A 2F72                   MOV.L       R7,@R15
+    0000026C 56F3                   MOV.L       @(12,R15),R6
+    0000026E 6573                   MOV         R7,R5
+    00000270 4E0B                   JSR         @R14
+    00000272 54F1                   MOV.L       @(4,R15),R4
+        dPicoc.c   177                    Bdisp_DrawLineVRAM (box.left,box.bottom,box.right,box.bottom); 
+    00000274 57F4                   MOV.L       @(16,R15),R7
+    00000276 2F72                   MOV.L       R7,@R15
+    00000278 56F3                   MOV.L       @(12,R15),R6
+    0000027A 6573                   MOV         R7,R5
+    0000027C 4E0B                   JSR         @R14
+    0000027E 54F1                   MOV.L       @(4,R15),R4
+        dPicoc.c   178                    Bdisp_DrawLineVRAM (box.left,box.top,box.left,box.bottom); 
+    00000280 57F4                   MOV.L       @(16,R15),R7
+    00000282 56F1                   MOV.L       @(4,R15),R6
+    00000284 2F62                   MOV.L       R6,@R15
+    00000286 55F2                   MOV.L       @(8,R15),R5
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-Aug-2013 09:51:57  PAGE   10
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000288 4E0B                   JSR         @R14
+    0000028A 6463                   MOV         R6,R4
+        dPicoc.c   179                    Bdisp_DrawLineVRAM (box.right,box.top,box.right,box.bottom); 
+    0000028C 57F4                   MOV.L       @(16,R15),R7
+    0000028E 56F3                   MOV.L       @(12,R15),R6
+    00000290 2F62                   MOV.L       R6,@R15
+    00000292 55F2                   MOV.L       @(8,R15),R5
+    00000294 4E0B                   JSR         @R14
+    00000296 6463                   MOV         R6,R4
+    00000298              L725:                             
+        dPicoc.c   180        } 
+        dPicoc.c   181    }
+    00000298 7F14                   ADD         #20,R15
+    0000029A 4F26                   LDS.L       @R15+,PR
+    0000029C 000B                   RTS
+    0000029E 6EF6                   MOV.L       @R15+,R14
+        dPicoc.c   182    
+        dPicoc.c   183    /*
+        dPicoc.c   184      draw picture
+        dPicoc.c   185    */
+        dPicoc.c   186    void draw_picture (int x,int y,int width,int height,int mode,unsigned char * pGraph)
+    000002A0              _draw_picture:                   ; function: draw_picture
+                                                           ; frame size=28
+    000002A0 4F22                   STS.L       PR,@-R15
+        dPicoc.c   187    {
+        dPicoc.c   188            DISPGRAPH dg;
+        dPicoc.c   189    
+        dPicoc.c   190            dg.x                                    = x;
+        dPicoc.c   191            dg.y                                    = y;
+        dPicoc.c   192            dg.GraphData.width              = width;
+        dPicoc.c   193            dg.GraphData.height             = height;
+        dPicoc.c   194            dg.GraphData.pBitmap    = pGraph;
+        dPicoc.c   195            dg.WriteModify                  = mode+1;
+    000002A2 E014                   MOV         #20,R0
+    000002A4 7FE8                   ADD         #-24,R15
+    000002A6 2F42                   MOV.L       R4,@R15
+    000002A8 1F51                   MOV.L       R5,@(4,R15)
+    000002AA 1F62                   MOV.L       R6,@(8,R15)
+    000002AC 1F73                   MOV.L       R7,@(12,R15)
+    000002AE 53F8                   MOV.L       @(32,R15),R3
+    000002B0 1F34                   MOV.L       R3,@(16,R15)
+        dPicoc.c   196            dg.WriteKind                    = IMB_WRITEKIND_OVER;
+    000002B2 E301                   MOV         #1,R3
+    000002B4 52F7                   MOV.L       @(28,R15),R2
+    000002B6 7201                   ADD         #1,R2
+    000002B8 0F24                   MOV.B       R2,@(R0,R15)
+    000002BA E015                   MOV         #21,R0
+    000002BC 0F34                   MOV.B       R3,@(R0,R15)
+        dPicoc.c   197    
+        dPicoc.c   198            Bdisp_WriteGraph_VRAM(&dg);
+    000002BE D333                   MOV.L       L764+16,R3 ; _Bdisp_WriteGraph_VRAM
+    000002C0 430B                   JSR         @R3
+    000002C2 64F3                   MOV         R15,R4
+        dPicoc.c   199    }
+    000002C4 7F18                   ADD         #24,R15
+    000002C6 4F26                   LDS.L       @R15+,PR
+    000002C8 000B                   RTS
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-Aug-2013 09:51:57  PAGE   11
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000002CA 0009                   NOP
+        dPicoc.c   200    /*
+        dPicoc.c   201      setup
+        dPicoc.c   202    */
+        dPicoc.c   203    void setup ()
+    000002CC              _setup:                          ; function: setup
+                                                           ; frame size=0
+        dPicoc.c   204    {
+        dPicoc.c   205    }
+    000002CC 000B                   RTS
+    000002CE 0009                   NOP
+        dPicoc.c   206    
+        dPicoc.c   207    /*
+        dPicoc.c   208      file viewer
+        dPicoc.c   209    */
+        dPicoc.c   210    extern const unsigned char ICON_EXE[],ICON_SCP[],ICON_SET[];
+        dPicoc.c   211    
+        dPicoc.c   212    #define         all_clr         Bdisp_AllClr_VRAM
+        dPicoc.c   213    #define         area_rev        Bdisp_AreaReverseVRAM
+        dPicoc.c   214    #define         putdisp         Bdisp_PutDisp_DD
+        dPicoc.c   215    #define         printxy         PrintXY
+        dPicoc.c   216    #define         REFRESH_PART    1
+        dPicoc.c   217    #define         REFRESH_ALL             2
+        dPicoc.c   218    
+        dPicoc.c   219    int file_view (int root,char * cfname)
+    000002D0              _file_view:                      ; function: file_view
+                                                           ; frame size=312
+    000002D0 2FE6                   MOV.L       R14,@-R15
+        dPicoc.c   220    {
+        dPicoc.c   221            char                    strtemp[32];
+        dPicoc.c   222            fontc                   fnttemp[32];
+        dPicoc.c   223            fontc                   fntpath[32];
+        dPicoc.c   224            char                    **clist;
+        dPicoc.c   225            unsigned int    key;
+        dPicoc.c   226            list                    lfile;
+        dPicoc.c   227            int                             fh_find;
+        dPicoc.c   228            node                    *nnode;
+        dPicoc.c   229            int                             i,top,bottom,index,refresh;
+        dPicoc.c   230            const int               h_max = 6-1;
+    000002D2 E305                   MOV         #5,R3
+    000002D4 9052                   MOV.W       L764,R0    ; H'FF00
+    000002D6 2FD6                   MOV.L       R13,@-R15
+    000002D8 2FC6                   MOV.L       R12,@-R15
+    000002DA 2FB6                   MOV.L       R11,@-R15
+    000002DC 2FA6                   MOV.L       R10,@-R15
+    000002DE 2F96                   MOV.L       R9,@-R15
+    000002E0 2F86                   MOV.L       R8,@-R15
+    000002E2 4F22                   STS.L       PR,@-R15
+    000002E4 3F0C                   ADD         R0,R15
+    000002E6 1F43                   MOV.L       R4,@(12,R15)
+    000002E8 1F57                   MOV.L       R5,@(28,R15)
+        dPicoc.c   231            FILE_INFO               file_info;
+        dPicoc.c   232    
+        dPicoc.c   233            list_init(&lfile);
+    000002EA 64F3                   MOV         R15,R4
+    000002EC 1F35                   MOV.L       R3,@(20,R15)
+    000002EE BF49                   BSR         _list_init
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-Aug-2013 09:51:57  PAGE   12
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000002F0 7454                   ADD         #84,R4
+        dPicoc.c   234    
+        dPicoc.c   235            sprintf(strtemp,"\\\\%s\\*.c",root ? "fls0":"crd0");
+    000002F2 9E44                   MOV.W       L764+2,R14 ; H'00E0
+    000002F4 52F3                   MOV.L       @(12,R15),R2
+    000002F6 2228                   TST         R2,R2
+    000002F8 8D04                   BT/S        L726
+    000002FA 3EFC                   ADD         R15,R14
+    000002FC D324                   MOV.L       L764+20,R3 ; L649
+    000002FE 2F36                   MOV.L       R3,@-R15
+    00000300 A002                   BRA         L727
+    00000302 0009                   NOP
+    00000304              L726:                             
+    00000304 D223                   MOV.L       L764+24,R2 ; L650
+    00000306 2F26                   MOV.L       R2,@-R15
+    00000308              L727:                             
+    00000308 D123                   MOV.L       L764+28,R1 ; L648
+    0000030A 2F16                   MOV.L       R1,@-R15
+    0000030C D323                   MOV.L       L764+32,R3 ; _sprintf
+    0000030E 430B                   JSR         @R3
+    00000310 64E3                   MOV         R14,R4
+    00000312 7F08                   ADD         #8,R15
+        dPicoc.c   236            CharToFont(strtemp,fntpath);
+    00000314 D222                   MOV.L       L764+36,R2 ; _CharToFont
+    00000316 65F3                   MOV         R15,R5
+    00000318 7560                   ADD         #96,R5
+    0000031A 420B                   JSR         @R2
+    0000031C 64E3                   MOV         R14,R4
+        dPicoc.c   237            
+        dPicoc.c   238    
+        dPicoc.c   239            if(Bfile_FindFirst (fntpath,&fh_find,fnttemp,&file_info)!=0)
+    0000031E 67F3                   MOV         R15,R7
+    00000320 D320                   MOV.L       L764+40,R3 ; _Bfile_FindFirst
+    00000322 65F3                   MOV         R15,R5
+    00000324 9D2C                   MOV.W       L764+4,R13 ; H'00A0
+    00000326 64F3                   MOV         R15,R4
+    00000328 3DFC                   ADD         R15,R13
+    0000032A 7740                   ADD         #64,R7
+    0000032C 66D3                   MOV         R13,R6
+    0000032E 7508                   ADD         #8,R5
+    00000330 430B                   JSR         @R3
+    00000332 7460                   ADD         #96,R4
+    00000334 2008                   TST         R0,R0
+    00000336 8904                   BT          L728
+        dPicoc.c   240            {
+        dPicoc.c   241                    Bfile_FindClose(fh_find);
+    00000338 D31B                   MOV.L       L764+44,R3 ; _Bfile_FindClose
+    0000033A 430B                   JSR         @R3
+    0000033C 54F2                   MOV.L       @(8,R15),R4
+        dPicoc.c   242                    return -1;
+    0000033E A156                   BRA         L729
+    00000340 E0FF                   MOV         #-1,R0
+    00000342              L728:                             
+    00000342 DB1A                   MOV.L       L764+48,R11; _Bfile_FindNext
+    00000344 DC1A                   MOV.L       L764+52,R12; _FontToChar
+        dPicoc.c   243            }
+        dPicoc.c   244    
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-Aug-2013 09:51:57  PAGE   13
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+        dPicoc.c   245            do
+    00000346              L730:                             
+        dPicoc.c   246            {
+        dPicoc.c   247                    FontToChar(fnttemp,strtemp);
+    00000346 65E3                   MOV         R14,R5
+    00000348 4C0B                   JSR         @R12
+    0000034A 64D3                   MOV         R13,R4
+        dPicoc.c   248                    //locate(1,1);Print(strtemp);
+        dPicoc.c   249                    //WaitKey();
+        dPicoc.c   250                    //
+        dPicoc.c   251                    list_push(&lfile,strtemp);
+    0000034C 65E3                   MOV         R14,R5
+    0000034E 64F3                   MOV         R15,R4
+    00000350 BF33                   BSR         _list_push
+    00000352 7454                   ADD         #84,R4
+        dPicoc.c   252            }
+        dPicoc.c   253            while(Bfile_FindNext(fh_find,fnttemp,&file_info)==0);
+    00000354 66F3                   MOV         R15,R6
+    00000356 7640                   ADD         #64,R6
+    00000358 65D3                   MOV         R13,R5
+    0000035A 4B0B                   JSR         @R11
+    0000035C 54F2                   MOV.L       @(8,R15),R4
+    0000035E 2008                   TST         R0,R0
+    00000360 89F1                   BT          L730
+        dPicoc.c   254    
+        dPicoc.c   255            Bfile_FindClose(fh_find);
+    00000362 D311                   MOV.L       L764+44,R3 ; _Bfile_FindClose
+    00000364 430B                   JSR         @R3
+    00000366 54F2                   MOV.L       @(8,R15),R4
+        dPicoc.c   256    
+        dPicoc.c   257            clist = (char**)malloc(sizeof(char*)*lfile.size);
+    00000368 D312                   MOV.L       L764+56,R3 ; _malloc
+    0000036A E05C                   MOV         #92,R0
+    0000036C 04FE                   MOV.L       @(R0,R15),R4
+    0000036E 430B                   JSR         @R3
+    00000370 4408                   SHLL2       R4
+    00000372 6803                   MOV         R0,R8
+        dPicoc.c   258            
+        dPicoc.c   259            for (i=0,nnode=lfile.head;nnode!=NULL;nnode=nnode->next,++i)
+    00000374 E500                   MOV         #0,R5
+    00000376 E054                   MOV         #84,R0
+    00000378 A024                   BRA         L731
+    0000037A 04FE                   MOV.L       @(R0,R15),R4
+    0000037C              L764:                             
+    0000037C FF00                   .DATA.W     H'FF00
+    0000037E 00E0                   .DATA.W     H'00E0
+    00000380 00A0                   .DATA.W     H'00A0
+    00000382 0000                   .DATA.W     0
+    00000384 <00000000>             .DATA.L     _Bdisp_AreaClr_VRAM
+    00000388 <00000000>             .DATA.L     _Bdisp_DrawLineVRAM
+    0000038C <00000000>             .DATA.L     _Bdisp_WriteGraph_VRAM
+    00000390 <00000000>             .DATA.L     L649
+    00000394 <00000000>             .DATA.L     L650
+    00000398 <00000000>             .DATA.L     L648
+    0000039C <00000000>             .DATA.L     _sprintf
+    000003A0 <00000000>             .DATA.L     _CharToFont
+    000003A4 <00000000>             .DATA.L     _Bfile_FindFirst
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-Aug-2013 09:51:57  PAGE   14
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000003A8 <00000000>             .DATA.L     _Bfile_FindClose
+    000003AC <00000000>             .DATA.L     _Bfile_FindNext
+    000003B0 <00000000>             .DATA.L     _FontToChar
+    000003B4 <00000000>             .DATA.L     _malloc
+    000003B8              L732:                             
+        dPicoc.c   260            {
+        dPicoc.c   261                    clist[i] = nnode->str;
+    000003B8 6053                   MOV         R5,R0
+    000003BA 4008                   SHLL2       R0
+    000003BC 0846                   MOV.L       R4,@(R0,R8)
+    000003BE 7501                   ADD         #1,R5
+    000003C0 6343                   MOV         R4,R3
+    000003C2 5446                   MOV.L       @(24,R4),R4
+    000003C4              L731:                             
+    000003C4 2448                   TST         R4,R4
+    000003C6 8BF7                   BF          L732
+    000003C8 D923                   MOV.L       L765+2,R9  ; _locate
+        dPicoc.c   262            }
+        dPicoc.c   263    
+        dPicoc.c   264            /* select file */
+        dPicoc.c   265    
+        dPicoc.c   266            index = 0,refresh = REFRESH_ALL;
+    000003CA ED00                   MOV         #0,R13
+    000003CC DA23                   MOV.L       L765+6,R10 ; _Print
+    000003CE E302                   MOV         #2,R3
+    000003D0 1F34                   MOV.L       R3,@(16,R15)
+        dPicoc.c   267            top = 0,bottom = h_max;
+    000003D2 6BD3                   MOV         R13,R11
+    000003D4 5EF5                   MOV.L       @(20,R15),R14
+        dPicoc.c   268            while(1)
+    000003D6              L734:                             
+        dPicoc.c   269            {
+        dPicoc.c   270                    if (refresh)
+    000003D6 52F4                   MOV.L       @(16,R15),R2
+    000003D8 2228                   TST         R2,R2
+    000003DA 8B01                   BF          L766
+    000003DC A0A2                   BRA         L735
+    000003DE 0009                   NOP
+    000003E0              L766:                             
+        dPicoc.c   271                    {
+        dPicoc.c   272                            int y;
+        dPicoc.c   273    
+        dPicoc.c   274                            /* draw_title && bottom */
+        dPicoc.c   275                            if (refresh == REFRESH_ALL)
+    000003E0 50F4                   MOV.L       @(16,R15),R0
+    000003E2 8802                   CMP/EQ      #2,R0
+    000003E4 8B4C                   BF          L736
+        dPicoc.c   276                            {
+        dPicoc.c   277                                    char temp[32];
+        dPicoc.c   278                                    all_clr();
+    000003E6 D21E                   MOV.L       L765+10,R2 ; _Bdisp_AllClr_VRAM
+    000003E8 420B                   JSR         @R2
+    000003EA 0009                   NOP
+        dPicoc.c   279                                    locate(1,1) ;Print((unsigned char*)"dPicoC Programs");
+    000003EC E501                   MOV         #1,R5
+    000003EE 490B                   JSR         @R9
+    000003F0 6453                   MOV         R5,R4
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-Aug-2013 09:51:57  PAGE   15
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000003F2 D41C                   MOV.L       L765+14,R4 ; L659
+    000003F4 4A0B                   JSR         @R10
+    000003F6 0009                   NOP
+        dPicoc.c   280                                    locate(17,1);Print((const unsigned char*)(root ? "[fls]":"[crd]"));
+    000003F8 E501                   MOV         #1,R5
+    000003FA 490B                   JSR         @R9
+    000003FC E411                   MOV         #17,R4
+    000003FE 53F3                   MOV.L       @(12,R15),R3
+    00000400 2338                   TST         R3,R3
+    00000402 8902                   BT          L737
+    00000404 D418                   MOV.L       L765+18,R4 ; L660
+    00000406 A001                   BRA         L738
+    00000408 0009                   NOP
+    0000040A              L737:                             
+    0000040A D418                   MOV.L       L765+22,R4 ; L661
+    0000040C              L738:                             
+    0000040C 4A0B                   JSR         @R10
+    0000040E 0009                   NOP
+        dPicoc.c   281                                    area_rev(0,0,127,7);
+    00000410 D217                   MOV.L       L765+26,R2 ; _Bdisp_AreaReverseVRAM
+    00000412 E707                   MOV         #7,R7
+    00000414 E67F                   MOV         #127,R6
+    00000416 E500                   MOV         #0,R5
+    00000418 420B                   JSR         @R2
+    0000041A 6453                   MOV         R5,R4
+        dPicoc.c   282    
+        dPicoc.c   283                                    draw_picture(  2,56,19,8,0,ICON_EXE);
+    0000041C D315                   MOV.L       L765+30,R3 ; _ICON_EXE
+    0000041E E200                   MOV         #0,R2
+    00000420 2F36                   MOV.L       R3,@-R15
+    00000422 E708                   MOV         #8,R7
+    00000424 2F26                   MOV.L       R2,@-R15
+    00000426 E613                   MOV         #19,R6
+    00000428 E538                   MOV         #56,R5
+    0000042A BF39                   BSR         _draw_picture
+    0000042C E402                   MOV         #2,R4
+        dPicoc.c   284                                    draw_picture( 23,56,19,8,0,ICON_SCP);
+    0000042E E200                   MOV         #0,R2
+    00000430 D311                   MOV.L       L765+34,R3 ; _ICON_SCP
+    00000432 E708                   MOV         #8,R7
+    00000434 2F36                   MOV.L       R3,@-R15
+    00000436 E613                   MOV         #19,R6
+    00000438 2F26                   MOV.L       R2,@-R15
+    0000043A E538                   MOV         #56,R5
+    0000043C BF30                   BSR         _draw_picture
+    0000043E E417                   MOV         #23,R4
+        dPicoc.c   285                                    draw_picture(107,56,19,8,0,ICON_SET);
+    00000440 D30E                   MOV.L       L765+38,R3 ; _ICON_SET
+    00000442 E200                   MOV         #0,R2
+    00000444 2F36                   MOV.L       R3,@-R15
+    00000446 E708                   MOV         #8,R7
+    00000448 2F26                   MOV.L       R2,@-R15
+    0000044A E613                   MOV         #19,R6
+    0000044C E538                   MOV         #56,R5
+    0000044E BF27                   BSR         _draw_picture
+    00000450 E46B                   MOV         #107,R4
+    00000452 A01D                   BRA         L739
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-Aug-2013 09:51:57  PAGE   16
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000454 7F18                   ADD         #24,R15
+    00000456              L765:                             
+    00000456 0000                   .DATA.W     0
+    00000458 <00000000>             .DATA.L     _locate
+    0000045C <00000000>             .DATA.L     _Print
+    00000460 <00000000>             .DATA.L     _Bdisp_AllClr_VRAM
+    00000464 <00000000>             .DATA.L     L659
+    00000468 <00000000>             .DATA.L     L660
+    0000046C <00000000>             .DATA.L     L661
+    00000470 <00000000>             .DATA.L     _Bdisp_AreaReverseVRAM
+    00000474 <00000000>             .DATA.L     _ICON_EXE
+    00000478 <00000000>             .DATA.L     _ICON_SCP
+    0000047C <00000000>             .DATA.L     _ICON_SET
+    00000480              L736:                             
+        dPicoc.c   286                            }
+        dPicoc.c   287                            else
+        dPicoc.c   288                                    area_clear(0,8,127,55,0);
+    00000480 E200                   MOV         #0,R2
+    00000482 E737                   MOV         #55,R7
+    00000484 2F26                   MOV.L       R2,@-R15
+    00000486 E67F                   MOV         #127,R6
+    00000488 E508                   MOV         #8,R5
+    0000048A BEDB                   BSR         _area_clear
+    0000048C 6423                   MOV         R2,R4
+    0000048E 7F04                   ADD         #4,R15
+    00000490              L739:                             
+        dPicoc.c   289    
+        dPicoc.c   290                            if (bottom-top>h_max)bottom = top + h_max;
+    00000490 53F5                   MOV.L       @(20,R15),R3
+    00000492 61E3                   MOV         R14,R1
+    00000494 31B8                   SUB         R11,R1
+    00000496 3137                   CMP/GT      R3,R1
+    00000498 8B01                   BF          L740
+    0000049A 6EB3                   MOV         R11,R14
+    0000049C 7E05                   ADD         #5,R14
+    0000049E              L740:                             
+        dPicoc.c   291                            if(top>index)
+    0000049E 3BD7                   CMP/GT      R13,R11
+    000004A0 8B02                   BF          L741
+        dPicoc.c   292                            {
+        dPicoc.c   293                                    top = index;
+    000004A2 6BD3                   MOV         R13,R11
+        dPicoc.c   294                                    bottom = index + h_max;
+    000004A4 6ED3                   MOV         R13,R14
+    000004A6 7E05                   ADD         #5,R14
+    000004A8              L741:                             
+        dPicoc.c   295                            }
+        dPicoc.c   296                            if (index>bottom)
+    000004A8 3DE7                   CMP/GT      R14,R13
+    000004AA 8B02                   BF          L742
+        dPicoc.c   297                            {
+        dPicoc.c   298                                    bottom = index;
+    000004AC 6ED3                   MOV         R13,R14
+        dPicoc.c   299                                    top = bottom - h_max;
+    000004AE 6BD3                   MOV         R13,R11
+    000004B0 7BFB                   ADD         #-5,R11
+    000004B2              L742:                             
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-Aug-2013 09:51:57  PAGE   17
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+        dPicoc.c   300                            }
+        dPicoc.c   301                            if(bottom>lfile.size - 1)bottom = lfile.size - 1;
+    000004B2 E05C                   MOV         #92,R0
+    000004B4 03FE                   MOV.L       @(R0,R15),R3
+    000004B6 73FF                   ADD         #-1,R3
+    000004B8 3E37                   CMP/GT      R3,R14
+    000004BA 8B02                   BF          L743
+    000004BC E05C                   MOV         #92,R0
+    000004BE 0EFE                   MOV.L       @(R0,R15),R14
+    000004C0 7EFF                   ADD         #-1,R14
+    000004C2              L743:                             
+        dPicoc.c   302    
+        dPicoc.c   303                            if(top>0)
+    000004C2 4B15                   CMP/PL      R11
+    000004C4 8B05                   BF          L744
+        dPicoc.c   304                                    {locate(21,2);Print((unsigned char*)"\xE6\x92");}
+    000004C6 E502                   MOV         #2,R5
+    000004C8 490B                   JSR         @R9
+    000004CA E415                   MOV         #21,R4
+    000004CC D42E                   MOV.L       L767+14,R4 ; L665
+    000004CE 4A0B                   JSR         @R10
+    000004D0 0009                   NOP
+    000004D2              L744:                             
+        dPicoc.c   305                            if(bottom<lfile.size-1)
+    000004D2 E05C                   MOV         #92,R0
+    000004D4 02FE                   MOV.L       @(R0,R15),R2
+    000004D6 72FF                   ADD         #-1,R2
+    000004D8 3E23                   CMP/GE      R2,R14
+    000004DA 8905                   BT          L745
+        dPicoc.c   306                                    {locate(21,7);Print((unsigned char*)"\xE6\x93");}
+    000004DC E507                   MOV         #7,R5
+    000004DE 490B                   JSR         @R9
+    000004E0 E415                   MOV         #21,R4
+    000004E2 D42A                   MOV.L       L767+18,R4 ; L667
+    000004E4 4A0B                   JSR         @R10
+    000004E6 0009                   NOP
+    000004E8              L745:                             
+        dPicoc.c   307    
+        dPicoc.c   308                            for (i=top;i<=bottom;++i)
+    000004E8 6CB3                   MOV         R11,R12
+    000004EA 3CE7                   CMP/GT      R14,R12
+    000004EC 891A                   BT          L735
+    000004EE              L747:                             
+        dPicoc.c   309                            {
+        dPicoc.c   310                                    y = i-top+1;
+    000004EE 63C3                   MOV         R12,R3
+    000004F0 33B8                   SUB         R11,R3
+    000004F2 7301                   ADD         #1,R3
+    000004F4 1F31                   MOV.L       R3,@(4,R15)
+        dPicoc.c   311                                    locate(2,y+1);Print((unsigned char*)clist[i]);
+    000004F6 6533                   MOV         R3,R5
+    000004F8 7501                   ADD         #1,R5
+    000004FA 490B                   JSR         @R9
+    000004FC E402                   MOV         #2,R4
+    000004FE 60C3                   MOV         R12,R0
+    00000500 4008                   SHLL2       R0
+    00000502 4A0B                   JSR         @R10
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-Aug-2013 09:51:57  PAGE   18
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000504 048E                   MOV.L       @(R0,R8),R4
+        dPicoc.c   312                                    if(index==i)area_rev(0,y*8,127,7+y*8);  
+    00000506 3DC0                   CMP/EQ      R12,R13
+    00000508 8B09                   BF          L748
+    0000050A E67F                   MOV         #127,R6
+    0000050C D320                   MOV.L       L767+22,R3 ; _Bdisp_AreaReverseVRAM
+    0000050E 57F1                   MOV.L       @(4,R15),R7
+    00000510 4708                   SHLL2       R7
+    00000512 4700                   SHLL        R7
+    00000514 1F76                   MOV.L       R7,@(24,R15)
+    00000516 7707                   ADD         #7,R7
+    00000518 55F6                   MOV.L       @(24,R15),R5
+    0000051A 430B                   JSR         @R3
+    0000051C E400                   MOV         #0,R4
+    0000051E              L748:                             
+    0000051E 7C01                   ADD         #1,R12
+    00000520 3CE7                   CMP/GT      R14,R12
+    00000522 8BE4                   BF          L747
+    00000524              L735:                             
+        dPicoc.c   313                            }
+        dPicoc.c   314                    }
+        dPicoc.c   315                    GetKey(&key);
+    00000524 D31B                   MOV.L       L767+26,R3 ; _GetKey
+    00000526 430B                   JSR         @R3
+    00000528 64F3                   MOV         R15,R4
+    0000052A E05C                   MOV         #92,R0
+    0000052C 9325                   MOV.W       L767,R3    ; H'7542
+    0000052E 04FE                   MOV.L       @(R0,R15),R4
+    00000530 62F2                   MOV.L       @R15,R2
+    00000532 3230                   CMP/EQ      R3,R2
+    00000534 8F06                   BF/S        L749
+    00000536 74FF                   ADD         #-1,R4
+        dPicoc.c   316    
+        dPicoc.c   317                    if (key==KEY_CTRL_UP) 
+        dPicoc.c   318                            {if(--index<0) index = lfile.size - 1;refresh = REFRESH_PART;}
+    00000538 7DFF                   ADD         #-1,R13
+    0000053A 4D11                   CMP/PZ      R13
+    0000053C 8D01                   BT/S        L750
+    0000053E E301                   MOV         #1,R3
+    00000540 6D43                   MOV         R4,R13
+    00000542              L750:                             
+    00000542 1F34                   MOV.L       R3,@(16,R15)
+    00000544              L749:                             
+        dPicoc.c   319                    if (key==KEY_CTRL_DOWN)
+    00000544 921A                   MOV.W       L767+2,R2  ; H'7547
+    00000546 61F2                   MOV.L       @R15,R1
+    00000548 3120                   CMP/EQ      R2,R1
+    0000054A 8B05                   BF          L751
+        dPicoc.c   320                            {if(++index>lfile.size - 1) index = 0;refresh = REFRESH_PART;}
+    0000054C 7D01                   ADD         #1,R13
+    0000054E 3D47                   CMP/GT      R4,R13
+    00000550 8F01                   BF/S        L752
+    00000552 E301                   MOV         #1,R3
+    00000554 ED00                   MOV         #0,R13
+    00000556              L752:                             
+    00000556 1F34                   MOV.L       R3,@(16,R15)
+    00000558              L751:                             
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-Aug-2013 09:51:57  PAGE   19
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+        dPicoc.c   321                    if (key==KEY_CTRL_EXIT)
+    00000558 9211                   MOV.W       L767+4,R2  ; H'7532
+    0000055A 61F2                   MOV.L       @R15,R1
+    0000055C 3120                   CMP/EQ      R2,R1
+    0000055E 893F                   BT          L682
+        dPicoc.c   322                    {
+        dPicoc.c   323                            free(clist);
+        dPicoc.c   324                            list_destory(&lfile);
+        dPicoc.c   325                    
+        dPicoc.c   326                            return FILE_EXIT;
+        dPicoc.c   327                    }
+        dPicoc.c   328                    if (key==KEY_CTRL_EXE || key==KEY_CTRL_F1 || key==KEY_CTRL_F2)
+    00000560 920E                   MOV.W       L767+6,R2  ; H'7534
+    00000562 63F2                   MOV.L       @R15,R3
+    00000564 3320                   CMP/EQ      R2,R3
+    00000566 891A                   BT          L755
+    00000568 930B                   MOV.W       L767+8,R3  ; H'7539
+    0000056A 61F2                   MOV.L       @R15,R1
+    0000056C 3130                   CMP/EQ      R3,R1
+    0000056E 8916                   BT          L755
+    00000570 9108                   MOV.W       L767+10,R1 ; H'753A
+    00000572 60F2                   MOV.L       @R15,R0
+    00000574 3010                   CMP/EQ      R1,R0
+    00000576 A00F                   BRA         L761
+    00000578 0009                   NOP
+    0000057A              L767:                             
+    0000057A 7542                   .DATA.W     H'7542
+    0000057C 7547                   .DATA.W     H'7547
+    0000057E 7532                   .DATA.W     H'7532
+    00000580 7534                   .DATA.W     H'7534
+    00000582 7539                   .DATA.W     H'7539
+    00000584 753A                   .DATA.W     H'753A
+    00000586 0000                   .DATA.W     0
+    00000588 <00000000>             .DATA.L     L665
+    0000058C <00000000>             .DATA.L     L667
+    00000590 <00000000>             .DATA.L     _Bdisp_AreaReverseVRAM
+    00000594 <00000000>             .DATA.L     _GetKey
+    00000598              L761:                             
+    00000598 8901                   BT          L768
+    0000059A AF1C                   BRA         L734
+    0000059C 0009                   NOP
+    0000059E              L768:                             
+    0000059E              L755:                             
+        dPicoc.c   329                    {
+        dPicoc.c   330                            sprintf(cfname,"\\\\%s\\%s",root ? "fls0":"crd0",clist[index]);
+    0000059E 60D3                   MOV         R13,R0
+    000005A0 4008                   SHLL2       R0
+    000005A2 038E                   MOV.L       @(R0,R8),R3
+    000005A4 2F36                   MOV.L       R3,@-R15
+    000005A6 52F4                   MOV.L       @(16,R15),R2
+    000005A8 2228                   TST         R2,R2
+    000005AA 8903                   BT          L756
+    000005AC D216                   MOV.L       L769+4,R2  ; L649
+    000005AE 2F26                   MOV.L       R2,@-R15
+    000005B0 A002                   BRA         L757
+    000005B2 0009                   NOP
+    000005B4              L756:                             
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-Aug-2013 09:51:57  PAGE   20
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000005B4 D315                   MOV.L       L769+8,R3  ; L650
+    000005B6 2F36                   MOV.L       R3,@-R15
+    000005B8              L757:                             
+    000005B8 D115                   MOV.L       L769+12,R1 ; L673
+    000005BA 2F16                   MOV.L       R1,@-R15
+    000005BC D315                   MOV.L       L769+16,R3 ; _sprintf
+    000005BE 430B                   JSR         @R3
+    000005C0 54FA                   MOV.L       @(40,R15),R4
+    000005C2 7F0C                   ADD         #12,R15
+        dPicoc.c   331                            free(clist);
+    000005C4 D214                   MOV.L       L769+20,R2 ; _free
+    000005C6 420B                   JSR         @R2
+    000005C8 6483                   MOV         R8,R4
+        dPicoc.c   332                            list_destory(&lfile);
+    000005CA 64F3                   MOV         R15,R4
+    000005CC BDDF                   BSR         _list_destory
+    000005CE 7454                   ADD         #84,R4
+        dPicoc.c   333                            
+        dPicoc.c   334                            if (key==KEY_CTRL_F2)
+    000005D0 9218                   MOV.W       L769,R2    ; H'753A
+    000005D2 63F2                   MOV.L       @R15,R3
+    000005D4 3320                   CMP/EQ      R2,R3
+    000005D6 8B01                   BF          L758
+        dPicoc.c   335                                    return FILE_SCRIPT;
+    000005D8 A009                   BRA         L729
+    000005DA E002                   MOV         #2,R0
+    000005DC              L758:                             
+        dPicoc.c   336                            else
+        dPicoc.c   337                                    return FILE_EXE;
+    000005DC A007                   BRA         L729
+    000005DE E001                   MOV         #1,R0
+    000005E0              L682:
+        dPicoc.c   338                    }
+        dPicoc.c   339    
+        dPicoc.c   340            }
+        dPicoc.c   341    
+        dPicoc.c   342            free(clist);
+    000005E0 D30D                   MOV.L       L769+20,R3 ; _free
+    000005E2 430B                   JSR         @R3
+    000005E4 6483                   MOV         R8,R4
+        dPicoc.c   343            list_destory(&lfile);
+    000005E6 64F3                   MOV         R15,R4
+    000005E8 BDD1                   BSR         _list_destory
+    000005EA 7454                   ADD         #84,R4
+        dPicoc.c   344    
+        dPicoc.c   345            return 0;
+    000005EC E000                   MOV         #0,R0
+        dPicoc.c   346    }
+    000005EE              L729:                             
+    000005EE 910A                   MOV.W       L769+2,R1  ; H'0100
+    000005F0 3F1C                   ADD         R1,R15
+    000005F2 4F26                   LDS.L       @R15+,PR
+    000005F4 68F6                   MOV.L       @R15+,R8
+    000005F6 69F6                   MOV.L       @R15+,R9
+    000005F8 6AF6                   MOV.L       @R15+,R10
+    000005FA 6BF6                   MOV.L       @R15+,R11
+    000005FC 6CF6                   MOV.L       @R15+,R12
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-Aug-2013 09:51:57  PAGE   21
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000005FE 6DF6                   MOV.L       @R15+,R13
+    00000600 000B                   RTS
+    00000602 6EF6                   MOV.L       @R15+,R14
+    00000604              L769:                             
+    00000604 753A                   .DATA.W     H'753A
+    00000606 0100                   .DATA.W     H'0100
+    00000608 <00000000>             .DATA.L     L649
+    0000060C <00000000>             .DATA.L     L650
+    00000610 <00000000>             .DATA.L     L673
+    00000614 <00000000>             .DATA.L     _sprintf
+    00000618 <00000000>             .DATA.L     _free
+        dPicoc.c   347    
+        dPicoc.c   348    const unsigned char ICON_EXE[]= //19*8
+        dPicoc.c   349    {0xFF,0xFF,0xE0,
+        dPicoc.c   350    0x80,0x0,0x0,
+        dPicoc.c   351    0xBD,0x17,0x80,
+        dPicoc.c   352    0xA0,0xA4,0x0,
+        dPicoc.c   353    0xB8,0x47,0x0,
+        dPicoc.c   354    0xA0,0xA4,0x0,
+        dPicoc.c   355    0xBD,0x17,0x80,
+        dPicoc.c   356    0x80,0x0,0x0,};
+        dPicoc.c   357    
+        dPicoc.c   358    const unsigned char ICON_SCP[]= //19*8
+        dPicoc.c   359    {0xFF,0xFF,0xE0,
+        dPicoc.c   360    0x80,0x0,0x0,
+        dPicoc.c   361    0x9E,0x73,0x80,
+        dPicoc.c   362    0xA0,0x8A,0x40,
+        dPicoc.c   363    0x9C,0x83,0x80,
+        dPicoc.c   364    0x82,0x8A,0x0,
+        dPicoc.c   365    0xBC,0x72,0x0,
+        dPicoc.c   366    0x80,0x0,0x0,};
+        dPicoc.c   367    
+        dPicoc.c   368    const unsigned char ICON_SET[] = //19*8
+        dPicoc.c   369    {0xFF,0xFF,0xE0,
+        dPicoc.c   370    0xC2,0x10,0x60,
+        dPicoc.c   371    0xBE,0xFD,0xE0,
+        dPicoc.c   372    0xC6,0x1D,0xE0,
+        dPicoc.c   373    0xFA,0xFD,0xE0,
+        dPicoc.c   374    0xFA,0xFD,0xC0,
+        dPicoc.c   375    0x86,0x1D,0x80,
+        dPicoc.c   376    0xFF,0xFF,0x0,};
+        dPicoc.c   377    
+        dPicoc.c   378    #pragma section _BR_Size
+        dPicoc.c   379    unsigned long BR_Size;
+        dPicoc.c   380    #pragma section
+        dPicoc.c   381    
+        dPicoc.c   382    
+        dPicoc.c   383    #pragma section _TOP
+        dPicoc.c   384    int InitializeSystem(int isAppli, unsigned short OptionNum)
+P_T 00000000              _InitializeSystem:               ; function: InitializeSystem
+                                                           ; frame size=0
+        dPicoc.c   385    {
+        dPicoc.c   386        return INIT_ADDIN_APPLICATION(isAppli, OptionNum);
+    00000000 D301                   MOV.L       L770+2,R3  ; _INIT_ADDIN_APPLICATION
+    00000002 432B                   JMP         @R3
+    00000004 0009                   NOP
+    00000006              L770:                             
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-Aug-2013 09:51:57  PAGE   22
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000006 0000                   .DATA.W     0
+    00000008 <00000000>             .DATA.L     _INIT_ADDIN_APPLICATION
+        dPicoc.c   387    }
+        dPicoc.c   388    
+        dPicoc.c   389    #pragma section
+        dPicoc.c   390    
+D   00000000              __$times$572:                    ; static: times
+    00000000 00000000               .DATA.L     H'00000000
+C   00000000              L579:
+    00000000 427265616B             .SDATA      "Break!"
+             21           
+    00000006 00                     .DATA.B     H'00
+    00000007 00000001               .RES.B      1
+    00000008              L580:
+    00000008 5072657373             .SDATA      "Press [EXE]"
+             205B455845   
+             5D           
+    00000013 00                     .DATA.B     H'00
+    00000014              L582:
+    00000014 6572726F72             .SDATA      "error:EXIT Break"
+             3A45584954   
+             2042726561   
+             6B           
+    00000024 0A00                   .DATA.B     H'0A,H'00
+    00000026 00000002               .RES.W      1
+    00000028              L590:
+    00000028 6E6F202A2E             .SDATA      "no *.c file exist"
+             632066696C   
+             6520657869   
+             7374         
+    00000039 0A                     .DATA.B     H'0A
+    0000003A 7072657373             .SDATA      "press [EXE]"
+             205B455845   
+             5D           
+    00000045 00                     .DATA.B     H'00
+    00000046 00000002               .RES.W      1
+    00000048              L648:
+    00000048 5C5C25735C             .SDATA      "\\%s\*.c"
+             2A2E63       
+    00000050 00                     .DATA.B     H'00
+    00000051 00000001               .RES.B      1
+    00000052 00000002               .RES.W      1
+    00000054              L649:
+    00000054 666C7330               .SDATA      "fls0"
+    00000058 00                     .DATA.B     H'00
+    00000059 00000001               .RES.B      1
+    0000005A 00000002               .RES.W      1
+    0000005C              L650:
+    0000005C 63726430               .SDATA      "crd0"
+    00000060 00                     .DATA.B     H'00
+    00000061 00000001               .RES.B      1
+    00000062 00000002               .RES.W      1
+    00000064              L659:
+    00000064 645069636F             .SDATA      "dPicoC Programs"
+             432050726F   
+             6772616D73   
+    00000073 00                     .DATA.B     H'00
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-Aug-2013 09:51:57  PAGE   23
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000074              L660:
+    00000074 5B666C735D             .SDATA      "[fls]"
+    00000079 00                     .DATA.B     H'00
+    0000007A 00000002               .RES.W      1
+    0000007C              L661:
+    0000007C 5B6372645D             .SDATA      "[crd]"
+    00000081 00                     .DATA.B     H'00
+    00000082 00000002               .RES.W      1
+    00000084              L665:
+    00000084 E69200                 .DATA.B     H'E6,H'92,H'00
+    00000087 00000001               .RES.B      1
+    00000088              L667:
+    00000088 E69300                 .DATA.B     H'E6,H'93,H'00
+    0000008B 00000001               .RES.B      1
+    0000008C              L673:
+    0000008C 5C5C25735C             .SDATA      "\\%s\%s"
+             2573         
+    00000093 00                     .DATA.B     H'00
+    00000094              _ICON_EXE:                       ; static: ICON_EXE
+    00000094 FFFFE08000             .DATA.B     H'FF,H'FF,H'E0,H'80,H'00,H'00,H'BD,H'17,H'80,H'A0,H'A4,H'00,H'B8,H'47,H'00,H'A0,
+             00BD1780A0 +                       H'A4,H'00,H'BD,H'17,H'80,H'80,H'00,H'00
+             A400B84700   
+             A0A400BD17   
+             80800000     
+    000000AC              _ICON_SCP:                       ; static: ICON_SCP
+    000000AC FFFFE08000             .DATA.B     H'FF,H'FF,H'E0,H'80,H'00,H'00,H'9E,H'73,H'80,H'A0,H'8A,H'40,H'9C,H'83,H'80,H'82,
+             009E7380A0 +                       H'8A,H'00,H'BC,H'72,H'00,H'80,H'00,H'00
+             8A409C8380   
+             828A00BC72   
+             00800000     
+    000000C4              _ICON_SET:                       ; static: ICON_SET
+    000000C4 FFFFE0C210             .DATA.B     H'FF,H'FF,H'E0,H'C2,H'10,H'60,H'BE,H'FD,H'E0,H'C6,H'1D,H'E0,H'FA,H'FD,H'E0,H'FA,
+             60BEFDE0C6 +                       H'FD,H'C0,H'86,H'1D,H'80,H'FF,H'FF,H'00
+             1DE0FAFDE0   
+             FAFDC0861D   
+             80FFFF00     
+B   00000000              _stack_size:                     ; static: stack_size
+    00000000 00000004               .RES.L      1
+B_B 00000000              _BR_Size:                        ; static: BR_Size
+    00000000 00000004               .RES.L      1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-Aug-2013 09:51:57  PAGE    1
+
+
+******** STATISTICS INFORMATION ********
+
+
+********** ERROR INFORMATION ***********
+
+NUMBER OF ERRORS:           0
+NUMBER OF WARNINGS:         1
+
+
+
+
+******* SOURCE LINE INFORMATION ********
+
+COMPILED SOURCE LINE:      390
+
+
+
+******* SECTION SIZE INFORMATION *******
+
+PROGRAM  SECTION (P):                               0000061C Byte(s)
+PROGRAM  SECTION (P_BR_Size):                       00000000 Byte(s)
+PROGRAM  SECTION (P_TOP):                           0000000C Byte(s)
+CONSTANT SECTION (C):                               000000DC Byte(s)
+CONSTANT SECTION (C_BR_Size):                       00000000 Byte(s)
+CONSTANT SECTION (C_TOP):                           00000000 Byte(s)
+DATA     SECTION (D):                               00000004 Byte(s)
+DATA     SECTION (D_BR_Size):                       00000000 Byte(s)
+DATA     SECTION (D_TOP):                           00000000 Byte(s)
+BSS      SECTION (B):                               00000004 Byte(s)
+BSS      SECTION (B_BR_Size):                       00000004 Byte(s)
+BSS      SECTION (B_TOP):                           00000000 Byte(s)
+
+ TOTAL PROGRAM SIZE: 00000710 Byte(s)
+
+
+
+********** LABEL INFORMATION ***********
+
+NUMBER OF EXTERNAL REFERENCE SYMBOLS:           34
+NUMBER OF EXTERNAL DEFINITION SYMBOLS:          15
+NUMBER OF INTERNAL/EXTERNAL SYMBOLS:           122
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*** COMMAND PARAMETER ***
+
+
+  -subcommand=C:\Users\ADMINI~1\AppData\Local\Temp\hmk9945.tmp 
+

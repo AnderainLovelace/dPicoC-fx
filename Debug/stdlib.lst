@@ -1,0 +1,797 @@
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:33  PAGE    1
+
+************ OBJECT LISTING ************
+
+FILE NAME: E:\Anderain\fx-9860\dPicoc\cstdlib\stdlib.c
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+        stdlib.c     1    /* stdlib.h library for large systems - small embedded systems use clibrary.c instead */
+        stdlib.c     2    #include "../interpreter.h"
+        stdlib.c     3    
+        stdlib.c     4    #ifndef BUILTIN_MINI_STDLIB
+        stdlib.c     5    
+        stdlib.c     6    static int ZeroValue = 0;
+        stdlib.c     7    
+        stdlib.c     8    #ifndef NO_FP
+        stdlib.c     9    void StdlibAtof(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+P   00000000              _StdlibAtof:                     ; function: StdlibAtof
+                                                           ; frame size=16
+    00000000 4F22                   STS.L       PR,@-R15
+        stdlib.c    10    {
+        stdlib.c    11        ReturnValue->Val->FP = atof(Param[0]->Val->Pointer);
+    00000002 6463                   MOV         R6,R4
+    00000004 7FF8                   ADD         #-8,R15
+    00000006 1F51                   MOV.L       R5,@(4,R15)
+    00000008 2F62                   MOV.L       R6,@R15
+    0000000A 53F1                   MOV.L       @(4,R15),R3
+    0000000C 6442                   MOV.L       @R4,R4
+    0000000E 5231                   MOV.L       @(4,R3),R2
+    00000010 5441                   MOV.L       @(4,R4),R4
+    00000012 6442                   MOV.L       @R4,R4
+    00000014 2F26                   MOV.L       R2,@-R15
+    00000016 D282                   MOV.L       L633+2,R2  ; _atof
+    00000018 420B                   JSR         @R2
+    0000001A 0009                   NOP
+        stdlib.c    12    }
+    0000001C 7F0C                   ADD         #12,R15
+    0000001E 4F26                   LDS.L       @R15+,PR
+    00000020 000B                   RTS
+    00000022 0009                   NOP
+        stdlib.c    13    #endif
+        stdlib.c    14    
+        stdlib.c    15    void StdlibAtoi(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    00000024              _StdlibAtoi:                     ; function: StdlibAtoi
+                                                           ; frame size=16
+    00000024 2F86                   MOV.L       R8,@-R15
+        stdlib.c    16    {
+        stdlib.c    17        ReturnValue->Val->Integer = atoi(Param[0]->Val->Pointer);
+    00000026 6463                   MOV         R6,R4
+    00000028 4F22                   STS.L       PR,@-R15
+    0000002A 7FF8                   ADD         #-8,R15
+    0000002C 1F51                   MOV.L       R5,@(4,R15)
+    0000002E 2F62                   MOV.L       R6,@R15
+    00000030 53F1                   MOV.L       @(4,R15),R3
+    00000032 5831                   MOV.L       @(4,R3),R8
+    00000034 6442                   MOV.L       @R4,R4
+    00000036 5441                   MOV.L       @(4,R4),R4
+    00000038 D37A                   MOV.L       L633+6,R3  ; _atoi
+    0000003A 430B                   JSR         @R3
+    0000003C 6442                   MOV.L       @R4,R4
+    0000003E 2802                   MOV.L       R0,@R8
+        stdlib.c    18    }
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:33  PAGE    2
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000040 7F08                   ADD         #8,R15
+    00000042 4F26                   LDS.L       @R15+,PR
+    00000044 000B                   RTS
+    00000046 68F6                   MOV.L       @R15+,R8
+        stdlib.c    19    
+        stdlib.c    20    void StdlibAtol(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    00000048              _StdlibAtol:                     ; function: StdlibAtol
+                                                           ; frame size=16
+    00000048 2F86                   MOV.L       R8,@-R15
+        stdlib.c    21    {
+        stdlib.c    22        ReturnValue->Val->Integer = atol(Param[0]->Val->Pointer);
+    0000004A 6463                   MOV         R6,R4
+    0000004C 4F22                   STS.L       PR,@-R15
+    0000004E 7FF8                   ADD         #-8,R15
+    00000050 1F51                   MOV.L       R5,@(4,R15)
+    00000052 2F62                   MOV.L       R6,@R15
+    00000054 53F1                   MOV.L       @(4,R15),R3
+    00000056 5831                   MOV.L       @(4,R3),R8
+    00000058 6442                   MOV.L       @R4,R4
+    0000005A 5441                   MOV.L       @(4,R4),R4
+    0000005C D372                   MOV.L       L633+10,R3 ; _atol
+    0000005E 430B                   JSR         @R3
+    00000060 6442                   MOV.L       @R4,R4
+    00000062 2802                   MOV.L       R0,@R8
+        stdlib.c    23    }
+    00000064 7F08                   ADD         #8,R15
+    00000066 4F26                   LDS.L       @R15+,PR
+    00000068 000B                   RTS
+    0000006A 68F6                   MOV.L       @R15+,R8
+        stdlib.c    24    
+        stdlib.c    25    void StdlibStrtod(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    0000006C              _StdlibStrtod:                   ; function: StdlibStrtod
+                                                           ; frame size=16
+    0000006C 4F22                   STS.L       PR,@-R15
+        stdlib.c    26    {
+        stdlib.c    27        ReturnValue->Val->FP = strtod(Param[0]->Val->Pointer, Param[1]->Val->Pointer);
+    0000006E 6163                   MOV         R6,R1
+    00000070 7FF8                   ADD         #-8,R15
+    00000072 6463                   MOV         R6,R4
+    00000074 1F51                   MOV.L       R5,@(4,R15)
+    00000076 2F62                   MOV.L       R6,@R15
+    00000078 53F1                   MOV.L       @(4,R15),R3
+    0000007A 5231                   MOV.L       @(4,R3),R2
+    0000007C 5511                   MOV.L       @(4,R1),R5
+    0000007E 5551                   MOV.L       @(4,R5),R5
+    00000080 6442                   MOV.L       @R4,R4
+    00000082 6552                   MOV.L       @R5,R5
+    00000084 5441                   MOV.L       @(4,R4),R4
+    00000086 6442                   MOV.L       @R4,R4
+    00000088 2F26                   MOV.L       R2,@-R15
+    0000008A D268                   MOV.L       L633+14,R2 ; _strtod
+    0000008C 420B                   JSR         @R2
+    0000008E 0009                   NOP
+        stdlib.c    28    }
+    00000090 7F0C                   ADD         #12,R15
+    00000092 4F26                   LDS.L       @R15+,PR
+    00000094 000B                   RTS
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:33  PAGE    3
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000096 0009                   NOP
+        stdlib.c    29    
+        stdlib.c    30    void StdlibStrtol(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    00000098              _StdlibStrtol:                   ; function: StdlibStrtol
+                                                           ; frame size=16
+    00000098 2FE6                   MOV.L       R14,@-R15
+        stdlib.c    31    {
+        stdlib.c    32        ReturnValue->Val->Integer = strtol(Param[0]->Val->Pointer, Param[1]->Val->Pointer, Param[2]->Val->Inte
+                         +ger);
+    0000009A 6353                   MOV         R5,R3
+    0000009C 2F86                   MOV.L       R8,@-R15
+    0000009E 6E63                   MOV         R6,R14
+    000000A0 4F22                   STS.L       PR,@-R15
+    000000A2 7FFC                   ADD         #-4,R15
+    000000A4 2F52                   MOV.L       R5,@R15
+    000000A6 5831                   MOV.L       @(4,R3),R8
+    000000A8 56E2                   MOV.L       @(8,R14),R6
+    000000AA 5661                   MOV.L       @(4,R6),R6
+    000000AC 55E1                   MOV.L       @(4,R14),R5
+    000000AE 6662                   MOV.L       @R6,R6
+    000000B0 5551                   MOV.L       @(4,R5),R5
+    000000B2 6552                   MOV.L       @R5,R5
+    000000B4 64E2                   MOV.L       @R14,R4
+    000000B6 5441                   MOV.L       @(4,R4),R4
+    000000B8 D35D                   MOV.L       L633+18,R3 ; _strtol
+    000000BA 430B                   JSR         @R3
+    000000BC 6442                   MOV.L       @R4,R4
+    000000BE 2802                   MOV.L       R0,@R8
+        stdlib.c    33    }
+    000000C0 7F04                   ADD         #4,R15
+    000000C2 4F26                   LDS.L       @R15+,PR
+    000000C4 68F6                   MOV.L       @R15+,R8
+    000000C6 000B                   RTS
+    000000C8 6EF6                   MOV.L       @R15+,R14
+        stdlib.c    34    
+        stdlib.c    35    void StdlibMalloc(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    000000CA              _StdlibMalloc:                   ; function: StdlibMalloc
+                                                           ; frame size=16
+        stdlib.c    36    {
+        stdlib.c    37        ReturnValue->Val->Pointer = malloc(Param[0]->Val->Integer);
+    000000CA 6463                   MOV         R6,R4
+    000000CC 2F86                   MOV.L       R8,@-R15
+    000000CE 4F22                   STS.L       PR,@-R15
+    000000D0 7FF8                   ADD         #-8,R15
+    000000D2 1F51                   MOV.L       R5,@(4,R15)
+    000000D4 2F62                   MOV.L       R6,@R15
+    000000D6 53F1                   MOV.L       @(4,R15),R3
+    000000D8 6442                   MOV.L       @R4,R4
+    000000DA 5831                   MOV.L       @(4,R3),R8
+    000000DC 5441                   MOV.L       @(4,R4),R4
+    000000DE D355                   MOV.L       L633+22,R3 ; _malloc
+    000000E0 430B                   JSR         @R3
+    000000E2 6442                   MOV.L       @R4,R4
+    000000E4 2802                   MOV.L       R0,@R8
+        stdlib.c    38    }
+    000000E6 7F08                   ADD         #8,R15
+    000000E8 4F26                   LDS.L       @R15+,PR
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:33  PAGE    4
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000000EA 000B                   RTS
+    000000EC 68F6                   MOV.L       @R15+,R8
+        stdlib.c    39    
+        stdlib.c    40    void StdlibCalloc(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    000000EE              _StdlibCalloc:                   ; function: StdlibCalloc
+                                                           ; frame size=16
+        stdlib.c    41    {
+        stdlib.c    42        ReturnValue->Val->Pointer = calloc(Param[0]->Val->Integer, Param[1]->Val->Integer);
+    000000EE 6163                   MOV         R6,R1
+    000000F0 2F86                   MOV.L       R8,@-R15
+    000000F2 6463                   MOV         R6,R4
+    000000F4 4F22                   STS.L       PR,@-R15
+    000000F6 7FF8                   ADD         #-8,R15
+    000000F8 1F51                   MOV.L       R5,@(4,R15)
+    000000FA 2F62                   MOV.L       R6,@R15
+    000000FC 53F1                   MOV.L       @(4,R15),R3
+    000000FE 5831                   MOV.L       @(4,R3),R8
+    00000100 5511                   MOV.L       @(4,R1),R5
+    00000102 5551                   MOV.L       @(4,R5),R5
+    00000104 6442                   MOV.L       @R4,R4
+    00000106 6552                   MOV.L       @R5,R5
+    00000108 5441                   MOV.L       @(4,R4),R4
+    0000010A D34B                   MOV.L       L633+26,R3 ; _calloc
+    0000010C 430B                   JSR         @R3
+    0000010E 6442                   MOV.L       @R4,R4
+    00000110 2802                   MOV.L       R0,@R8
+        stdlib.c    43    }
+    00000112 7F08                   ADD         #8,R15
+    00000114 4F26                   LDS.L       @R15+,PR
+    00000116 000B                   RTS
+    00000118 68F6                   MOV.L       @R15+,R8
+        stdlib.c    44    
+        stdlib.c    45    void StdlibRealloc(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs
+                         +)
+    0000011A              _StdlibRealloc:                  ; function: StdlibRealloc
+                                                           ; frame size=16
+        stdlib.c    46    {
+        stdlib.c    47        ReturnValue->Val->Pointer = realloc(Param[0]->Val->Pointer, Param[1]->Val->Integer);
+    0000011A 6163                   MOV         R6,R1
+    0000011C 2F86                   MOV.L       R8,@-R15
+    0000011E 6463                   MOV         R6,R4
+    00000120 4F22                   STS.L       PR,@-R15
+    00000122 7FF8                   ADD         #-8,R15
+    00000124 1F51                   MOV.L       R5,@(4,R15)
+    00000126 2F62                   MOV.L       R6,@R15
+    00000128 53F1                   MOV.L       @(4,R15),R3
+    0000012A 5831                   MOV.L       @(4,R3),R8
+    0000012C 5511                   MOV.L       @(4,R1),R5
+    0000012E 5551                   MOV.L       @(4,R5),R5
+    00000130 6442                   MOV.L       @R4,R4
+    00000132 6552                   MOV.L       @R5,R5
+    00000134 5441                   MOV.L       @(4,R4),R4
+    00000136 D341                   MOV.L       L633+30,R3 ; _realloc
+    00000138 430B                   JSR         @R3
+    0000013A 6442                   MOV.L       @R4,R4
+    0000013C 2802                   MOV.L       R0,@R8
+        stdlib.c    48    }
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:33  PAGE    5
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    0000013E 7F08                   ADD         #8,R15
+    00000140 4F26                   LDS.L       @R15+,PR
+    00000142 000B                   RTS
+    00000144 68F6                   MOV.L       @R15+,R8
+        stdlib.c    49    
+        stdlib.c    50    void StdlibFree(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    00000146              _StdlibFree:                     ; function: StdlibFree
+                                                           ; frame size=4
+        stdlib.c    51    {
+        stdlib.c    52        free(Param[0]->Val->Pointer);
+    00000146 6463                   MOV         R6,R4
+    00000148 D33D                   MOV.L       L633+34,R3 ; _free
+    0000014A 2F66                   MOV.L       R6,@-R15
+    0000014C 6442                   MOV.L       @R4,R4
+    0000014E 5441                   MOV.L       @(4,R4),R4
+    00000150 6442                   MOV.L       @R4,R4
+    00000152 432B                   JMP         @R3
+    00000154 7F04                   ADD         #4,R15
+        stdlib.c    53    }
+        stdlib.c    54    
+        stdlib.c    55    void StdlibRand(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    00000156              _StdlibRand:                     ; function: StdlibRand
+                                                           ; frame size=12
+        stdlib.c    56    {
+        stdlib.c    57        ReturnValue->Val->Integer = rand();
+    00000156 6353                   MOV         R5,R3
+    00000158 D13A                   MOV.L       L633+38,R1 ; _rand
+    0000015A 2F86                   MOV.L       R8,@-R15
+    0000015C 4F22                   STS.L       PR,@-R15
+    0000015E 7FFC                   ADD         #-4,R15
+    00000160 2F52                   MOV.L       R5,@R15
+    00000162 410B                   JSR         @R1
+    00000164 5831                   MOV.L       @(4,R3),R8
+    00000166 2802                   MOV.L       R0,@R8
+        stdlib.c    58    }
+    00000168 7F04                   ADD         #4,R15
+    0000016A 4F26                   LDS.L       @R15+,PR
+    0000016C 000B                   RTS
+    0000016E 68F6                   MOV.L       @R15+,R8
+        stdlib.c    59    
+        stdlib.c    60    void StdlibSrand(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    00000170              _StdlibSrand:                    ; function: StdlibSrand
+                                                           ; frame size=4
+    00000170 2F66                   MOV.L       R6,@-R15
+        stdlib.c    61    {
+        stdlib.c    62        srand(Param[0]->Val->Integer);
+    00000172 6463                   MOV         R6,R4
+    00000174 D334                   MOV.L       L633+42,R3 ; _srand
+    00000176 6442                   MOV.L       @R4,R4
+    00000178 5441                   MOV.L       @(4,R4),R4
+    0000017A 6442                   MOV.L       @R4,R4
+    0000017C 432B                   JMP         @R3
+    0000017E 7F04                   ADD         #4,R15
+        stdlib.c    63    }
+        stdlib.c    64    
+        stdlib.c    65    void StdlibAbort(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    00000180              _StdlibAbort:                    ; function: StdlibAbort
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:33  PAGE    6
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+                                                           ; frame size=8
+    00000180 4F22                   STS.L       PR,@-R15
+        stdlib.c    66    {
+        stdlib.c    67        ProgramFail(Parser, "abort");
+    00000182 D332                   MOV.L       L633+46,R3 ; L566
+    00000184 D232                   MOV.L       L633+50,R2 ; _ProgramFail
+    00000186 420B                   JSR         @R2
+    00000188 2F36                   MOV.L       R3,@-R15
+        stdlib.c    68    }
+    0000018A 7F04                   ADD         #4,R15
+    0000018C 4F26                   LDS.L       @R15+,PR
+    0000018E 000B                   RTS
+    00000190 0009                   NOP
+        stdlib.c    69    
+        stdlib.c    70    void StdlibExit(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    00000192              _StdlibExit:                     ; function: StdlibExit
+                                                           ; frame size=4
+        stdlib.c    71    {
+        stdlib.c    72        PlatformExit(Param[0]->Val->Integer);
+    00000192 6463                   MOV         R6,R4
+    00000194 D32F                   MOV.L       L633+54,R3 ; _PlatformExit
+    00000196 2F66                   MOV.L       R6,@-R15
+    00000198 6442                   MOV.L       @R4,R4
+    0000019A 5441                   MOV.L       @(4,R4),R4
+    0000019C 6442                   MOV.L       @R4,R4
+    0000019E 432B                   JMP         @R3
+    000001A0 7F04                   ADD         #4,R15
+        stdlib.c    73    }
+        stdlib.c    74    
+        stdlib.c    75    void StdlibGetenv(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    000001A2              _StdlibGetenv:                   ; function: StdlibGetenv
+                                                           ; frame size=0
+        stdlib.c    76    {
+        stdlib.c    77        //ReturnValue->Val->Pointer = getenv(Param[0]->Val->Pointer);
+        stdlib.c    78    }
+    000001A2 000B                   RTS
+    000001A4 0009                   NOP
+        stdlib.c    79    
+        stdlib.c    80    void StdlibSystem(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    000001A6              _StdlibSystem:                   ; function: StdlibSystem
+                                                           ; frame size=0
+        stdlib.c    81    {
+        stdlib.c    82        //ReturnValue->Val->Integer = system(Param[0]->Val->Pointer);
+        stdlib.c    83    }
+    000001A6 000B                   RTS
+    000001A8 0009                   NOP
+        stdlib.c    84    
+        stdlib.c    85    void StdlibAbs(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    000001AA              _StdlibAbs:                      ; function: StdlibAbs
+                                                           ; frame size=16
+        stdlib.c    86    {
+        stdlib.c    87        ReturnValue->Val->Integer = abs(Param[0]->Val->Integer);
+    000001AA 6463                   MOV         R6,R4
+    000001AC 2F86                   MOV.L       R8,@-R15
+    000001AE 4F22                   STS.L       PR,@-R15
+    000001B0 7FF8                   ADD         #-8,R15
+    000001B2 1F51                   MOV.L       R5,@(4,R15)
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:33  PAGE    7
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000001B4 2F62                   MOV.L       R6,@R15
+    000001B6 53F1                   MOV.L       @(4,R15),R3
+    000001B8 6442                   MOV.L       @R4,R4
+    000001BA 5831                   MOV.L       @(4,R3),R8
+    000001BC 5441                   MOV.L       @(4,R4),R4
+    000001BE D326                   MOV.L       L633+58,R3 ; _abs
+    000001C0 430B                   JSR         @R3
+    000001C2 6442                   MOV.L       @R4,R4
+    000001C4 2802                   MOV.L       R0,@R8
+        stdlib.c    88    }
+    000001C6 7F08                   ADD         #8,R15
+    000001C8 4F26                   LDS.L       @R15+,PR
+    000001CA 000B                   RTS
+    000001CC 68F6                   MOV.L       @R15+,R8
+        stdlib.c    89    
+        stdlib.c    90    void StdlibLabs(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    000001CE              _StdlibLabs:                     ; function: StdlibLabs
+                                                           ; frame size=16
+        stdlib.c    91    {
+        stdlib.c    92        ReturnValue->Val->Integer = labs(Param[0]->Val->Integer);
+    000001CE 6463                   MOV         R6,R4
+    000001D0 2F86                   MOV.L       R8,@-R15
+    000001D2 4F22                   STS.L       PR,@-R15
+    000001D4 7FF8                   ADD         #-8,R15
+    000001D6 1F51                   MOV.L       R5,@(4,R15)
+    000001D8 2F62                   MOV.L       R6,@R15
+    000001DA 53F1                   MOV.L       @(4,R15),R3
+    000001DC 6442                   MOV.L       @R4,R4
+    000001DE 5831                   MOV.L       @(4,R3),R8
+    000001E0 5441                   MOV.L       @(4,R4),R4
+    000001E2 D31E                   MOV.L       L633+62,R3 ; _labs
+    000001E4 430B                   JSR         @R3
+    000001E6 6442                   MOV.L       @R4,R4
+    000001E8 2802                   MOV.L       R0,@R8
+        stdlib.c    93    }
+    000001EA 7F08                   ADD         #8,R15
+    000001EC 4F26                   LDS.L       @R15+,PR
+    000001EE 000B                   RTS
+    000001F0 68F6                   MOV.L       @R15+,R8
+        stdlib.c    94    
+        stdlib.c    95    /* all stdlib.h functions */
+        stdlib.c    96    struct LibraryFunction StdlibFunctions[] =
+        stdlib.c    97    {
+        stdlib.c    98        { StdlibAtof,           "float atof(char *);" },
+        stdlib.c    99        { StdlibAtoi,           "int atoi(char *);" },
+        stdlib.c   100        { StdlibAtol,           "int atol(char *);" },
+        stdlib.c   101        { StdlibStrtol,         "int strtol(char *,char **,int);" },
+        stdlib.c   102        { StdlibMalloc,         "void *malloc(int);" },
+        stdlib.c   103        { StdlibCalloc,         "void *calloc(int,int);" },
+        stdlib.c   104        { StdlibRealloc,        "void *realloc(void *,int);" },
+        stdlib.c   105        { StdlibFree,           "void free(void *);" },
+        stdlib.c   106        { StdlibRand,           "int rand();" },
+        stdlib.c   107        { StdlibSrand,          "void srand(int);" },
+        stdlib.c   108        { StdlibAbort,          "void abort();" },
+        stdlib.c   109        { StdlibExit,           "void exit(int);" },
+        stdlib.c   110        { StdlibGetenv,         "char *getenv(char *);" },
+        stdlib.c   111        { StdlibAbs,            "int abs(int);" },
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:33  PAGE    8
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+        stdlib.c   112        { StdlibLabs,           "int labs(int);" },
+        stdlib.c   113        { NULL,                 NULL }
+        stdlib.c   114    };
+        stdlib.c   115    
+        stdlib.c   116    /* creates various system-dependent definitions */
+        stdlib.c   117    void StdlibSetupFunc(void)
+    000001F2              _StdlibSetupFunc:                ; function: StdlibSetupFunc
+                                                           ; frame size=8
+    000001F2 4F22                   STS.L       PR,@-R15
+        stdlib.c   118    {
+        stdlib.c   119        /* define NULL, TRUE and FALSE */
+        stdlib.c   120        if (!VariableDefined(TableStrRegister("NULL")))
+    000001F4 D41A                   MOV.L       L633+66,R4 ; L613
+    000001F6 D31B                   MOV.L       L633+70,R3 ; _TableStrRegister
+    000001F8 430B                   JSR         @R3
+    000001FA 0009                   NOP
+    000001FC D21A                   MOV.L       L633+74,R2 ; _VariableDefined
+    000001FE 420B                   JSR         @R2
+    00000200 6403                   MOV         R0,R4
+    00000202 2008                   TST         R0,R0
+    00000204 8B08                   BF          L632
+        stdlib.c   121            VariableDefinePlatformVar(NULL, "NULL", &IntType, (union AnyValue *)&ZeroValue, FALSE);
+    00000206 E200                   MOV         #0,R2
+    00000208 D718                   MOV.L       L633+78,R7 ; __$ZeroValue
+    0000020A 2F26                   MOV.L       R2,@-R15
+    0000020C D618                   MOV.L       L633+82,R6 ; _IntType
+    0000020E D514                   MOV.L       L633+66,R5 ; L613
+    00000210 D318                   MOV.L       L633+86,R3 ; _VariableDefinePlatformVar
+    00000212 430B                   JSR         @R3
+    00000214 6423                   MOV         R2,R4
+    00000216 7F04                   ADD         #4,R15
+    00000218              L632:                             
+        stdlib.c   122    }
+    00000218 4F26                   LDS.L       @R15+,PR
+    0000021A 000B                   RTS
+    0000021C 0009                   NOP
+    0000021E              L633:                             
+    0000021E 0000                   .DATA.W     0
+    00000220 <00000000>             .DATA.L     _atof
+    00000224 <00000000>             .DATA.L     _atoi
+    00000228 <00000000>             .DATA.L     _atol
+    0000022C <00000000>             .DATA.L     _strtod
+    00000230 <00000000>             .DATA.L     _strtol
+    00000234 <00000000>             .DATA.L     _malloc
+    00000238 <00000000>             .DATA.L     _calloc
+    0000023C <00000000>             .DATA.L     _realloc
+    00000240 <00000000>             .DATA.L     _free
+    00000244 <00000000>             .DATA.L     _rand
+    00000248 <00000000>             .DATA.L     _srand
+    0000024C <00000000>             .DATA.L     L566
+    00000250 <00000000>             .DATA.L     _ProgramFail
+    00000254 <00000000>             .DATA.L     _PlatformExit
+    00000258 <00000000>             .DATA.L     _abs
+    0000025C <00000000>             .DATA.L     _labs
+    00000260 <00000000>             .DATA.L     L613
+    00000264 <00000000>             .DATA.L     _TableStrRegister
+    00000268 <00000000>             .DATA.L     _VariableDefined
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:33  PAGE    9
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    0000026C <00000000>             .DATA.L     __$ZeroValue
+    00000270 <00000000>             .DATA.L     _IntType
+    00000274 <00000000>             .DATA.L     _VariableDefinePlatformVar
+        stdlib.c   123    
+        stdlib.c   124    #endif /* !BUILTIN_MINI_STDLIB */
+D   00000000              __$ZeroValue:                    ; static: ZeroValue
+    00000000 00000000               .DATA.L     H'00000000
+    00000004              _StdlibFunctions:                ; static: StdlibFunctions
+    00000004 <00000000>             .DATA.L     _StdlibAtof,L597,_StdlibAtoi,L598,_StdlibAtol,L599,_StdlibStrtol,L600,_StdlibMalloc,
+             <00000000> +                       L601,_StdlibCalloc,L602,_StdlibRealloc,L603,_StdlibFree,L604,_StdlibRand,L605,
+             <00000000> +                       _StdlibSrand,L606,_StdlibAbort,L607,_StdlibExit,L608,_StdlibGetenv,L609,_StdlibAbs,
+             <00000000> +                       L610,_StdlibLabs,L611
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+    0000007C 0000000000             .DATA.L     H'00000000,H'00000000
+             000000       
+C   00000000              L566:
+    00000000 61626F7274             .SDATA      "abort"
+    00000005 00                     .DATA.B     H'00
+    00000006 00000002               .RES.W      1
+    00000008              L613:
+    00000008 4E554C4C               .SDATA      "NULL"
+    0000000C 00                     .DATA.B     H'00
+    0000000D 00000001               .RES.B      1
+    0000000E 00000002               .RES.W      1
+    00000010              L597:
+    00000010 666C6F6174             .SDATA      "float atof(char *);"
+             2061746F66   
+             2863686172   
+             202A293B     
+    00000023 00                     .DATA.B     H'00
+    00000024              L598:
+    00000024 696E742061             .SDATA      "int atoi(char *);"
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:33  PAGE   10
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+             746F692863   
+             686172202A   
+             293B         
+    00000035 00                     .DATA.B     H'00
+    00000036 00000002               .RES.W      1
+    00000038              L599:
+    00000038 696E742061             .SDATA      "int atol(char *);"
+             746F6C2863   
+             686172202A   
+             293B         
+    00000049 00                     .DATA.B     H'00
+    0000004A 00000002               .RES.W      1
+    0000004C              L600:
+    0000004C 696E742073             .SDATA      "int strtol(char *,char **,int);"
+             7472746F6C   
+             2863686172   
+             202A2C6368   
+             6172202A2A   
+             2C696E7429   
+             3B           
+    0000006B 00                     .DATA.B     H'00
+    0000006C              L601:
+    0000006C 766F696420             .SDATA      "void *malloc(int);"
+             2A6D616C6C   
+             6F6328696E   
+             74293B       
+    0000007E 00                     .DATA.B     H'00
+    0000007F 00000001               .RES.B      1
+    00000080              L602:
+    00000080 766F696420             .SDATA      "void *calloc(int,int);"
+             2A63616C6C   
+             6F6328696E   
+             742C696E74   
+             293B         
+    00000096 00                     .DATA.B     H'00
+    00000097 00000001               .RES.B      1
+    00000098              L603:
+    00000098 766F696420             .SDATA      "void *realloc(void *,int);"
+             2A7265616C   
+             6C6F632876   
+             6F6964202A   
+             2C696E7429   
+             3B           
+    000000B2 00                     .DATA.B     H'00
+    000000B3 00000001               .RES.B      1
+    000000B4              L604:
+    000000B4 766F696420             .SDATA      "void free(void *);"
+             6672656528   
+             766F696420   
+             2A293B       
+    000000C6 00                     .DATA.B     H'00
+    000000C7 00000001               .RES.B      1
+    000000C8              L605:
+    000000C8 696E742072             .SDATA      "int rand();"
+             616E642829   
+             3B           
+    000000D3 00                     .DATA.B     H'00
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:33  PAGE   11
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000000D4              L606:
+    000000D4 766F696420             .SDATA      "void srand(int);"
+             7372616E64   
+             28696E7429   
+             3B           
+    000000E4 00                     .DATA.B     H'00
+    000000E5 00000001               .RES.B      1
+    000000E6 00000002               .RES.W      1
+    000000E8              L607:
+    000000E8 766F696420             .SDATA      "void abort();"
+             61626F7274   
+             28293B       
+    000000F5 00                     .DATA.B     H'00
+    000000F6 00000002               .RES.W      1
+    000000F8              L608:
+    000000F8 766F696420             .SDATA      "void exit(int);"
+             6578697428   
+             696E74293B   
+    00000107 00                     .DATA.B     H'00
+    00000108              L609:
+    00000108 6368617220             .SDATA      "char *getenv(char *);"
+             2A67657465   
+             6E76286368   
+             6172202A29   
+             3B           
+    0000011D 00                     .DATA.B     H'00
+    0000011E 00000002               .RES.W      1
+    00000120              L610:
+    00000120 696E742061             .SDATA      "int abs(int);"
+             627328696E   
+             74293B       
+    0000012D 00                     .DATA.B     H'00
+    0000012E 00000002               .RES.W      1
+    00000130              L611:
+    00000130 696E74206C             .SDATA      "int labs(int);"
+             6162732869   
+             6E74293B     
+    0000013E 00                     .DATA.B     H'00
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:33  PAGE    1
+
+
+******** STATISTICS INFORMATION ********
+
+
+********** ERROR INFORMATION ***********
+
+NUMBER OF ERRORS:           0
+NUMBER OF WARNINGS:         0
+
+
+
+
+******* SOURCE LINE INFORMATION ********
+
+COMPILED SOURCE LINE:      123
+
+
+
+******* SECTION SIZE INFORMATION *******
+
+PROGRAM  SECTION (P):                               00000278 Byte(s)
+CONSTANT SECTION (C):                               0000013F Byte(s)
+DATA     SECTION (D):                               00000084 Byte(s)
+BSS      SECTION (B):                               00000000 Byte(s)
+
+ TOTAL PROGRAM SIZE: 0000043B Byte(s)
+
+
+
+********** LABEL INFORMATION ***********
+
+NUMBER OF EXTERNAL REFERENCE SYMBOLS:           19
+NUMBER OF EXTERNAL DEFINITION SYMBOLS:          19
+NUMBER OF INTERNAL/EXTERNAL SYMBOLS:            57
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*** COMMAND PARAMETER ***
+
+
+  -subcommand=C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\hmk350.tmp 
+

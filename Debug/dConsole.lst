@@ -1,0 +1,1325 @@
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:35  PAGE    1
+
+************ OBJECT LISTING ************
+
+FILE NAME: E:\Anderain\fx-9860\dPicoc\dConsole.c
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+      dConsole.c     1    #include <fxlib.h>
+      dConsole.c     2    #include <stdio.h>
+      dConsole.c     3    #include <stdarg.h>
+      dConsole.c     4    #include "dconsole.h"
+      dConsole.c     5    
+      dConsole.c     6    #define LINE_ROW_MAX    8
+      dConsole.c     7    #define LINE_COL_MAX    21
+      dConsole.c     8    
+      dConsole.c     9    typedef unsigned int    uint;
+      dConsole.c    10    typedef unsigned char   uchar;
+      dConsole.c    11    
+      dConsole.c    12    char    line_buf[LINE_ROW_MAX][LINE_COL_MAX+1];
+      dConsole.c    13    int             line_index      = 0;
+      dConsole.c    14    int             line_x          = 0;
+      dConsole.c    15    int             line_start      = 0;
+      dConsole.c    16    int             line_count      = 0;
+      dConsole.c    17    
+      dConsole.c    18    void dAreaClear (int left,int top,int right,int bottom,int sel) 
+P   00000000              _dAreaClear:                     ; function: dAreaClear
+                                                           ; frame size=28
+    00000000 2FE6                   MOV.L       R14,@-R15
+    00000002 4F22                   STS.L       PR,@-R15
+    00000004 7FEC                   ADD         #-20,R15
+      dConsole.c    19    { 
+      dConsole.c    20            DISPBOX box; 
+      dConsole.c    21            box.left = left;box.top = top;box.right = right;box.bottom = bottom; 
+    00000006 1F41                   MOV.L       R4,@(4,R15)
+    00000008 1F52                   MOV.L       R5,@(8,R15)
+    0000000A 1F63                   MOV.L       R6,@(12,R15)
+    0000000C 1F74                   MOV.L       R7,@(16,R15)
+      dConsole.c    22            if (sel != 1) 
+    0000000E 50F7                   MOV.L       @(28,R15),R0
+    00000010 8801                   CMP/EQ      #1,R0
+    00000012 8903                   BT          L450
+      dConsole.c    23                    Bdisp_AreaClr_VRAM (&box); 
+    00000014 D25A                   MOV.L       L521+2,R2  ; _Bdisp_AreaClr_VRAM
+    00000016 64F3                   MOV         R15,R4
+    00000018 420B                   JSR         @R2
+    0000001A 7404                   ADD         #4,R4
+    0000001C              L450:                             
+      dConsole.c    24            if (sel != 0){ 
+    0000001C 53F7                   MOV.L       @(28,R15),R3
+    0000001E 2338                   TST         R3,R3
+    00000020 8918                   BT          L451
+      dConsole.c    25                    Bdisp_DrawLineVRAM (box.left,box.top,box.right,box.top); 
+    00000022 DE58                   MOV.L       L521+6,R14 ; _Bdisp_DrawLineVRAM
+    00000024 57F2                   MOV.L       @(8,R15),R7
+    00000026 2F72                   MOV.L       R7,@R15
+    00000028 56F3                   MOV.L       @(12,R15),R6
+    0000002A 6573                   MOV         R7,R5
+    0000002C 4E0B                   JSR         @R14
+    0000002E 54F1                   MOV.L       @(4,R15),R4
+      dConsole.c    26                    Bdisp_DrawLineVRAM (box.left,box.bottom,box.right,box.bottom); 
+    00000030 57F4                   MOV.L       @(16,R15),R7
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:35  PAGE    2
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000032 2F72                   MOV.L       R7,@R15
+    00000034 56F3                   MOV.L       @(12,R15),R6
+    00000036 6573                   MOV         R7,R5
+    00000038 4E0B                   JSR         @R14
+    0000003A 54F1                   MOV.L       @(4,R15),R4
+      dConsole.c    27                    Bdisp_DrawLineVRAM (box.left,box.top,box.left,box.bottom); 
+    0000003C 57F4                   MOV.L       @(16,R15),R7
+    0000003E 56F1                   MOV.L       @(4,R15),R6
+    00000040 2F62                   MOV.L       R6,@R15
+    00000042 55F2                   MOV.L       @(8,R15),R5
+    00000044 4E0B                   JSR         @R14
+    00000046 6463                   MOV         R6,R4
+      dConsole.c    28                    Bdisp_DrawLineVRAM (box.right,box.top,box.right,box.bottom); 
+    00000048 57F4                   MOV.L       @(16,R15),R7
+    0000004A 56F3                   MOV.L       @(12,R15),R6
+    0000004C 2F62                   MOV.L       R6,@R15
+    0000004E 55F2                   MOV.L       @(8,R15),R5
+    00000050 4E0B                   JSR         @R14
+    00000052 6463                   MOV         R6,R4
+    00000054              L451:                             
+      dConsole.c    29        } 
+      dConsole.c    30    }
+    00000054 7F14                   ADD         #20,R15
+    00000056 4F26                   LDS.L       @R15+,PR
+    00000058 000B                   RTS
+    0000005A 6EF6                   MOV.L       @R15+,R14
+      dConsole.c    31    
+      dConsole.c    32    uint WaitKey ()
+    0000005C              _WaitKey:                        ; function: WaitKey
+                                                           ; frame size=8
+    0000005C 4F22                   STS.L       PR,@-R15
+    0000005E 7FFC                   ADD         #-4,R15
+      dConsole.c    33    {
+      dConsole.c    34            uint key;GetKey(&key);return key;
+    00000060 D349                   MOV.L       L521+10,R3 ; _GetKey
+    00000062 430B                   JSR         @R3
+    00000064 64F3                   MOV         R15,R4
+    00000066 60F2                   MOV.L       @R15,R0
+      dConsole.c    35    }
+    00000068 7F04                   ADD         #4,R15
+    0000006A 4F26                   LDS.L       @R15+,PR
+    0000006C 000B                   RTS
+    0000006E 0009                   NOP
+      dConsole.c    36    
+      dConsole.c    37    char dGetKeyChar (uint key)
+    00000070              _dGetKeyChar:                    ; function: dGetKeyChar
+                                                           ; frame size=0
+      dConsole.c    38    {
+      dConsole.c    39            if (key>=KEY_CHAR_A && key<=KEY_CHAR_Z)
+    00000070 E341                   MOV         #65,R3
+    00000072 3432                   CMP/HS      R3,R4
+    00000074 8B02                   BF          L453
+    00000076 E15A                   MOV         #90,R1
+    00000078 3416                   CMP/HI      R1,R4
+    0000007A 8B05                   BF          L431
+    0000007C              L453:                             
+      dConsole.c    40                    return key;
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:35  PAGE    3
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+      dConsole.c    41    
+      dConsole.c    42            else if (key>=KEY_CHAR_0 && key<= KEY_CHAR_9)
+    0000007C E330                   MOV         #48,R3
+    0000007E 3432                   CMP/HS      R3,R4
+    00000080 8B04                   BF          L455
+    00000082 E139                   MOV         #57,R1
+    00000084 3416                   CMP/HI      R1,R4
+    00000086 8901                   BT          L455
+    00000088              L431:
+      dConsole.c    43                    return key;
+    00000088 000B                   RTS
+    0000008A 6043                   MOV         R4,R0
+    0000008C              L455:                             
+      dConsole.c    44    
+      dConsole.c    45            return 0;
+    0000008C E000                   MOV         #0,R0
+      dConsole.c    46    }
+    0000008E              L454:                             
+    0000008E 000B                   RTS
+    00000090 0009                   NOP
+      dConsole.c    47    
+      dConsole.c    48    void dConsoleCls ()
+    00000092              _dConsoleCls:                    ; function: dConsoleCls
+                                                           ; frame size=0
+      dConsole.c    49    {
+      dConsole.c    50            line_index      = 0;
+    00000092 E400                   MOV         #0,R4
+    00000094 D33D                   MOV.L       L521+14,R3 ; _line_index
+    00000096 2342                   MOV.L       R4,@R3
+      dConsole.c    51            line_x          = 0;
+    00000098 D23D                   MOV.L       L521+18,R2 ; _line_x
+    0000009A 2242                   MOV.L       R4,@R2
+      dConsole.c    52            line_start      = 0;
+    0000009C D13D                   MOV.L       L521+22,R1 ; _line_start
+    0000009E 2142                   MOV.L       R4,@R1
+      dConsole.c    53            line_count      = 0;
+    000000A0 D33D                   MOV.L       L521+26,R3 ; _line_count
+      dConsole.c    54            Bdisp_AllClr_VRAM();
+    000000A2 D23E                   MOV.L       L521+30,R2 ; _Bdisp_AllClr_VRAM
+    000000A4 422B                   JMP         @R2
+    000000A6 2342                   MOV.L       R4,@R3
+      dConsole.c    55    }
+      dConsole.c    56    
+      dConsole.c    57    int dGetLineBox (char * s,int max,int width,int x,int y)
+    000000A8              _dGetLineBox:                    ; function: dGetLineBox
+                                                           ; frame size=60
+    000000A8 2FE6                   MOV.L       R14,@-R15
+    000000AA 2FD6                   MOV.L       R13,@-R15
+    000000AC 2FC6                   MOV.L       R12,@-R15
+    000000AE 6C43                   MOV         R4,R12
+      dConsole.c    58    {
+      dConsole.c    59            int             pos = strlen(s);
+    000000B0 D33B                   MOV.L       L521+34,R3 ; _strlen
+    000000B2 2FB6                   MOV.L       R11,@-R15
+    000000B4 2FA6                   MOV.L       R10,@-R15
+    000000B6 6A73                   MOV         R7,R10
+    000000B8 2F96                   MOV.L       R9,@-R15
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:35  PAGE    4
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000000BA 2F86                   MOV.L       R8,@-R15
+    000000BC 4F22                   STS.L       PR,@-R15
+    000000BE 6863                   MOV         R6,R8
+    000000C0 7FE8                   ADD         #-24,R15
+    000000C2 1F53                   MOV.L       R5,@(12,R15)
+    000000C4 430B                   JSR         @R3
+    000000C6 64C3                   MOV         R12,R4
+    000000C8 52FE                   MOV.L       @(56,R15),R2
+    000000CA 6383                   MOV         R8,R3
+    000000CC 6E03                   MOV         R0,R14
+      dConsole.c    60            int             refresh = 1;
+    000000CE EB01                   MOV         #1,R11
+    000000D0 720A                   ADD         #10,R2
+    000000D2 73FF                   ADD         #-1,R3
+    000000D4 1F25                   MOV.L       R2,@(20,R15)
+    000000D6 61A3                   MOV         R10,R1
+    000000D8 1F32                   MOV.L       R3,@(8,R15)
+    000000DA 7101                   ADD         #1,R1
+    000000DC 59FE                   MOV.L       @(56,R15),R9
+    000000DE 7902                   ADD         #2,R9
+    000000E0 1F11                   MOV.L       R1,@(4,R15)
+    000000E2 52F2                   MOV.L       @(8,R15),R2
+    000000E4 6023                   MOV         R2,R0
+    000000E6 4200                   SHLL        R2
+    000000E8 4008                   SHLL2       R0
+    000000EA 320C                   ADD         R0,R2
+    000000EC 32AC                   ADD         R10,R2
+    000000EE 7201                   ADD         #1,R2
+    000000F0 1F24                   MOV.L       R2,@(16,R15)
+      dConsole.c    61            uint    key;
+      dConsole.c    62            char    c;
+      dConsole.c    63            
+      dConsole.c    64            while(1)
+    000000F2              L458:                             
+      dConsole.c    65            {
+      dConsole.c    66                    if (refresh)
+    000000F2 2BB8                   TST         R11,R11
+    000000F4 8D31                   BT/S        L459
+    000000F6 ED00                   MOV         #0,R13
+      dConsole.c    67                    {
+      dConsole.c    68                            dAreaClear(x,y,x+width*6+2,y+10,2);
+    000000F8 EB02                   MOV         #2,R11
+    000000FA 6683                   MOV         R8,R6
+    000000FC 2FB6                   MOV.L       R11,@-R15
+    000000FE 6383                   MOV         R8,R3
+    00000100 57F6                   MOV.L       @(24,R15),R7
+    00000102 4600                   SHLL        R6
+    00000104 55FF                   MOV.L       @(60,R15),R5
+    00000106 4308                   SHLL2       R3
+    00000108 363C                   ADD         R3,R6
+    0000010A 36AC                   ADD         R10,R6
+    0000010C 7602                   ADD         #2,R6
+    0000010E BF77                   BSR         _dAreaClear
+    00000110 64A3                   MOV         R10,R4
+    00000112 7F04                   ADD         #4,R15
+      dConsole.c    69    
+      dConsole.c    70                            if (pos<width-1)
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:35  PAGE    5
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000114 DB23                   MOV.L       L521+38,R11; _PrintXY
+    00000116 52F2                   MOV.L       @(8,R15),R2
+    00000118 3E23                   CMP/GE      R2,R14
+    0000011A 890F                   BT          L460
+      dConsole.c    71                            {
+      dConsole.c    72                                    PrintXY (x+1,y+2,(uchar*)s,0);
+    0000011C E700                   MOV         #0,R7
+    0000011E 66C3                   MOV         R12,R6
+    00000120 6593                   MOV         R9,R5
+    00000122 4B0B                   JSR         @R11
+    00000124 54F1                   MOV.L       @(4,R15),R4
+      dConsole.c    73                                    PrintXY (x+1+pos*6,y+2,(uchar*)"_",0);
+    00000126 E700                   MOV         #0,R7
+    00000128 D61F                   MOV.L       L521+42,R6 ; L379
+    0000012A 6593                   MOV         R9,R5
+    0000012C 64E3                   MOV         R14,R4
+    0000012E 63E3                   MOV         R14,R3
+    00000130 4400                   SHLL        R4
+    00000132 4308                   SHLL2       R3
+    00000134 343C                   ADD         R3,R4
+    00000136 34AC                   ADD         R10,R4
+    00000138 A00C                   BRA         L517
+    0000013A 7401                   ADD         #1,R4
+    0000013C              L460:                             
+      dConsole.c    74                            }
+      dConsole.c    75                            else
+      dConsole.c    76                            {
+      dConsole.c    77                                    PrintXY (x+1,y+2,(uchar*)(s+pos-width+1),0);
+    0000013C E700                   MOV         #0,R7
+    0000013E 66E3                   MOV         R14,R6
+    00000140 3688                   SUB         R8,R6
+    00000142 36CC                   ADD         R12,R6
+    00000144 7601                   ADD         #1,R6
+    00000146 6593                   MOV         R9,R5
+    00000148 4B0B                   JSR         @R11
+    0000014A 54F1                   MOV.L       @(4,R15),R4
+      dConsole.c    78                                    PrintXY (x+1+(width-1)*6,y+2,(uchar*)"_",0);
+    0000014C D616                   MOV.L       L521+42,R6 ; L379
+    0000014E 6593                   MOV         R9,R5
+    00000150 54F4                   MOV.L       @(16,R15),R4
+    00000152 E700                   MOV         #0,R7
+    00000154              L517:                             
+    00000154 4B0B                   JSR         @R11
+    00000156 0009                   NOP
+      dConsole.c    79                            }
+      dConsole.c    80                            refresh = 0;
+    00000158 6BD3                   MOV         R13,R11
+    0000015A              L459:                             
+      dConsole.c    81                    }
+      dConsole.c    82    
+      dConsole.c    83                    GetKey(&key);
+    0000015A D30B                   MOV.L       L521+10,R3 ; _GetKey
+    0000015C 430B                   JSR         @R3
+    0000015E 64F3                   MOV         R15,R4
+      dConsole.c    84    
+      dConsole.c    85                    if ((c=dGetKeyChar(key))!=0)
+    00000160 BF86                   BSR         _dGetKeyChar
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:35  PAGE    6
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000162 64F2                   MOV.L       @R15,R4
+    00000164 6403                   MOV         R0,R4
+    00000166 600E                   EXTS.B      R0,R0
+    00000168 2008                   TST         R0,R0
+    0000016A 891F                   BT          L462
+      dConsole.c    86                    {
+      dConsole.c    87                            if (pos>=max) continue;
+    0000016C 53F3                   MOV.L       @(12,R15),R3
+    0000016E 3E33                   CMP/GE      R3,R14
+    00000170 89BF                   BT          L458
+      dConsole.c    88    
+      dConsole.c    89                            s[pos++] = c;s[pos] = '\0';
+    00000172 60E3                   MOV         R14,R0
+    00000174 0C44                   MOV.B       R4,@(R0,R12)
+    00000176 7E01                   ADD         #1,R14
+    00000178              L518:                             
+    00000178 60E3                   MOV         R14,R0
+    0000017A A025                   BRA         L433
+    0000017C 0CD4                   MOV.B       R13,@(R0,R12)
+    0000017E              L521:                             
+    0000017E 0000                   .DATA.W     0
+    00000180 <00000000>             .DATA.L     _Bdisp_AreaClr_VRAM
+    00000184 <00000000>             .DATA.L     _Bdisp_DrawLineVRAM
+    00000188 <00000000>             .DATA.L     _GetKey
+    0000018C <00000000>             .DATA.L     _line_index
+    00000190 <00000000>             .DATA.L     _line_x
+    00000194 <00000000>             .DATA.L     _line_start
+    00000198 <00000000>             .DATA.L     _line_count
+    0000019C <00000000>             .DATA.L     _Bdisp_AllClr_VRAM
+    000001A0 <00000000>             .DATA.L     _strlen
+    000001A4 <00000000>             .DATA.L     _PrintXY
+    000001A8 <00000000>             .DATA.L     L379
+    000001AC              L462:                             
+      dConsole.c    90                            refresh = 1;
+      dConsole.c    91                    }
+      dConsole.c    92                    else
+      dConsole.c    93                    {
+      dConsole.c    94                            if (key==KEY_CTRL_DEL)
+    000001AC 9476                   MOV.W       L522,R4    ; H'7549
+    000001AE 63F2                   MOV.L       @R15,R3
+    000001B0 3340                   CMP/EQ      R4,R3
+    000001B2 8B03                   BF          L465
+      dConsole.c    95                            {
+      dConsole.c    96                                    if (pos<=0) continue;
+    000001B4 4E15                   CMP/PL      R14
+    000001B6 8B9C                   BF          L458
+    000001B8 AFDE                   BRA         L518
+      dConsole.c    97                                    s[--pos] = '\0';
+    000001BA 7EFF                   ADD         #-1,R14
+    000001BC              L465:                             
+      dConsole.c    98                                    refresh  = 1;
+      dConsole.c    99                            }
+      dConsole.c   100                            else if (key==KEY_CTRL_AC)
+    000001BC 946F                   MOV.W       L522+2,R4  ; H'753F
+    000001BE 63F2                   MOV.L       @R15,R3
+    000001C0 3340                   CMP/EQ      R4,R3
+    000001C2 8B03                   BF          L468
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:35  PAGE    7
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+      dConsole.c   101                            {
+      dConsole.c   102                                    *s              = 0;
+    000001C4 2CD0                   MOV.B       R13,@R12
+      dConsole.c   103                                    pos             = 0;
+    000001C6 6ED3                   MOV         R13,R14
+    000001C8              L433:
+      dConsole.c   104                                    refresh = 1;
+    000001C8 AF93                   BRA         L458
+    000001CA EB01                   MOV         #1,R11
+    000001CC              L468:                             
+      dConsole.c   105                            }
+      dConsole.c   106                            else if (key==KEY_CTRL_EXE) return 1;
+    000001CC 9468                   MOV.W       L522+4,R4  ; H'7534
+    000001CE 62F2                   MOV.L       @R15,R2
+    000001D0 3240                   CMP/EQ      R4,R2
+    000001D2 8B01                   BF          L470
+    000001D4 A005                   BRA         L471
+    000001D6 E001                   MOV         #1,R0
+    000001D8              L470:                             
+      dConsole.c   107                            else if (key==KEY_CTRL_EXIT) return 0;
+    000001D8 9463                   MOV.W       L522+6,R4  ; H'7532
+    000001DA 63F2                   MOV.L       @R15,R3
+    000001DC 3340                   CMP/EQ      R4,R3
+    000001DE 8B88                   BF          L458
+    000001E0 E000                   MOV         #0,R0
+    000001E2              L471:                             
+      dConsole.c   108                            
+      dConsole.c   109                    }
+      dConsole.c   110                    
+      dConsole.c   111            }
+      dConsole.c   112    }
+    000001E2 7F18                   ADD         #24,R15
+    000001E4 4F26                   LDS.L       @R15+,PR
+    000001E6 68F6                   MOV.L       @R15+,R8
+    000001E8 69F6                   MOV.L       @R15+,R9
+    000001EA 6AF6                   MOV.L       @R15+,R10
+    000001EC 6BF6                   MOV.L       @R15+,R11
+    000001EE 6CF6                   MOV.L       @R15+,R12
+    000001F0 6DF6                   MOV.L       @R15+,R13
+    000001F2 000B                   RTS
+    000001F4 6EF6                   MOV.L       @R15+,R14
+      dConsole.c   113    
+      dConsole.c   114    int dGetLine (char * s,int max) // This function is depended on dConsole
+    000001F6              _dGetLine:                       ; function: dGetLine
+                                                           ; frame size=60
+    000001F6 2FE6                   MOV.L       R14,@-R15
+    000001F8 2FD6                   MOV.L       R13,@-R15
+    000001FA EE00                   MOV         #0,R14
+      dConsole.c   115                                                                    // And this function is not allowed to abo
+                         +lish
+      dConsole.c   116    {
+      dConsole.c   117            int             pos = strlen(s);
+    000001FC D329                   MOV.L       L522+8,R3  ; _strlen
+    000001FE 2FC6                   MOV.L       R12,@-R15
+    00000200 2FB6                   MOV.L       R11,@-R15
+    00000202 6B43                   MOV         R4,R11
+    00000204 2FA6                   MOV.L       R10,@-R15
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:35  PAGE    8
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000206 2F96                   MOV.L       R9,@-R15
+    00000208 2F86                   MOV.L       R8,@-R15
+    0000020A 4F22                   STS.L       PR,@-R15
+    0000020C 4F12                   STS.L       MACL,@-R15
+    0000020E 7FE8                   ADD         #-24,R15
+    00000210 1F53                   MOV.L       R5,@(12,R15)
+    00000212 430B                   JSR         @R3
+    00000214 64B3                   MOV         R11,R4
+    00000216 6D03                   MOV         R0,R13
+      dConsole.c   118            int             refresh = 1;
+      dConsole.c   119            int             x,y,l,width;
+      dConsole.c   120            uint    key;
+      dConsole.c   121            char    c;
+      dConsole.c   122            
+      dConsole.c   123            
+      dConsole.c   124            l = strlen (line_buf[line_index]);
+    00000218 D123                   MOV.L       L522+12,R1 ; _line_index
+    0000021A EC01                   MOV         #1,R12
+    0000021C D023                   MOV.L       L522+16,R0 ; _line_buf
+    0000021E E316                   MOV         #22,R3
+    00000220 6212                   MOV.L       @R1,R2
+    00000222 0237                   MUL.L       R3,R2
+    00000224 D21F                   MOV.L       L522+8,R2  ; _strlen
+    00000226 041A                   STS         MACL,R4
+    00000228 420B                   JSR         @R2
+    0000022A 340C                   ADD         R0,R4
+    0000022C 6903                   MOV         R0,R9
+      dConsole.c   125            
+      dConsole.c   126            if (l>=LINE_COL_MAX)
+    0000022E E315                   MOV         #21,R3
+    00000230 3933                   CMP/GE      R3,R9
+    00000232 8B04                   BF          L474
+      dConsole.c   127            {
+      dConsole.c   128                    dConsolePut("\n");
+    00000234 D41E                   MOV.L       L522+20,R4 ; L397
+    00000236 B11B                   BSR         _dConsolePut
+    00000238 0009                   NOP
+      dConsole.c   129                    l = 0;
+    0000023A A002                   BRA         L475
+    0000023C 69E3                   MOV         R14,R9
+    0000023E              L474:                             
+      dConsole.c   130            }
+      dConsole.c   131            else
+      dConsole.c   132                    dConsoleRedraw();
+    0000023E B084                   BSR         _dConsoleRedraw
+    00000240 0009                   NOP
+    00000242              L475:                             
+      dConsole.c   133    
+      dConsole.c   134            x = l + 1;
+    00000242 6393                   MOV         R9,R3
+      dConsole.c   135            y = line_count;
+    00000244 D21B                   MOV.L       L522+24,R2 ; _line_count
+      dConsole.c   136            width = LINE_COL_MAX - l;
+    00000246 E115                   MOV         #21,R1
+    00000248 7301                   ADD         #1,R3
+    0000024A 3198                   SUB         R9,R1
+    0000024C 1F31                   MOV.L       R3,@(4,R15)
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:35  PAGE    9
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    0000024E 6A22                   MOV.L       @R2,R10
+    00000250 1F12                   MOV.L       R1,@(8,R15)
+    00000252 71FF                   ADD         #-1,R1
+    00000254 1F14                   MOV.L       R1,@(16,R15)
+    00000256 53F2                   MOV.L       @(8,R15),R3
+    00000258 51F1                   MOV.L       @(4,R15),R1
+    0000025A 313C                   ADD         R3,R1
+    0000025C 71FF                   ADD         #-1,R1
+    0000025E 1F15                   MOV.L       R1,@(20,R15)
+      dConsole.c   137    
+      dConsole.c   138            while (1)
+    00000260              L477:                             
+      dConsole.c   139            {
+      dConsole.c   140                    if (refresh)
+    00000260 2CC8                   TST         R12,R12
+    00000262 8940                   BT          L478
+      dConsole.c   141                    {
+      dConsole.c   142                            int i;
+      dConsole.c   143                            for (i=x;i<=LINE_COL_MAX;++i)
+    00000264 58F1                   MOV.L       @(4,R15),R8
+    00000266 E315                   MOV         #21,R3
+    00000268 D913                   MOV.L       L522+28,R9 ; _Print
+    0000026A 3837                   CMP/GT      R3,R8
+    0000026C DC13                   MOV.L       L522+32,R12; _locate
+    0000026E 8909                   BT          L479
+    00000270              L480:                             
+      dConsole.c   144                            {
+      dConsole.c   145                                    locate(i,y);Print((uchar*)" ");
+    00000270 65A3                   MOV         R10,R5
+    00000272 4C0B                   JSR         @R12
+    00000274 6483                   MOV         R8,R4
+    00000276 D412                   MOV.L       L522+36,R4 ; L402
+    00000278 490B                   JSR         @R9
+    0000027A 0009                   NOP
+    0000027C 7801                   ADD         #1,R8
+    0000027E E315                   MOV         #21,R3
+    00000280 3837                   CMP/GT      R3,R8
+    00000282 8BF5                   BF          L480
+    00000284              L479:                             
+      dConsole.c   146                            }
+      dConsole.c   147                            if (pos<width-1)
+    00000284 51F4                   MOV.L       @(16,R15),R1
+    00000286 3D13                   CMP/GE      R1,R13
+    00000288 891C                   BT          L481
+      dConsole.c   148                            {
+      dConsole.c   149                                    locate(x,y);            Print((uchar*)s);
+    0000028A 65A3                   MOV         R10,R5
+    0000028C 4C0B                   JSR         @R12
+    0000028E 54F1                   MOV.L       @(4,R15),R4
+    00000290 490B                   JSR         @R9
+    00000292 64B3                   MOV         R11,R4
+      dConsole.c   150                                    locate(x+pos,y);        Print((uchar*)"_");
+    00000294 54F1                   MOV.L       @(4,R15),R4
+    00000296 65A3                   MOV         R10,R5
+    00000298 A01F                   BRA         L519
+    0000029A 34DC                   ADD         R13,R4
+    0000029C              L522:                             
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:35  PAGE   10
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    0000029C 7549                   .DATA.W     H'7549
+    0000029E 753F                   .DATA.W     H'753F
+    000002A0 7534                   .DATA.W     H'7534
+    000002A2 7532                   .DATA.W     H'7532
+    000002A4 <00000000>             .DATA.L     _strlen
+    000002A8 <00000000>             .DATA.L     _line_index
+    000002AC <00000000>             .DATA.L     _line_buf
+    000002B0 <00000000>             .DATA.L     L397
+    000002B4 <00000000>             .DATA.L     _line_count
+    000002B8 <00000000>             .DATA.L     _Print
+    000002BC <00000000>             .DATA.L     _locate
+    000002C0 <00000000>             .DATA.L     L402
+    000002C4              L481:                             
+      dConsole.c   151                            }
+      dConsole.c   152                            else
+      dConsole.c   153                            {
+      dConsole.c   154                                    locate(x,y);                    Print((uchar*)s+pos-width+1);
+    000002C4 65A3                   MOV         R10,R5
+    000002C6 4C0B                   JSR         @R12
+    000002C8 54F1                   MOV.L       @(4,R15),R4
+    000002CA 64D3                   MOV         R13,R4
+    000002CC 53F2                   MOV.L       @(8,R15),R3
+    000002CE 3438                   SUB         R3,R4
+    000002D0 34BC                   ADD         R11,R4
+    000002D2 490B                   JSR         @R9
+    000002D4 7401                   ADD         #1,R4
+      dConsole.c   155                                    locate(x+width-1,y);    Print((uchar*)"_");
+    000002D6 65A3                   MOV         R10,R5
+    000002D8 54F5                   MOV.L       @(20,R15),R4
+    000002DA              L519:                             
+    000002DA 4C0B                   JSR         @R12
+    000002DC 0009                   NOP
+    000002DE D435                   MOV.L       L523+6,R4  ; L379
+    000002E0 490B                   JSR         @R9
+    000002E2 0009                   NOP
+      dConsole.c   156                            }
+      dConsole.c   157                            refresh = 0;
+    000002E4 6CE3                   MOV         R14,R12
+    000002E6              L478:                             
+      dConsole.c   158                    }
+      dConsole.c   159                    GetKey(&key);
+    000002E6 D934                   MOV.L       L523+10,R9 ; _GetKey
+    000002E8 490B                   JSR         @R9
+    000002EA 64F3                   MOV         R15,R4
+      dConsole.c   160                    if ((c=dGetKeyChar(key))!=0)
+    000002EC BEC0                   BSR         _dGetKeyChar
+    000002EE 64F2                   MOV.L       @R15,R4
+    000002F0 6403                   MOV         R0,R4
+    000002F2 600E                   EXTS.B      R0,R0
+    000002F4 2008                   TST         R0,R0
+    000002F6 8906                   BT          L483
+      dConsole.c   161                    {
+      dConsole.c   162                            if (pos>=max) continue;
+    000002F8 53F3                   MOV.L       @(12,R15),R3
+    000002FA 3D33                   CMP/GE      R3,R13
+    000002FC 89B0                   BT          L477
+      dConsole.c   163    
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:35  PAGE   11
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+      dConsole.c   164                            s[pos++] = c;s[pos] = '\0';
+    000002FE 60D3                   MOV         R13,R0
+    00000300 7D01                   ADD         #1,R13
+    00000302 A007                   BRA         L520
+    00000304 0B44                   MOV.B       R4,@(R0,R11)
+    00000306              L483:                             
+      dConsole.c   165                            refresh = 1;
+      dConsole.c   166                    }
+      dConsole.c   167                    else
+      dConsole.c   168                    {
+      dConsole.c   169                            if (key==KEY_CTRL_DEL)
+    00000306 9452                   MOV.W       L523,R4    ; H'7549
+    00000308 63F2                   MOV.L       @R15,R3
+    0000030A 3340                   CMP/EQ      R4,R3
+    0000030C 8B05                   BF          L486
+      dConsole.c   170                            {
+      dConsole.c   171                                    if (pos<=0) continue;
+    0000030E 4D15                   CMP/PL      R13
+    00000310 8BA6                   BF          L477
+      dConsole.c   172                                    s[--pos] = '\0';
+    00000312 7DFF                   ADD         #-1,R13
+    00000314              L520:                             
+    00000314 60D3                   MOV         R13,R0
+    00000316 A006                   BRA         L437
+    00000318 0BE4                   MOV.B       R14,@(R0,R11)
+    0000031A              L486:                             
+      dConsole.c   173                                    refresh  = 1;
+      dConsole.c   174                            }
+      dConsole.c   175                            else if (key==KEY_CTRL_AC)
+    0000031A 9449                   MOV.W       L523+2,R4  ; H'753F
+    0000031C 63F2                   MOV.L       @R15,R3
+    0000031E 3340                   CMP/EQ      R4,R3
+    00000320 8B03                   BF          L489
+      dConsole.c   176                            {
+      dConsole.c   177                                    *s              = 0;
+      dConsole.c   178                                    pos             = 0;
+    00000322 6DE3                   MOV         R14,R13
+    00000324 2BE0                   MOV.B       R14,@R11
+    00000326              L437:
+      dConsole.c   179                                    refresh = 1;
+    00000326 AF9B                   BRA         L477
+    00000328 EC01                   MOV         #1,R12
+    0000032A              L489:                             
+      dConsole.c   180                            }
+      dConsole.c   181                            else if (key==KEY_CTRL_EXE) return 1;
+    0000032A 9442                   MOV.W       L523+4,R4  ; H'7534
+    0000032C 62F2                   MOV.L       @R15,R2
+    0000032E 3240                   CMP/EQ      R4,R2
+    00000330 8B96                   BF          L477
+    00000332 E001                   MOV         #1,R0
+      dConsole.c   182                            
+      dConsole.c   183                    }
+      dConsole.c   184            }
+      dConsole.c   185            return 0;
+      dConsole.c   186    }
+    00000334 7F18                   ADD         #24,R15
+    00000336 4F16                   LDS.L       @R15+,MACL
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:35  PAGE   12
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000338 4F26                   LDS.L       @R15+,PR
+    0000033A 68F6                   MOV.L       @R15+,R8
+    0000033C 69F6                   MOV.L       @R15+,R9
+    0000033E 6AF6                   MOV.L       @R15+,R10
+    00000340 6BF6                   MOV.L       @R15+,R11
+    00000342 6CF6                   MOV.L       @R15+,R12
+    00000344 6DF6                   MOV.L       @R15+,R13
+    00000346 000B                   RTS
+    00000348 6EF6                   MOV.L       @R15+,R14
+      dConsole.c   187    
+      dConsole.c   188    void dConsoleRedraw ()
+    0000034A              _dConsoleRedraw:                 ; function: dConsoleRedraw
+                                                           ; frame size=36
+    0000034A 2FE6                   MOV.L       R14,@-R15
+    0000034C 2FD6                   MOV.L       R13,@-R15
+    0000034E 2FC6                   MOV.L       R12,@-R15
+    00000350 2FB6                   MOV.L       R11,@-R15
+    00000352 2FA6                   MOV.L       R10,@-R15
+    00000354 2F96                   MOV.L       R9,@-R15
+    00000356 2F86                   MOV.L       R8,@-R15
+    00000358 4F22                   STS.L       PR,@-R15
+    0000035A 4F12                   STS.L       MACL,@-R15
+      dConsole.c   189    {
+      dConsole.c   190            int i,j;
+      dConsole.c   191            Bdisp_AllClr_VRAM();
+    0000035C D317                   MOV.L       L523+14,R3 ; _Bdisp_AllClr_VRAM
+    0000035E 430B                   JSR         @R3
+    00000360 0009                   NOP
+      dConsole.c   192            for(i=0,j=line_start;i<line_count;++i)
+    00000362 EB00                   MOV         #0,R11
+    00000364 D216                   MOV.L       L523+18,R2 ; _line_start
+    00000366 E916                   MOV         #22,R9
+    00000368 D816                   MOV.L       L523+22,R8 ; _locate
+    0000036A EA08                   MOV         #8,R10
+    0000036C 6E22                   MOV.L       @R2,R14
+    0000036E 6CB3                   MOV         R11,R12
+    00000370 A00F                   BRA         L493
+    00000372 ED01                   MOV         #1,R13
+    00000374              L494:                             
+      dConsole.c   193            {
+      dConsole.c   194                    locate(1,i+1);Print((uchar*)line_buf[j]);
+    00000374 65D3                   MOV         R13,R5
+    00000376 480B                   JSR         @R8
+    00000378 E401                   MOV         #1,R4
+    0000037A 0E97                   MUL.L       R9,R14
+    0000037C D312                   MOV.L       L523+26,R3 ; _line_buf
+    0000037E 041A                   STS         MACL,R4
+    00000380 D212                   MOV.L       L523+30,R2 ; _Print
+    00000382 420B                   JSR         @R2
+    00000384 343C                   ADD         R3,R4
+      dConsole.c   195                    if (++j>=LINE_ROW_MAX) j = 0;
+    00000386 7E01                   ADD         #1,R14
+    00000388 3EA3                   CMP/GE      R10,R14
+    0000038A 8F01                   BF/S        L495
+    0000038C 7C01                   ADD         #1,R12
+    0000038E 6EB3                   MOV         R11,R14
+    00000390              L495:                             
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:35  PAGE   13
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000390 7D01                   ADD         #1,R13
+    00000392              L493:                             
+    00000392 D30F                   MOV.L       L523+34,R3 ; _line_count
+    00000394 6232                   MOV.L       @R3,R2
+    00000396 3C23                   CMP/GE      R2,R12
+    00000398 8BEC                   BF          L494
+      dConsole.c   196            }
+      dConsole.c   197            
+      dConsole.c   198    }
+    0000039A 4F16                   LDS.L       @R15+,MACL
+    0000039C 4F26                   LDS.L       @R15+,PR
+    0000039E 68F6                   MOV.L       @R15+,R8
+    000003A0 69F6                   MOV.L       @R15+,R9
+    000003A2 6AF6                   MOV.L       @R15+,R10
+    000003A4 6BF6                   MOV.L       @R15+,R11
+    000003A6 6CF6                   MOV.L       @R15+,R12
+    000003A8 6DF6                   MOV.L       @R15+,R13
+    000003AA 000B                   RTS
+    000003AC 6EF6                   MOV.L       @R15+,R14
+    000003AE              L523:                             
+    000003AE 7549                   .DATA.W     H'7549
+    000003B0 753F                   .DATA.W     H'753F
+    000003B2 7534                   .DATA.W     H'7534
+    000003B4 <00000000>             .DATA.L     L379
+    000003B8 <00000000>             .DATA.L     _GetKey
+    000003BC <00000000>             .DATA.L     _Bdisp_AllClr_VRAM
+    000003C0 <00000000>             .DATA.L     _line_start
+    000003C4 <00000000>             .DATA.L     _locate
+    000003C8 <00000000>             .DATA.L     _line_buf
+    000003CC <00000000>             .DATA.L     _Print
+    000003D0 <00000000>             .DATA.L     _line_count
+      dConsole.c   199    void dConsolePutChar (char c)
+    000003D4              _dConsolePutChar:                ; function: dConsolePutChar
+                                                           ; frame size=20
+    000003D4 2FE6                   MOV.L       R14,@-R15
+    000003D6 2FD6                   MOV.L       R13,@-R15
+    000003D8 2FC6                   MOV.L       R12,@-R15
+    000003DA 2FB6                   MOV.L       R11,@-R15
+    000003DC 4F12                   STS.L       MACL,@-R15
+      dConsole.c   200    {
+      dConsole.c   201            if (line_count == 0) line_count = 1;
+    000003DE DE53                   MOV.L       L524+2,R14 ; _line_count
+    000003E0 63E2                   MOV.L       @R14,R3
+    000003E2 2338                   TST         R3,R3
+    000003E4 8B01                   BF          L496
+    000003E6 E301                   MOV         #1,R3
+    000003E8 2E32                   MOV.L       R3,@R14
+    000003EA              L496:                             
+    000003EA ED16                   MOV         #22,R13
+    000003EC D651                   MOV.L       L524+10,R6 ; _line_x
+    000003EE 604E                   EXTS.B      R4,R0
+    000003F0 DC4F                   MOV.L       L524+6,R12 ; _line_buf
+    000003F2 E700                   MOV         #0,R7
+    000003F4 D550                   MOV.L       L524+14,R5 ; _line_index
+    000003F6 880A                   CMP/EQ      #10,R0
+    000003F8 6B52                   MOV.L       @R5,R11
+    000003FA 0BD7                   MUL.L       R13,R11
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:35  PAGE   14
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000003FC 0B1A                   STS         MACL,R11
+    000003FE 8D06                   BT/S        L497
+    00000400 3BCC                   ADD         R12,R11
+      dConsole.c   202            if (c != '\n')
+      dConsole.c   203                    line_buf[line_index][line_x++] = c;
+    00000402 6062                   MOV.L       @R6,R0
+    00000404 7001                   ADD         #1,R0
+    00000406 2602                   MOV.L       R0,@R6
+    00000408 70FF                   ADD         #-1,R0
+    0000040A A004                   BRA         L498
+    0000040C 0B44                   MOV.B       R4,@(R0,R11)
+    0000040E              L497:                             
+      dConsole.c   204            else
+      dConsole.c   205            {
+      dConsole.c   206                    line_buf[line_index][line_x] = '\0';
+      dConsole.c   207                    line_x = LINE_COL_MAX;
+    0000040E E215                   MOV         #21,R2
+    00000410 6062                   MOV.L       @R6,R0
+    00000412 0B74                   MOV.B       R7,@(R0,R11)
+    00000414 2622                   MOV.L       R2,@R6
+    00000416              L498:                             
+    00000416 E315                   MOV         #21,R3
+    00000418 6462                   MOV.L       @R6,R4
+    0000041A 3433                   CMP/GE      R3,R4
+    0000041C 8B1C                   BF          L499
+      dConsole.c   208            }
+      dConsole.c   209            if (line_x>=LINE_COL_MAX)
+      dConsole.c   210            {
+      dConsole.c   211                    line_buf[line_index][line_x] = '\0';
+      dConsole.c   212    
+      dConsole.c   213                    line_x = 0;
+      dConsole.c   214                    if (line_count<LINE_ROW_MAX)
+    0000041E EB08                   MOV         #8,R11
+    00000420 6052                   MOV.L       @R5,R0
+    00000422 00D7                   MUL.L       R13,R0
+    00000424 001A                   STS         MACL,R0
+    00000426 30CC                   ADD         R12,R0
+    00000428 0474                   MOV.B       R7,@(R0,R4)
+    0000042A 2672                   MOV.L       R7,@R6
+    0000042C 62E2                   MOV.L       @R14,R2
+    0000042E 32B3                   CMP/GE      R11,R2
+    00000430 8903                   BT          L500
+      dConsole.c   215                    {
+      dConsole.c   216                            ++line_count;
+    00000432 60E2                   MOV.L       @R14,R0
+    00000434 7001                   ADD         #1,R0
+    00000436 A008                   BRA         L501
+    00000438 2E02                   MOV.L       R0,@R14
+    0000043A              L500:                             
+      dConsole.c   217                    }
+      dConsole.c   218                    else
+      dConsole.c   219                    {
+      dConsole.c   220                            line_start++;
+    0000043A D440                   MOV.L       L524+18,R4 ; _line_start
+    0000043C 6142                   MOV.L       @R4,R1
+    0000043E 7101                   ADD         #1,R1
+    00000440 2412                   MOV.L       R1,@R4
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:35  PAGE   15
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+      dConsole.c   221                            if (line_start>=LINE_ROW_MAX) line_start = 0;
+    00000442 6213                   MOV         R1,R2
+    00000444 32B3                   CMP/GE      R11,R2
+    00000446 8B00                   BF          L501
+    00000448 2472                   MOV.L       R7,@R4
+    0000044A              L501:                             
+      dConsole.c   222                    }
+      dConsole.c   223                    line_index++;
+    0000044A 6352                   MOV.L       @R5,R3
+    0000044C 7301                   ADD         #1,R3
+      dConsole.c   224                    if (line_index>=LINE_ROW_MAX) line_index = 0;
+    0000044E 6233                   MOV         R3,R2
+    00000450 2532                   MOV.L       R3,@R5
+    00000452 32B3                   CMP/GE      R11,R2
+    00000454 8B00                   BF          L499
+    00000456 2572                   MOV.L       R7,@R5
+    00000458              L499:                             
+      dConsole.c   225            }
+      dConsole.c   226            line_buf[line_index][line_x] = '\0';
+    00000458 6052                   MOV.L       @R5,R0
+    0000045A 00D7                   MUL.L       R13,R0
+    0000045C 6362                   MOV.L       @R6,R3
+    0000045E 001A                   STS         MACL,R0
+    00000460 30CC                   ADD         R12,R0
+    00000462 0374                   MOV.B       R7,@(R0,R3)
+      dConsole.c   227            dConsoleRedraw();
+    00000464 4F16                   LDS.L       @R15+,MACL
+    00000466 6BF6                   MOV.L       @R15+,R11
+    00000468 6CF6                   MOV.L       @R15+,R12
+    0000046A 6DF6                   MOV.L       @R15+,R13
+    0000046C AF6D                   BRA         _dConsoleRedraw
+    0000046E 6EF6                   MOV.L       @R15+,R14
+      dConsole.c   228    }
+      dConsole.c   229    
+      dConsole.c   230    void dConsolePut(const char * str)
+    00000470              _dConsolePut:                    ; function: dConsolePut
+                                                           ; frame size=28
+    00000470 2FE6                   MOV.L       R14,@-R15
+    00000472 2FD6                   MOV.L       R13,@-R15
+    00000474 2FC6                   MOV.L       R12,@-R15
+    00000476 2FB6                   MOV.L       R11,@-R15
+    00000478 2FA6                   MOV.L       R10,@-R15
+    0000047A 2F96                   MOV.L       R9,@-R15
+    0000047C 4F12                   STS.L       MACL,@-R15
+      dConsole.c   231    {
+      dConsole.c   232            if (line_count == 0) line_count = 1;
+    0000047E DB2B                   MOV.L       L524+2,R11 ; _line_count
+    00000480 63B2                   MOV.L       @R11,R3
+    00000482 2338                   TST         R3,R3
+    00000484 8F02                   BF/S        L504
+    00000486 E915                   MOV         #21,R9
+    00000488 E301                   MOV         #1,R3
+    0000048A 2B32                   MOV.L       R3,@R11
+    0000048C              L504:                             
+    0000048C DA28                   MOV.L       L524+6,R10 ; _line_buf
+    0000048E ED08                   MOV         #8,R13
+    00000490 D628                   MOV.L       L524+10,R6 ; _line_x
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:35  PAGE   16
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000492 EE16                   MOV         #22,R14
+    00000494 D528                   MOV.L       L524+14,R5 ; _line_index
+    00000496 DC29                   MOV.L       L524+18,R12; _line_start
+      dConsole.c   233            for (;*str;++str)
+    00000498 A036                   BRA         L505
+    0000049A E700                   MOV         #0,R7
+    0000049C              L506:                             
+      dConsole.c   234            {
+      dConsole.c   235                    if (*str != '\n')
+    0000049C 6040                   MOV.B       @R4,R0
+    0000049E 880A                   CMP/EQ      #10,R0
+    000004A0 890B                   BT          L507
+      dConsole.c   236                            line_buf[line_index][line_x++] = *str;
+    000004A2 6052                   MOV.L       @R5,R0
+    000004A4 6362                   MOV.L       @R6,R3
+    000004A6 00E7                   MUL.L       R14,R0
+    000004A8 001A                   STS         MACL,R0
+    000004AA 30AC                   ADD         R10,R0
+    000004AC 7301                   ADD         #1,R3
+    000004AE 2632                   MOV.L       R3,@R6
+    000004B0 6240                   MOV.B       @R4,R2
+    000004B2 73FF                   ADD         #-1,R3
+    000004B4 0324                   MOV.B       R2,@(R0,R3)
+    000004B6 A007                   BRA         L508
+    000004B8 0009                   NOP
+    000004BA              L507:                             
+      dConsole.c   237                    else
+      dConsole.c   238                    {
+      dConsole.c   239                            line_buf[line_index][line_x] = '\0';
+    000004BA 6052                   MOV.L       @R5,R0
+    000004BC 6362                   MOV.L       @R6,R3
+    000004BE 00E7                   MUL.L       R14,R0
+    000004C0 001A                   STS         MACL,R0
+    000004C2 30AC                   ADD         R10,R0
+    000004C4 0374                   MOV.B       R7,@(R0,R3)
+      dConsole.c   240                            line_x = LINE_COL_MAX;
+    000004C6 2692                   MOV.L       R9,@R6
+    000004C8              L508:                             
+      dConsole.c   241                    }
+      dConsole.c   242                    if (line_x>=LINE_COL_MAX)
+    000004C8 6262                   MOV.L       @R6,R2
+    000004CA 3293                   CMP/GE      R9,R2
+    000004CC 8B1B                   BF          L509
+      dConsole.c   243                    {
+      dConsole.c   244                            line_buf[line_index][line_x] = '\0';
+    000004CE 6052                   MOV.L       @R5,R0
+    000004D0 6362                   MOV.L       @R6,R3
+    000004D2 00E7                   MUL.L       R14,R0
+    000004D4 001A                   STS         MACL,R0
+    000004D6 30AC                   ADD         R10,R0
+    000004D8 0374                   MOV.B       R7,@(R0,R3)
+      dConsole.c   245    
+      dConsole.c   246                            line_x = 0;
+    000004DA 2672                   MOV.L       R7,@R6
+      dConsole.c   247                            if (line_count<LINE_ROW_MAX)
+    000004DC 62B2                   MOV.L       @R11,R2
+    000004DE 32D3                   CMP/GE      R13,R2
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:35  PAGE   17
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000004E0 8903                   BT          L510
+      dConsole.c   248                            {
+      dConsole.c   249                                    ++line_count;
+    000004E2 61B2                   MOV.L       @R11,R1
+    000004E4 7101                   ADD         #1,R1
+    000004E6 A007                   BRA         L511
+    000004E8 2B12                   MOV.L       R1,@R11
+    000004EA              L510:                             
+      dConsole.c   250                            }
+      dConsole.c   251                            else
+      dConsole.c   252                            {
+      dConsole.c   253                                    line_start++;
+    000004EA 62C2                   MOV.L       @R12,R2
+    000004EC 7201                   ADD         #1,R2
+      dConsole.c   254                                    if (line_start>=LINE_ROW_MAX) line_start = 0;
+    000004EE 6323                   MOV         R2,R3
+    000004F0 2C22                   MOV.L       R2,@R12
+    000004F2 33D3                   CMP/GE      R13,R3
+    000004F4 8B00                   BF          L511
+    000004F6 2C72                   MOV.L       R7,@R12
+    000004F8              L511:                             
+      dConsole.c   255                            }
+      dConsole.c   256                            line_index++;
+    000004F8 6352                   MOV.L       @R5,R3
+    000004FA 7301                   ADD         #1,R3
+    000004FC 2532                   MOV.L       R3,@R5
+      dConsole.c   257                            if (line_index>=LINE_ROW_MAX) line_index = 0;
+    000004FE 6233                   MOV         R3,R2
+    00000500 32D3                   CMP/GE      R13,R2
+    00000502 8B00                   BF          L509
+    00000504 2572                   MOV.L       R7,@R5
+    00000506              L509:                             
+    00000506 7401                   ADD         #1,R4
+    00000508              L505:                             
+    00000508 6240                   MOV.B       @R4,R2
+    0000050A 2228                   TST         R2,R2
+    0000050C 8BC6                   BF          L506
+      dConsole.c   258                    }
+      dConsole.c   259            }
+      dConsole.c   260            line_buf[line_index][line_x] = '\0';
+    0000050E 6052                   MOV.L       @R5,R0
+    00000510 6362                   MOV.L       @R6,R3
+    00000512 00E7                   MUL.L       R14,R0
+    00000514 001A                   STS         MACL,R0
+    00000516 30AC                   ADD         R10,R0
+    00000518 0374                   MOV.B       R7,@(R0,R3)
+      dConsole.c   261            dConsoleRedraw();
+    0000051A 4F16                   LDS.L       @R15+,MACL
+    0000051C 69F6                   MOV.L       @R15+,R9
+    0000051E 6AF6                   MOV.L       @R15+,R10
+    00000520 6BF6                   MOV.L       @R15+,R11
+    00000522 6CF6                   MOV.L       @R15+,R12
+    00000524 6DF6                   MOV.L       @R15+,R13
+    00000526 AF10                   BRA         _dConsoleRedraw
+    00000528 6EF6                   MOV.L       @R15+,R14
+    0000052A              L524:                             
+    0000052A 0000                   .DATA.W     0
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:35  PAGE   18
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    0000052C <00000000>             .DATA.L     _line_count
+    00000530 <00000000>             .DATA.L     _line_buf
+    00000534 <00000000>             .DATA.L     _line_x
+    00000538 <00000000>             .DATA.L     _line_index
+    0000053C <00000000>             .DATA.L     _line_start
+      dConsole.c   262    }
+      dConsole.c   263    
+      dConsole.c   264    int dPrintf (const char * format,...)
+    00000540              _dPrintf:                        ; function: dPrintf
+                                                           ; frame size=264
+    00000540 4F22                   STS.L       PR,@-R15
+      dConsole.c   265    {
+      dConsole.c   266            char    buf[256];
+      dConsole.c   267            int             length;
+      dConsole.c   268            va_list arg_list;
+      dConsole.c   269    
+      dConsole.c   270            va_start(arg_list,format);
+    00000542 E503                   MOV         #3,R5
+    00000544 901D                   MOV.W       L525,R0    ; H'FEFC
+    00000546 3F0C                   ADD         R0,R15
+    00000548 901C                   MOV.W       L525+2,R0  ; H'0108
+    0000054A 30FC                   ADD         R15,R0
+    0000054C 7004                   ADD         #4,R0
+    0000054E 2508                   TST         R0,R5
+    00000550 8903                   BT          L514
+    00000552 9517                   MOV.W       L525+2,R5  ; H'0108
+    00000554 35FC                   ADD         R15,R5
+    00000556 A003                   BRA         L515
+    00000558 7508                   ADD         #8,R5
+    0000055A              L514:                             
+    0000055A 9513                   MOV.W       L525+2,R5  ; H'0108
+    0000055C 35FC                   ADD         R15,R5
+    0000055E 7504                   ADD         #4,R5
+    00000560              L515:                             
+      dConsole.c   271            length = vsprintf(buf,format,arg_list);
+    00000560 9010                   MOV.W       L525+2,R0  ; H'0108
+    00000562 64F3                   MOV         R15,R4
+    00000564 D308                   MOV.L       L525+6,R3  ; _vsprintf
+    00000566 6653                   MOV         R5,R6
+    00000568 05FE                   MOV.L       @(R0,R15),R5
+    0000056A 430B                   JSR         @R3
+    0000056C 7404                   ADD         #4,R4
+      dConsole.c   272            va_end(arg_list);
+      dConsole.c   273    
+      dConsole.c   274            dConsolePut (buf);
+    0000056E 64F3                   MOV         R15,R4
+    00000570 2F02                   MOV.L       R0,@R15
+    00000572 BF7D                   BSR         _dConsolePut
+    00000574 7404                   ADD         #4,R4
+      dConsole.c   275    
+      dConsole.c   276            return length;
+    00000576 60F2                   MOV.L       @R15,R0
+      dConsole.c   277    }
+    00000578 9105                   MOV.W       L525+4,R1  ; H'0104
+    0000057A 3F1C                   ADD         R1,R15
+    0000057C 4F26                   LDS.L       @R15+,PR
+    0000057E 000B                   RTS
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:35  PAGE   19
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000580 0009                   NOP
+    00000582              L525:                             
+    00000582 FEFC                   .DATA.W     H'FEFC
+    00000584 0108                   .DATA.W     H'0108
+    00000586 0104                   .DATA.W     H'0104
+    00000588 <00000000>             .DATA.L     _vsprintf
+      dConsole.c   278    
+D   00000000              _line_index:                     ; static: line_index
+    00000000 00000000               .DATA.L     H'00000000
+    00000004              _line_x:                         ; static: line_x
+    00000004 00000000               .DATA.L     H'00000000
+    00000008              _line_start:                     ; static: line_start
+    00000008 00000000               .DATA.L     H'00000000
+    0000000C              _line_count:                     ; static: line_count
+    0000000C 00000000               .DATA.L     H'00000000
+C   00000000              L379:
+    00000000 5F                     .SDATA      "_"
+    00000001 00                     .DATA.B     H'00
+    00000002 00000002               .RES.W      1
+    00000004              L397:
+    00000004 0A00                   .DATA.B     H'0A,H'00
+    00000006 00000002               .RES.W      1
+    00000008              L402:
+    00000008 20                     .SDATA      " "
+    00000009 00                     .DATA.B     H'00
+B   00000000              _line_buf:                       ; static: line_buf
+    00000000 000000B0               .RES.B      176
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:35  PAGE    1
+
+
+******** STATISTICS INFORMATION ********
+
+
+********** ERROR INFORMATION ***********
+
+NUMBER OF ERRORS:           0
+NUMBER OF WARNINGS:         0
+
+
+
+
+******* SOURCE LINE INFORMATION ********
+
+COMPILED SOURCE LINE:      278
+
+
+
+******* SECTION SIZE INFORMATION *******
+
+PROGRAM  SECTION (P):                               0000058C Byte(s)
+CONSTANT SECTION (C):                               0000000A Byte(s)
+DATA     SECTION (D):                               00000010 Byte(s)
+BSS      SECTION (B):                               000000B0 Byte(s)
+
+ TOTAL PROGRAM SIZE: 00000656 Byte(s)
+
+
+
+********** LABEL INFORMATION ***********
+
+NUMBER OF EXTERNAL REFERENCE SYMBOLS:            9
+NUMBER OF EXTERNAL DEFINITION SYMBOLS:          15
+NUMBER OF INTERNAL/EXTERNAL SYMBOLS:            81
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*** COMMAND PARAMETER ***
+
+
+  -subcommand=C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\hmk352.tmp 
+

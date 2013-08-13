@@ -1,0 +1,467 @@
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:27  PAGE    1
+
+************ OBJECT LISTING ************
+
+FILE NAME: E:\Anderain\fx-9860\dPicoc\platform\platform_fx9860.c
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+      platform_f     1    #include "../picoc.h"
+      platform_f     2    #include "../interpreter.h"
+      platform_f     3    #include <fxlib.h>
+      platform_f     4    #include <stdlib.h>
+      platform_f     5    
+      platform_f     6    /* mark where to end the program for platforms which require this */
+      platform_f     7    jmp_buf PicocExitBuf;
+      platform_f     8    
+      platform_f     9    void PlatformCleanup()
+P   00000000              _PlatformCleanup:                ; function: PlatformCleanup
+                                                           ; frame size=0
+      platform_f    10    {
+      platform_f    11    }
+    00000000 000B                   RTS
+    00000002 0009                   NOP
+      platform_f    12    
+      platform_f    13    /* get a line of interactive input */
+      platform_f    14    char *PlatformGetLine(char *Buf, int MaxLen, const char *Prompt)
+    00000004              _PlatformGetLine:                ; function: PlatformGetLine
+                                                           ; frame size=0
+      platform_f    15    {
+      platform_f    16            return NULL;
+      platform_f    17    }
+    00000004 000B                   RTS
+    00000006 E000                   MOV         #0,R0
+      platform_f    18    
+      platform_f    19    /* get a character of interactive input */
+      platform_f    20    int PlatformGetCharacter()
+    00000008              _PlatformGetCharacter:           ; function: PlatformGetCharacter
+                                                           ; frame size=0
+      platform_f    21    {
+      platform_f    22    }
+    00000008 000B                   RTS
+    0000000A 0009                   NOP
+      platform_f    23    
+      platform_f    24    /* write a character to the console */
+      platform_f    25    void PlatformPutc(unsigned char OutCh, union OutputStreamInfo *Stream)
+    0000000C              _PlatformPutc:                   ; function: PlatformPutc
+                                                           ; frame size=4
+      platform_f    26    {
+      platform_f    27        dConsolePutChar(OutCh);
+    0000000C D348                   MOV.L       L618+2,R3  ; _dConsolePutChar
+    0000000E 7FFC                   ADD         #-4,R15
+    00000010 2F40                   MOV.B       R4,@R15
+    00000012 64F0                   MOV.B       @R15,R4
+    00000014 432B                   JMP         @R3
+    00000016 7F04                   ADD         #4,R15
+      platform_f    28    }
+      platform_f    29    /* fx-9860 file ctrl*/
+      platform_f    30    
+      platform_f    31    typedef FONTCHARACTER fontc;
+      platform_f    32    
+      platform_f    33    fontc * CharToFont(const char * cfname,fontc * ffname)
+    00000018              _CharToFont:                     ; function: CharToFont
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:27  PAGE    2
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+                                                           ; frame size=12
+    00000018 2FE6                   MOV.L       R14,@-R15
+    0000001A 2FD6                   MOV.L       R13,@-R15
+    0000001C 4F22                   STS.L       PR,@-R15
+    0000001E 6D43                   MOV         R4,R13
+      platform_f    34    {
+      platform_f    35            int i,len = strlen(cfname);
+    00000020 D344                   MOV.L       L618+6,R3  ; _strlen
+    00000022 430B                   JSR         @R3
+    00000024 6E53                   MOV         R5,R14
+    00000026 6503                   MOV         R0,R5
+      platform_f    36            for(i=0; i<len ;++i)
+    00000028 E600                   MOV         #0,R6
+    0000002A 4515                   CMP/PL      R5
+    0000002C 8F09                   BF/S        L608
+    0000002E 6463                   MOV         R6,R4
+    00000030              L609:                             
+      platform_f    37                    ffname[i] = cfname[i];
+    00000030 6343                   MOV         R4,R3
+    00000032 4300                   SHLL        R3
+    00000034 33EC                   ADD         R14,R3
+    00000036 6043                   MOV         R4,R0
+    00000038 02DC                   MOV.B       @(R0,R13),R2
+    0000003A 7401                   ADD         #1,R4
+    0000003C 2321                   MOV.W       R2,@R3
+    0000003E 3453                   CMP/GE      R5,R4
+    00000040 8BF6                   BF          L609
+    00000042              L608:                             
+      platform_f    38            ffname[i]=0;
+    00000042 6043                   MOV         R4,R0
+    00000044 4000                   SHLL        R0
+    00000046 0E65                   MOV.W       R6,@(R0,R14)
+      platform_f    39            return ffname;
+      platform_f    40    }
+    00000048 4F26                   LDS.L       @R15+,PR
+    0000004A 60E3                   MOV         R14,R0
+    0000004C 6DF6                   MOV.L       @R15+,R13
+    0000004E 000B                   RTS
+    00000050 6EF6                   MOV.L       @R15+,R14
+      platform_f    41    
+      platform_f    42    char * FontToChar(const fontc *ffname,char *cfname)
+    00000052              _FontToChar:                     ; function: FontToChar
+                                                           ; frame size=0
+      platform_f    43    {
+      platform_f    44            int i = 0;
+      platform_f    45            while((cfname[i]=ffname[i])!=0)++i;
+    00000052 A001                   BRA         L611
+    00000054 E000                   MOV         #0,R0
+    00000056              L612:                             
+    00000056 7001                   ADD         #1,R0
+    00000058              L611:                             
+    00000058 6203                   MOV         R0,R2
+    0000005A 325C                   ADD         R5,R2
+    0000005C 6303                   MOV         R0,R3
+    0000005E 4300                   SHLL        R3
+    00000060 334C                   ADD         R4,R3
+    00000062 E101                   MOV         #1,R1
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:27  PAGE    3
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000064 313C                   ADD         R3,R1
+    00000066 6310                   MOV.B       @R1,R3
+    00000068 2230                   MOV.B       R3,@R2
+    0000006A 2338                   TST         R3,R3
+    0000006C 8BF3                   BF          L612
+      platform_f    46            return cfname;
+      platform_f    47    }
+    0000006E 000B                   RTS
+    00000070 6053                   MOV         R5,R0
+      platform_f    48    
+      platform_f    49    int     OpenFile (const char * cfname,int mode)
+    00000072              _OpenFile:                       ; function: OpenFile
+                                                           ; frame size=72
+    00000072 4F22                   STS.L       PR,@-R15
+    00000074 7FBC                   ADD         #-68,R15
+    00000076 2F52                   MOV.L       R5,@R15
+      platform_f    50    {
+      platform_f    51            fontc ffname[32];
+      platform_f    52    
+      platform_f    53            CharToFont(cfname,ffname);
+    00000078 65F3                   MOV         R15,R5
+    0000007A BFCD                   BSR         _CharToFont
+    0000007C 7504                   ADD         #4,R5
+      platform_f    54    
+      platform_f    55            return Bfile_OpenFile(ffname,mode);
+    0000007E 64F3                   MOV         R15,R4
+    00000080 D32D                   MOV.L       L618+10,R3 ; _Bfile_OpenFile
+    00000082 65F2                   MOV.L       @R15,R5
+    00000084 430B                   JSR         @R3
+    00000086 7404                   ADD         #4,R4
+      platform_f    56    }
+    00000088 7F44                   ADD         #68,R15
+    0000008A 4F26                   LDS.L       @R15+,PR
+    0000008C 000B                   RTS
+    0000008E 0009                   NOP
+      platform_f    57    
+      platform_f    58    /* read a file into memory */
+      platform_f    59    char *PlatformReadFile(const char *FileName)
+    00000090              _PlatformReadFile:               ; function: PlatformReadFile
+                                                           ; frame size=20
+    00000090 2FE6                   MOV.L       R14,@-R15
+    00000092 2FD6                   MOV.L       R13,@-R15
+    00000094 2FC6                   MOV.L       R12,@-R15
+    00000096 4F22                   STS.L       PR,@-R15
+      platform_f    60    {
+      platform_f    61        char *      ReadText;
+      platform_f    62        int         BytesRead,FileSize;
+      platform_f    63            int             FileHandle;
+      platform_f    64    
+      platform_f    65            FileHandle = OpenFile(FileName,_OPENMODE_READ);
+    00000098 BFEB                   BSR         _OpenFile
+    0000009A E501                   MOV         #1,R5
+    0000009C 6D03                   MOV         R0,R13
+      platform_f    66            
+      platform_f    67            if (FileHandle < 0)
+    0000009E 4D11                   CMP/PZ      R13
+    000000A0 8905                   BT          L615
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:27  PAGE    4
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+      platform_f    68                    ProgramFail(NULL, "cannot open\n");
+    000000A2 D326                   MOV.L       L618+14,R3 ; L598
+    000000A4 D226                   MOV.L       L618+18,R2 ; _ProgramFail
+    000000A6 2F36                   MOV.L       R3,@-R15
+    000000A8 420B                   JSR         @R2
+    000000AA E400                   MOV         #0,R4
+    000000AC 7F04                   ADD         #4,R15
+    000000AE              L615:                             
+      platform_f    69            FileSize = Bfile_GetFileSize(FileHandle);
+    000000AE D325                   MOV.L       L618+22,R3 ; _Bfile_GetFileSize
+    000000B0 430B                   JSR         @R3
+    000000B2 64D3                   MOV         R13,R4
+      platform_f    70    
+      platform_f    71        ReadText = malloc(FileSize + 1);
+    000000B4 D224                   MOV.L       L618+26,R2 ; _malloc
+    000000B6 6C03                   MOV         R0,R12
+    000000B8 6403                   MOV         R0,R4
+    000000BA 420B                   JSR         @R2
+    000000BC 7401                   ADD         #1,R4
+    000000BE 6E03                   MOV         R0,R14
+      platform_f    72    
+      platform_f    73        if (ReadText == NULL)
+    000000C0 2EE8                   TST         R14,R14
+    000000C2 8B05                   BF          L616
+      platform_f    74            ProgramFail(NULL, "out of memory\n");
+    000000C4 D221                   MOV.L       L618+30,R2 ; L599
+    000000C6 2F26                   MOV.L       R2,@-R15
+    000000C8 D31D                   MOV.L       L618+18,R3 ; _ProgramFail
+    000000CA 430B                   JSR         @R3
+    000000CC E400                   MOV         #0,R4
+    000000CE 7F04                   ADD         #4,R15
+    000000D0              L616:                             
+      platform_f    75    
+      platform_f    76        BytesRead = Bfile_ReadFile(FileHandle,ReadText,FileSize,0);
+    000000D0 D21F                   MOV.L       L618+34,R2 ; _Bfile_ReadFile
+    000000D2 E700                   MOV         #0,R7
+    000000D4 66C3                   MOV         R12,R6
+    000000D6 65E3                   MOV         R14,R5
+    000000D8 420B                   JSR         @R2
+    000000DA 64D3                   MOV         R13,R4
+      platform_f    77    
+      platform_f    78        ReadText[BytesRead] = '\0';
+      platform_f    79        
+      platform_f    80            Bfile_CloseFile(FileHandle);
+    000000DC D21D                   MOV.L       L618+38,R2 ; _Bfile_CloseFile
+    000000DE E300                   MOV         #0,R3
+    000000E0 0E34                   MOV.B       R3,@(R0,R14)
+    000000E2 420B                   JSR         @R2
+    000000E4 64D3                   MOV         R13,R4
+      platform_f    81    
+      platform_f    82            return ReadText;
+    000000E6 60E3                   MOV         R14,R0
+      platform_f    83    }
+    000000E8 4F26                   LDS.L       @R15+,PR
+    000000EA 6CF6                   MOV.L       @R15+,R12
+    000000EC 6DF6                   MOV.L       @R15+,R13
+    000000EE 000B                   RTS
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:27  PAGE    5
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000000F0 6EF6                   MOV.L       @R15+,R14
+      platform_f    84    
+      platform_f    85    /* read and scan a file for definitions */
+      platform_f    86    void PicocPlatformScanFile(const char *FileName)
+    000000F2              _PicocPlatformScanFile:          ; function: PicocPlatformScanFile
+                                                           ; frame size=24
+    000000F2 2FE6                   MOV.L       R14,@-R15
+    000000F4 4F22                   STS.L       PR,@-R15
+    000000F6 7FFC                   ADD         #-4,R15
+      platform_f    87    {
+      platform_f    88        char *SourceStr = PlatformReadFile(FileName);
+    000000F8 BFCA                   BSR         _PlatformReadFile
+    000000FA 2F42                   MOV.L       R4,@R15
+      platform_f    89    
+      platform_f    90        PicocParse(FileName, SourceStr, strlen(SourceStr), TRUE, FALSE, TRUE);
+    000000FC D10D                   MOV.L       L618+6,R1  ; _strlen
+    000000FE 6E03                   MOV         R0,R14
+    00000100 E201                   MOV         #1,R2
+    00000102 E300                   MOV         #0,R3
+    00000104 2F26                   MOV.L       R2,@-R15
+    00000106 2F36                   MOV.L       R3,@-R15
+    00000108 2F26                   MOV.L       R2,@-R15
+    0000010A 410B                   JSR         @R1
+    0000010C 64E3                   MOV         R14,R4
+    0000010E 6603                   MOV         R0,R6
+    00000110 54F3                   MOV.L       @(12,R15),R4
+    00000112 65E3                   MOV         R14,R5
+    00000114 D310                   MOV.L       L618+42,R3 ; _PicocParse
+    00000116 430B                   JSR         @R3
+    00000118 67F6                   MOV.L       @R15+,R7
+      platform_f    91    }
+    0000011A 7F0C                   ADD         #12,R15
+    0000011C 4F26                   LDS.L       @R15+,PR
+    0000011E 000B                   RTS
+    00000120 6EF6                   MOV.L       @R15+,R14
+      platform_f    92    
+      platform_f    93    /* exit the program */
+      platform_f    94    void PlatformExit(int RetVal)
+    00000122              _PlatformExit:                   ; function: PlatformExit
+                                                           ; frame size=0
+      platform_f    95    {
+      platform_f    96        PicocExitValue = RetVal;
+    00000122 D30E                   MOV.L       L618+46,R3 ; _PicocExitValue
+      platform_f    97        longjmp(PicocExitBuf, 1);
+    00000124 D20F                   MOV.L       L618+54,R2 ; _longjmp
+    00000126 2342                   MOV.L       R4,@R3
+    00000128 D40D                   MOV.L       L618+50,R4 ; _PicocExitBuf
+    0000012A 422B                   JMP         @R2
+    0000012C E501                   MOV         #1,R5
+    0000012E              L618:                             
+    0000012E 0000                   .DATA.W     0
+    00000130 <00000000>             .DATA.L     _dConsolePutChar
+    00000134 <00000000>             .DATA.L     _strlen
+    00000138 <00000000>             .DATA.L     _Bfile_OpenFile
+    0000013C <00000000>             .DATA.L     L598
+    00000140 <00000000>             .DATA.L     _ProgramFail
+    00000144 <00000000>             .DATA.L     _Bfile_GetFileSize
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:27  PAGE    6
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000148 <00000000>             .DATA.L     _malloc
+    0000014C <00000000>             .DATA.L     L599
+    00000150 <00000000>             .DATA.L     _Bfile_ReadFile
+    00000154 <00000000>             .DATA.L     _Bfile_CloseFile
+    00000158 <00000000>             .DATA.L     _PicocParse
+    0000015C <00000000>             .DATA.L     _PicocExitValue
+    00000160 <00000000>             .DATA.L     _PicocExitBuf
+    00000164 <00000000>             .DATA.L     _longjmp
+      platform_f    98    }
+      platform_f    99    
+C   00000000              L598:
+    00000000 63616E6E6F             .SDATA      "cannot open"
+             74206F7065   
+             6E           
+    0000000B 0A00                   .DATA.B     H'0A,H'00
+    0000000D 00000001               .RES.B      1
+    0000000E 00000002               .RES.W      1
+    00000010              L599:
+    00000010 6F7574206F             .SDATA      "out of memory"
+             66206D656D   
+             6F7279       
+    0000001D 0A00                   .DATA.B     H'0A,H'00
+B   00000000              _PicocExitBuf:                   ; static: PicocExitBuf
+    00000000 00000050               .RES.L      20
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:27  PAGE    1
+
+
+******** STATISTICS INFORMATION ********
+
+
+********** ERROR INFORMATION ***********
+
+NUMBER OF ERRORS:           0
+NUMBER OF WARNINGS:         0
+
+
+
+
+******* SOURCE LINE INFORMATION ********
+
+COMPILED SOURCE LINE:       99
+
+
+
+******* SECTION SIZE INFORMATION *******
+
+PROGRAM  SECTION (P):                               00000168 Byte(s)
+CONSTANT SECTION (C):                               0000001F Byte(s)
+DATA     SECTION (D):                               00000000 Byte(s)
+BSS      SECTION (B):                               00000050 Byte(s)
+
+ TOTAL PROGRAM SIZE: 000001D7 Byte(s)
+
+
+
+********** LABEL INFORMATION ***********
+
+NUMBER OF EXTERNAL REFERENCE SYMBOLS:           11
+NUMBER OF EXTERNAL DEFINITION SYMBOLS:          11
+NUMBER OF INTERNAL/EXTERNAL SYMBOLS:            31
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*** COMMAND PARAMETER ***
+
+
+  -subcommand=C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\hmk34A.tmp 
+

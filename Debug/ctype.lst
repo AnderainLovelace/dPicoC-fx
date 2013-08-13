@@ -1,0 +1,599 @@
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:28  PAGE    1
+
+************ OBJECT LISTING ************
+
+FILE NAME: E:\Anderain\fx-9860\dPicoc\cstdlib\ctype.c
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+         ctype.c     1    /* string.h library for large systems - small embedded systems use clibrary.c instead */
+         ctype.c     2    #include <ctype.h>
+         ctype.c     3    #include "../interpreter.h"
+         ctype.c     4    
+         ctype.c     5    #ifndef BUILTIN_MINI_STDLIB
+         ctype.c     6    
+         ctype.c     7    void StdIsalnum(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+P   00000000              _StdIsalnum:                     ; function: StdIsalnum
+                                                           ; frame size=0
+         ctype.c     8    {
+         ctype.c     9        ReturnValue->Val->Integer = isalnum(Param[0]->Val->Integer);
+    00000000 5351                   MOV.L       @(4,R5),R3
+    00000002 6062                   MOV.L       @R6,R0
+    00000004 D154                   MOV.L       L610,R1    ; __ctype
+    00000006 5001                   MOV.L       @(4,R0),R0
+    00000008 8403                   MOV.B       @(3,R0),R0
+    0000000A 600C                   EXTU.B      R0,R0
+    0000000C 001C                   MOV.B       @(R0,R1),R0
+    0000000E 600C                   EXTU.B      R0,R0
+    00000010 C907                   AND         #7,R0
+         ctype.c    10    }
+    00000012 000B                   RTS
+    00000014 2302                   MOV.L       R0,@R3
+         ctype.c    11    
+         ctype.c    12    void StdIsalpha(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    00000016              _StdIsalpha:                     ; function: StdIsalpha
+                                                           ; frame size=0
+         ctype.c    13    {
+         ctype.c    14        ReturnValue->Val->Integer = isalpha(Param[0]->Val->Integer);
+    00000016 5351                   MOV.L       @(4,R5),R3
+    00000018 6062                   MOV.L       @R6,R0
+    0000001A 5001                   MOV.L       @(4,R0),R0
+    0000001C D14E                   MOV.L       L610,R1    ; __ctype
+    0000001E 8403                   MOV.B       @(3,R0),R0
+    00000020 600C                   EXTU.B      R0,R0
+    00000022 001C                   MOV.B       @(R0,R1),R0
+    00000024 600C                   EXTU.B      R0,R0
+    00000026 C903                   AND         #3,R0
+         ctype.c    15    }
+    00000028 000B                   RTS
+    0000002A 2302                   MOV.L       R0,@R3
+         ctype.c    16    
+         ctype.c    17    void StdIsblank(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    0000002C              _StdIsblank:                     ; function: StdIsblank
+                                                           ; frame size=0
+         ctype.c    18    {
+         ctype.c    19        int ch = Param[0]->Val->Integer;
+    0000002C 6462                   MOV.L       @R6,R4
+    0000002E 5441                   MOV.L       @(4,R4),R4
+         ctype.c    20        ReturnValue->Val->Integer = (ch == ' ') | (ch == '\t');
+    00000030 5351                   MOV.L       @(4,R5),R3
+    00000032 6042                   MOV.L       @R4,R0
+    00000034 8809                   CMP/EQ      #9,R0
+    00000036 0129                   MOVT        R1
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:28  PAGE    2
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000038 8820                   CMP/EQ      #32,R0
+    0000003A 0029                   MOVT        R0
+    0000003C 201B                   OR          R1,R0
+         ctype.c    21    }
+    0000003E 000B                   RTS
+    00000040 2302                   MOV.L       R0,@R3
+         ctype.c    22    
+         ctype.c    23    void StdIscntrl(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    00000042              _StdIscntrl:                     ; function: StdIscntrl
+                                                           ; frame size=0
+         ctype.c    24    {
+         ctype.c    25        ReturnValue->Val->Integer = iscntrl(Param[0]->Val->Integer);
+    00000042 5351                   MOV.L       @(4,R5),R3
+    00000044 6062                   MOV.L       @R6,R0
+    00000046 5001                   MOV.L       @(4,R0),R0
+    00000048 D143                   MOV.L       L610,R1    ; __ctype
+    0000004A 8403                   MOV.B       @(3,R0),R0
+    0000004C 600C                   EXTU.B      R0,R0
+    0000004E 001C                   MOV.B       @(R0,R1),R0
+    00000050 600C                   EXTU.B      R0,R0
+    00000052 C920                   AND         #32,R0
+         ctype.c    26    }
+    00000054 000B                   RTS
+    00000056 2302                   MOV.L       R0,@R3
+         ctype.c    27    
+         ctype.c    28    void StdIsdigit(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    00000058              _StdIsdigit:                     ; function: StdIsdigit
+                                                           ; frame size=0
+         ctype.c    29    {
+         ctype.c    30        ReturnValue->Val->Integer = isdigit(Param[0]->Val->Integer);
+    00000058 5351                   MOV.L       @(4,R5),R3
+    0000005A 6062                   MOV.L       @R6,R0
+    0000005C D13E                   MOV.L       L610,R1    ; __ctype
+    0000005E 5001                   MOV.L       @(4,R0),R0
+    00000060 8403                   MOV.B       @(3,R0),R0
+    00000062 600C                   EXTU.B      R0,R0
+    00000064 001C                   MOV.B       @(R0,R1),R0
+    00000066 600C                   EXTU.B      R0,R0
+    00000068 C904                   AND         #4,R0
+         ctype.c    31    }
+    0000006A 000B                   RTS
+    0000006C 2302                   MOV.L       R0,@R3
+         ctype.c    32    
+         ctype.c    33    void StdIsgraph(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    0000006E              _StdIsgraph:                     ; function: StdIsgraph
+                                                           ; frame size=0
+         ctype.c    34    {
+         ctype.c    35        ReturnValue->Val->Integer = isgraph(Param[0]->Val->Integer);
+    0000006E 5351                   MOV.L       @(4,R5),R3
+    00000070 6062                   MOV.L       @R6,R0
+    00000072 5001                   MOV.L       @(4,R0),R0
+    00000074 D138                   MOV.L       L610,R1    ; __ctype
+    00000076 8403                   MOV.B       @(3,R0),R0
+    00000078 600C                   EXTU.B      R0,R0
+    0000007A 001C                   MOV.B       @(R0,R1),R0
+    0000007C 600C                   EXTU.B      R0,R0
+    0000007E C917                   AND         #23,R0
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:28  PAGE    3
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+         ctype.c    36    }
+    00000080 000B                   RTS
+    00000082 2302                   MOV.L       R0,@R3
+         ctype.c    37    
+         ctype.c    38    void StdIslower(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    00000084              _StdIslower:                     ; function: StdIslower
+                                                           ; frame size=0
+         ctype.c    39    {
+         ctype.c    40        ReturnValue->Val->Integer = islower(Param[0]->Val->Integer);
+    00000084 5351                   MOV.L       @(4,R5),R3
+    00000086 6062                   MOV.L       @R6,R0
+    00000088 D133                   MOV.L       L610,R1    ; __ctype
+    0000008A 5001                   MOV.L       @(4,R0),R0
+    0000008C 8403                   MOV.B       @(3,R0),R0
+    0000008E 600C                   EXTU.B      R0,R0
+    00000090 001C                   MOV.B       @(R0,R1),R0
+    00000092 600C                   EXTU.B      R0,R0
+    00000094 C902                   AND         #2,R0
+         ctype.c    41    }
+    00000096 000B                   RTS
+    00000098 2302                   MOV.L       R0,@R3
+         ctype.c    42    
+         ctype.c    43    void StdIsprint(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    0000009A              _StdIsprint:                     ; function: StdIsprint
+                                                           ; frame size=0
+         ctype.c    44    {
+         ctype.c    45        ReturnValue->Val->Integer = isprint(Param[0]->Val->Integer);
+    0000009A 5351                   MOV.L       @(4,R5),R3
+    0000009C 6062                   MOV.L       @R6,R0
+    0000009E 5001                   MOV.L       @(4,R0),R0
+    000000A0 D12D                   MOV.L       L610,R1    ; __ctype
+    000000A2 8403                   MOV.B       @(3,R0),R0
+    000000A4 600C                   EXTU.B      R0,R0
+    000000A6 001C                   MOV.B       @(R0,R1),R0
+    000000A8 600C                   EXTU.B      R0,R0
+    000000AA C91F                   AND         #31,R0
+         ctype.c    46    }
+    000000AC 000B                   RTS
+    000000AE 2302                   MOV.L       R0,@R3
+         ctype.c    47    
+         ctype.c    48    void StdIspunct(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    000000B0              _StdIspunct:                     ; function: StdIspunct
+                                                           ; frame size=0
+         ctype.c    49    {
+         ctype.c    50        ReturnValue->Val->Integer = ispunct(Param[0]->Val->Integer);
+    000000B0 5351                   MOV.L       @(4,R5),R3
+    000000B2 6062                   MOV.L       @R6,R0
+    000000B4 D128                   MOV.L       L610,R1    ; __ctype
+    000000B6 5001                   MOV.L       @(4,R0),R0
+    000000B8 8403                   MOV.B       @(3,R0),R0
+    000000BA 600C                   EXTU.B      R0,R0
+    000000BC 001C                   MOV.B       @(R0,R1),R0
+    000000BE 600C                   EXTU.B      R0,R0
+    000000C0 C910                   AND         #16,R0
+         ctype.c    51    }
+    000000C2 000B                   RTS
+    000000C4 2302                   MOV.L       R0,@R3
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:28  PAGE    4
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+         ctype.c    52    
+         ctype.c    53    void StdIsspace(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    000000C6              _StdIsspace:                     ; function: StdIsspace
+                                                           ; frame size=0
+         ctype.c    54    {
+         ctype.c    55        ReturnValue->Val->Integer = isspace(Param[0]->Val->Integer);
+    000000C6 5351                   MOV.L       @(4,R5),R3
+    000000C8 6062                   MOV.L       @R6,R0
+    000000CA 5001                   MOV.L       @(4,R0),R0
+    000000CC D122                   MOV.L       L610,R1    ; __ctype
+    000000CE 8403                   MOV.B       @(3,R0),R0
+    000000D0 600C                   EXTU.B      R0,R0
+    000000D2 001C                   MOV.B       @(R0,R1),R0
+    000000D4 600C                   EXTU.B      R0,R0
+    000000D6 C940                   AND         #64,R0
+         ctype.c    56    }
+    000000D8 000B                   RTS
+    000000DA 2302                   MOV.L       R0,@R3
+         ctype.c    57    
+         ctype.c    58    void StdIsupper(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    000000DC              _StdIsupper:                     ; function: StdIsupper
+                                                           ; frame size=0
+         ctype.c    59    {
+         ctype.c    60        ReturnValue->Val->Integer = isupper(Param[0]->Val->Integer);
+    000000DC 5351                   MOV.L       @(4,R5),R3
+    000000DE 6062                   MOV.L       @R6,R0
+    000000E0 D11D                   MOV.L       L610,R1    ; __ctype
+    000000E2 5001                   MOV.L       @(4,R0),R0
+    000000E4 8403                   MOV.B       @(3,R0),R0
+    000000E6 600C                   EXTU.B      R0,R0
+    000000E8 001C                   MOV.B       @(R0,R1),R0
+    000000EA 600C                   EXTU.B      R0,R0
+    000000EC C901                   AND         #1,R0
+         ctype.c    61    }
+    000000EE 000B                   RTS
+    000000F0 2302                   MOV.L       R0,@R3
+         ctype.c    62    
+         ctype.c    63    void StdIsxdigit(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    000000F2              _StdIsxdigit:                    ; function: StdIsxdigit
+                                                           ; frame size=0
+         ctype.c    64    {
+         ctype.c    65        ReturnValue->Val->Integer = isxdigit(Param[0]->Val->Integer);
+    000000F2 5351                   MOV.L       @(4,R5),R3
+    000000F4 6062                   MOV.L       @R6,R0
+    000000F6 5001                   MOV.L       @(4,R0),R0
+    000000F8 D117                   MOV.L       L610,R1    ; __ctype
+    000000FA 8403                   MOV.B       @(3,R0),R0
+    000000FC 600C                   EXTU.B      R0,R0
+    000000FE 001C                   MOV.B       @(R0,R1),R0
+    00000100 600C                   EXTU.B      R0,R0
+    00000102 C980                   AND         #128,R0
+         ctype.c    66    }
+    00000104 000B                   RTS
+    00000106 2302                   MOV.L       R0,@R3
+         ctype.c    67    
+         ctype.c    68    void StdTolower(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    00000108              _StdTolower:                     ; function: StdTolower
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:28  PAGE    5
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+                                                           ; frame size=8
+         ctype.c    69    {
+         ctype.c    70        ReturnValue->Val->Integer = tolower(Param[0]->Val->Integer);
+    00000108 D113                   MOV.L       L610,R1    ; __ctype
+    0000010A 7FF8                   ADD         #-8,R15
+    0000010C 5351                   MOV.L       @(4,R5),R3
+    0000010E 6462                   MOV.L       @R6,R4
+    00000110 1F41                   MOV.L       R4,@(4,R15)
+    00000112 5441                   MOV.L       @(4,R4),R4
+    00000114 2F42                   MOV.L       R4,@R15
+    00000116 6442                   MOV.L       @R4,R4
+    00000118 604C                   EXTU.B      R4,R0
+    0000011A 001C                   MOV.B       @(R0,R1),R0
+    0000011C 600C                   EXTU.B      R0,R0
+    0000011E C801                   TST         #1,R0
+    00000120 8902                   BT          L606
+    00000122 6243                   MOV         R4,R2
+    00000124 A001                   BRA         L607
+    00000126 7220                   ADD         #32,R2
+    00000128              L606:                             
+    00000128 6243                   MOV         R4,R2
+    0000012A              L607:                             
+    0000012A 2322                   MOV.L       R2,@R3
+         ctype.c    71    }
+    0000012C 000B                   RTS
+    0000012E 7F08                   ADD         #8,R15
+         ctype.c    72    
+         ctype.c    73    void StdToupper(struct ParseState *Parser, struct Value *ReturnValue, struct Value **Param, int NumArgs)
+    00000130              _StdToupper:                     ; function: StdToupper
+                                                           ; frame size=8
+         ctype.c    74    {
+         ctype.c    75        ReturnValue->Val->Integer = toupper(Param[0]->Val->Integer);
+    00000130 D109                   MOV.L       L610,R1    ; __ctype
+    00000132 7FF8                   ADD         #-8,R15
+    00000134 5351                   MOV.L       @(4,R5),R3
+    00000136 6462                   MOV.L       @R6,R4
+    00000138 1F41                   MOV.L       R4,@(4,R15)
+    0000013A 5441                   MOV.L       @(4,R4),R4
+    0000013C 2F42                   MOV.L       R4,@R15
+    0000013E 6442                   MOV.L       @R4,R4
+    00000140 604C                   EXTU.B      R4,R0
+    00000142 001C                   MOV.B       @(R0,R1),R0
+    00000144 600C                   EXTU.B      R0,R0
+    00000146 C802                   TST         #2,R0
+    00000148 8902                   BT          L608
+    0000014A 6243                   MOV         R4,R2
+    0000014C A001                   BRA         L609
+    0000014E 72E0                   ADD         #-32,R2
+    00000150              L608:                             
+    00000150 6243                   MOV         R4,R2
+    00000152              L609:                             
+    00000152 2322                   MOV.L       R2,@R3
+         ctype.c    76    }
+    00000154 000B                   RTS
+    00000156 7F08                   ADD         #8,R15
+    00000158              L610:                             
+    00000158 <00000000>             .DATA.L     __ctype
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:28  PAGE    6
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+         ctype.c    77    
+         ctype.c    78    /* all string.h functions */
+         ctype.c    79    struct LibraryFunction StdCtypeFunctions[] =
+         ctype.c    80    {
+         ctype.c    81        { StdIsalnum,      "int isalnum(int);" },
+         ctype.c    82        { StdIsalpha,      "int isalpha(int);" },
+         ctype.c    83        { StdIsblank,      "int isblank(int);" },
+         ctype.c    84        { StdIscntrl,      "int iscntrl(int);" },
+         ctype.c    85        { StdIsdigit,      "int isdigit(int);" },
+         ctype.c    86        { StdIsgraph,      "int isgraph(int);" },
+         ctype.c    87        { StdIslower,      "int islower(int);" },
+         ctype.c    88        { StdIsprint,      "int isprint(int);" },
+         ctype.c    89        { StdIspunct,      "int ispunct(int);" },
+         ctype.c    90        { StdIsspace,      "int isspace(int);" },
+         ctype.c    91        { StdIsupper,      "int isupper(int);" },
+         ctype.c    92        { StdIsxdigit,     "int isxdigit(int);" },
+         ctype.c    93        { StdTolower,      "int tolower(int);" },
+         ctype.c    94        { StdToupper,      "int toupper(int);" },
+         ctype.c    95        { NULL,             NULL }
+         ctype.c    96    };
+         ctype.c    97    
+         ctype.c    98    #endif /* !BUILTIN_MINI_STDLIB */
+D   00000000              _StdCtypeFunctions:              ; static: StdCtypeFunctions
+    00000000 <00000000>             .DATA.L     _StdIsalnum,L578,_StdIsalpha,L579,_StdIsblank,L580,_StdIscntrl,L581,_StdIsdigit,
+             <00000000> +                       L582,_StdIsgraph,L583,_StdIslower,L584,_StdIsprint,L585,_StdIspunct,L586,
+             <00000000> +                       _StdIsspace,L587,_StdIsupper,L588,_StdIsxdigit,L589,_StdTolower,L590,_StdToupper,
+             <00000000> +                       L591
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+             <00000000>   
+    00000070 0000000000             .DATA.L     H'00000000,H'00000000
+             000000       
+C   00000000              L578:
+    00000000 696E742069             .SDATA      "int isalnum(int);"
+             73616C6E75   
+             6D28696E74   
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:28  PAGE    7
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+             293B         
+    00000011 00                     .DATA.B     H'00
+    00000012 00000002               .RES.W      1
+    00000014              L579:
+    00000014 696E742069             .SDATA      "int isalpha(int);"
+             73616C7068   
+             6128696E74   
+             293B         
+    00000025 00                     .DATA.B     H'00
+    00000026 00000002               .RES.W      1
+    00000028              L580:
+    00000028 696E742069             .SDATA      "int isblank(int);"
+             73626C616E   
+             6B28696E74   
+             293B         
+    00000039 00                     .DATA.B     H'00
+    0000003A 00000002               .RES.W      1
+    0000003C              L581:
+    0000003C 696E742069             .SDATA      "int iscntrl(int);"
+             73636E7472   
+             6C28696E74   
+             293B         
+    0000004D 00                     .DATA.B     H'00
+    0000004E 00000002               .RES.W      1
+    00000050              L582:
+    00000050 696E742069             .SDATA      "int isdigit(int);"
+             7364696769   
+             7428696E74   
+             293B         
+    00000061 00                     .DATA.B     H'00
+    00000062 00000002               .RES.W      1
+    00000064              L583:
+    00000064 696E742069             .SDATA      "int isgraph(int);"
+             7367726170   
+             6828696E74   
+             293B         
+    00000075 00                     .DATA.B     H'00
+    00000076 00000002               .RES.W      1
+    00000078              L584:
+    00000078 696E742069             .SDATA      "int islower(int);"
+             736C6F7765   
+             7228696E74   
+             293B         
+    00000089 00                     .DATA.B     H'00
+    0000008A 00000002               .RES.W      1
+    0000008C              L585:
+    0000008C 696E742069             .SDATA      "int isprint(int);"
+             737072696E   
+             7428696E74   
+             293B         
+    0000009D 00                     .DATA.B     H'00
+    0000009E 00000002               .RES.W      1
+    000000A0              L586:
+    000000A0 696E742069             .SDATA      "int ispunct(int);"
+             7370756E63   
+             7428696E74   
+             293B         
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:28  PAGE    8
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000000B1 00                     .DATA.B     H'00
+    000000B2 00000002               .RES.W      1
+    000000B4              L587:
+    000000B4 696E742069             .SDATA      "int isspace(int);"
+             7373706163   
+             6528696E74   
+             293B         
+    000000C5 00                     .DATA.B     H'00
+    000000C6 00000002               .RES.W      1
+    000000C8              L588:
+    000000C8 696E742069             .SDATA      "int isupper(int);"
+             7375707065   
+             7228696E74   
+             293B         
+    000000D9 00                     .DATA.B     H'00
+    000000DA 00000002               .RES.W      1
+    000000DC              L589:
+    000000DC 696E742069             .SDATA      "int isxdigit(int);"
+             7378646967   
+             697428696E   
+             74293B       
+    000000EE 00                     .DATA.B     H'00
+    000000EF 00000001               .RES.B      1
+    000000F0              L590:
+    000000F0 696E742074             .SDATA      "int tolower(int);"
+             6F6C6F7765   
+             7228696E74   
+             293B         
+    00000101 00                     .DATA.B     H'00
+    00000102 00000002               .RES.W      1
+    00000104              L591:
+    00000104 696E742074             .SDATA      "int toupper(int);"
+             6F75707065   
+             7228696E74   
+             293B         
+    00000115 00                     .DATA.B     H'00
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:28  PAGE    1
+
+
+******** STATISTICS INFORMATION ********
+
+
+********** ERROR INFORMATION ***********
+
+NUMBER OF ERRORS:           0
+NUMBER OF WARNINGS:         0
+
+
+
+
+******* SOURCE LINE INFORMATION ********
+
+COMPILED SOURCE LINE:       97
+
+
+
+******* SECTION SIZE INFORMATION *******
+
+PROGRAM  SECTION (P):                               0000015C Byte(s)
+CONSTANT SECTION (C):                               00000116 Byte(s)
+DATA     SECTION (D):                               00000078 Byte(s)
+BSS      SECTION (B):                               00000000 Byte(s)
+
+ TOTAL PROGRAM SIZE: 000002EA Byte(s)
+
+
+
+********** LABEL INFORMATION ***********
+
+NUMBER OF EXTERNAL REFERENCE SYMBOLS:            1
+NUMBER OF EXTERNAL DEFINITION SYMBOLS:          15
+NUMBER OF INTERNAL/EXTERNAL SYMBOLS:            35
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*** COMMAND PARAMETER ***
+
+
+  -subcommand=C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\hmk34B.tmp 
+

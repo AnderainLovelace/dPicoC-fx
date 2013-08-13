@@ -1,0 +1,929 @@
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:29  PAGE    1
+
+************ OBJECT LISTING ************
+
+FILE NAME: E:\Anderain\fx-9860\dPicoc\cstdlib\errno.c
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+         errno.c     1    /* string.h library for large systems - small embedded systems use clibrary.c instead */
+         errno.c     2    #include <errno.h>
+         errno.c     3    #include "../interpreter.h"
+         errno.c     4    
+         errno.c     5    #ifndef BUILTIN_MINI_STDLIB
+         errno.c     6    
+         errno.c     7    #ifdef EACCES
+         errno.c     8    static int EACCESValue = EACCES;
+         errno.c     9    #endif
+         errno.c    10    
+         errno.c    11    #ifdef EADDRINUSE
+         errno.c    12    static int EADDRINUSEValue = EADDRINUSE;
+         errno.c    13    #endif
+         errno.c    14    
+         errno.c    15    #ifdef EADDRNOTAVAIL
+         errno.c    16    static int EADDRNOTAVAILValue = EADDRNOTAVAIL;
+         errno.c    17    #endif
+         errno.c    18    
+         errno.c    19    #ifdef EAFNOSUPPORT
+         errno.c    20    static int EAFNOSUPPORTValue = EAFNOSUPPORT;
+         errno.c    21    #endif
+         errno.c    22    
+         errno.c    23    #ifdef EAGAIN
+         errno.c    24    static int EAGAINValue = EAGAIN;
+         errno.c    25    #endif
+         errno.c    26    
+         errno.c    27    #ifdef EALREADY
+         errno.c    28    static int EALREADYValue = EALREADY;
+         errno.c    29    #endif
+         errno.c    30    
+         errno.c    31    #ifdef EBADF
+         errno.c    32    static int EBADFValue = EBADF;
+         errno.c    33    #endif
+         errno.c    34    
+         errno.c    35    #ifdef EBADMSG
+         errno.c    36    static int EBADMSGValue = EBADMSG;
+         errno.c    37    #endif
+         errno.c    38    
+         errno.c    39    #ifdef EBUSY
+         errno.c    40    static int EBUSYValue = EBUSY;
+         errno.c    41    #endif
+         errno.c    42    
+         errno.c    43    #ifdef ECANCELED
+         errno.c    44    static int ECANCELEDValue = ECANCELED;
+         errno.c    45    #endif
+         errno.c    46    
+         errno.c    47    #ifdef ECHILD
+         errno.c    48    static int ECHILDValue = ECHILD;
+         errno.c    49    #endif
+         errno.c    50    
+         errno.c    51    #ifdef ECONNABORTED
+         errno.c    52    static int ECONNABORTEDValue = ECONNABORTED;
+         errno.c    53    #endif
+         errno.c    54    
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:29  PAGE    2
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+         errno.c    55    #ifdef ECONNREFUSED
+         errno.c    56    static int ECONNREFUSEDValue = ECONNREFUSED;
+         errno.c    57    #endif
+         errno.c    58    
+         errno.c    59    #ifdef ECONNRESET
+         errno.c    60    static int ECONNRESETValue = ECONNRESET;
+         errno.c    61    #endif
+         errno.c    62    
+         errno.c    63    #ifdef EDEADLK
+         errno.c    64    static int EDEADLKValue = EDEADLK;
+         errno.c    65    #endif
+         errno.c    66    
+         errno.c    67    #ifdef EDESTADDRREQ
+         errno.c    68    static int EDESTADDRREQValue = EDESTADDRREQ;
+         errno.c    69    #endif
+         errno.c    70    
+         errno.c    71    #ifdef EDOM
+         errno.c    72    static int EDOMValue = EDOM;
+         errno.c    73    #endif
+         errno.c    74    
+         errno.c    75    #ifdef EDQUOT
+         errno.c    76    static int EDQUOTValue = EDQUOT;
+         errno.c    77    #endif
+         errno.c    78    
+         errno.c    79    #ifdef EEXIST
+         errno.c    80    static int EEXISTValue = EEXIST;
+         errno.c    81    #endif
+         errno.c    82    
+         errno.c    83    #ifdef EFAULT
+         errno.c    84    static int EFAULTValue = EFAULT;
+         errno.c    85    #endif
+         errno.c    86    
+         errno.c    87    #ifdef EFBIG
+         errno.c    88    static int EFBIGValue = EFBIG;
+         errno.c    89    #endif
+         errno.c    90    
+         errno.c    91    #ifdef EHOSTUNREACH
+         errno.c    92    static int EHOSTUNREACHValue = EHOSTUNREACH;
+         errno.c    93    #endif
+         errno.c    94    
+         errno.c    95    #ifdef EIDRM
+         errno.c    96    static int EIDRMValue = EIDRM;
+         errno.c    97    #endif
+         errno.c    98    
+         errno.c    99    #ifdef EILSEQ
+         errno.c   100    static int EILSEQValue = EILSEQ;
+         errno.c   101    #endif
+         errno.c   102    
+         errno.c   103    #ifdef EINPROGRESS
+         errno.c   104    static int EINPROGRESSValue = EINPROGRESS;
+         errno.c   105    #endif
+         errno.c   106    
+         errno.c   107    #ifdef EINTR
+         errno.c   108    static int EINTRValue = EINTR;
+         errno.c   109    #endif
+         errno.c   110    
+         errno.c   111    #ifdef EINVAL
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:29  PAGE    3
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+         errno.c   112    static int EINVALValue = EINVAL;
+         errno.c   113    #endif
+         errno.c   114    
+         errno.c   115    #ifdef EIO
+         errno.c   116    static int EIOValue = EIO;
+         errno.c   117    #endif
+         errno.c   118    
+         errno.c   119    #ifdef EISCONN
+         errno.c   120    static int EISCONNValue = EISCONN;
+         errno.c   121    #endif
+         errno.c   122    
+         errno.c   123    #ifdef EISDIR
+         errno.c   124    static int EISDIRValue = EISDIR;
+         errno.c   125    #endif
+         errno.c   126    
+         errno.c   127    #ifdef ELOOP
+         errno.c   128    static int ELOOPValue = ELOOP;
+         errno.c   129    #endif
+         errno.c   130    
+         errno.c   131    #ifdef EMFILE
+         errno.c   132    static int EMFILEValue = EMFILE;
+         errno.c   133    #endif
+         errno.c   134    
+         errno.c   135    #ifdef EMLINK
+         errno.c   136    static int EMLINKValue = EMLINK;
+         errno.c   137    #endif
+         errno.c   138    
+         errno.c   139    #ifdef EMSGSIZE
+         errno.c   140    static int EMSGSIZEValue = EMSGSIZE;
+         errno.c   141    #endif
+         errno.c   142    
+         errno.c   143    #ifdef EMULTIHOP
+         errno.c   144    static int EMULTIHOPValue = EMULTIHOP;
+         errno.c   145    #endif
+         errno.c   146    
+         errno.c   147    #ifdef ENAMETOOLONG
+         errno.c   148    static int ENAMETOOLONGValue = ENAMETOOLONG;
+         errno.c   149    #endif
+         errno.c   150    
+         errno.c   151    #ifdef ENETDOWN
+         errno.c   152    static int ENETDOWNValue = ENETDOWN;
+         errno.c   153    #endif
+         errno.c   154    
+         errno.c   155    #ifdef ENETRESET
+         errno.c   156    static int ENETRESETValue = ENETRESET;
+         errno.c   157    #endif
+         errno.c   158    
+         errno.c   159    #ifdef ENETUNREACH
+         errno.c   160    static int ENETUNREACHValue = ENETUNREACH;
+         errno.c   161    #endif
+         errno.c   162    
+         errno.c   163    #ifdef ENFILE
+         errno.c   164    static int ENFILEValue = ENFILE;
+         errno.c   165    #endif
+         errno.c   166    
+         errno.c   167    #ifdef ENOBUFS
+         errno.c   168    static int ENOBUFSValue = ENOBUFS;
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:29  PAGE    4
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+         errno.c   169    #endif
+         errno.c   170    
+         errno.c   171    #ifdef ENODATA
+         errno.c   172    static int ENODATAValue = ENODATA;
+         errno.c   173    #endif
+         errno.c   174    
+         errno.c   175    #ifdef ENODEV
+         errno.c   176    static int ENODEVValue = ENODEV;
+         errno.c   177    #endif
+         errno.c   178    
+         errno.c   179    #ifdef ENOENT
+         errno.c   180    static int ENOENTValue = ENOENT;
+         errno.c   181    #endif
+         errno.c   182    
+         errno.c   183    #ifdef ENOEXEC
+         errno.c   184    static int ENOEXECValue = ENOEXEC;
+         errno.c   185    #endif
+         errno.c   186    
+         errno.c   187    #ifdef ENOLCK
+         errno.c   188    static int ENOLCKValue = ENOLCK;
+         errno.c   189    #endif
+         errno.c   190    
+         errno.c   191    #ifdef ENOLINK
+         errno.c   192    static int ENOLINKValue = ENOLINK;
+         errno.c   193    #endif
+         errno.c   194    
+         errno.c   195    #ifdef ENOMEM
+         errno.c   196    static int ENOMEMValue = ENOMEM;
+         errno.c   197    #endif
+         errno.c   198    
+         errno.c   199    #ifdef ENOMSG
+         errno.c   200    static int ENOMSGValue = ENOMSG;
+         errno.c   201    #endif
+         errno.c   202    
+         errno.c   203    #ifdef ENOPROTOOPT
+         errno.c   204    static int ENOPROTOOPTValue = ENOPROTOOPT;
+         errno.c   205    #endif
+         errno.c   206    
+         errno.c   207    #ifdef ENOSPC
+         errno.c   208    static int ENOSPCValue = ENOSPC;
+         errno.c   209    #endif
+         errno.c   210    
+         errno.c   211    #ifdef ENOSR
+         errno.c   212    static int ENOSRValue = ENOSR;
+         errno.c   213    #endif
+         errno.c   214    
+         errno.c   215    #ifdef ENOSTR
+         errno.c   216    static int ENOSTRValue = ENOSTR;
+         errno.c   217    #endif
+         errno.c   218    
+         errno.c   219    #ifdef ENOSYS
+         errno.c   220    static int ENOSYSValue = ENOSYS;
+         errno.c   221    #endif
+         errno.c   222    
+         errno.c   223    #ifdef ENOTCONN
+         errno.c   224    static int ENOTCONNValue = ENOTCONN;
+         errno.c   225    #endif
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:29  PAGE    5
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+         errno.c   226    
+         errno.c   227    #ifdef ENOTDIR
+         errno.c   228    static int ENOTDIRValue = ENOTDIR;
+         errno.c   229    #endif
+         errno.c   230    
+         errno.c   231    #ifdef ENOTEMPTY
+         errno.c   232    static int ENOTEMPTYValue = ENOTEMPTY;
+         errno.c   233    #endif
+         errno.c   234    
+         errno.c   235    #ifdef ENOTRECOVERABLE
+         errno.c   236    static int ENOTRECOVERABLEValue = ENOTRECOVERABLE;
+         errno.c   237    #endif
+         errno.c   238    
+         errno.c   239    #ifdef ENOTSOCK
+         errno.c   240    static int ENOTSOCKValue = ENOTSOCK;
+         errno.c   241    #endif
+         errno.c   242    
+         errno.c   243    #ifdef ENOTSUP
+         errno.c   244    static int ENOTSUPValue = ENOTSUP;
+         errno.c   245    #endif
+         errno.c   246    
+         errno.c   247    #ifdef ENOTTY
+         errno.c   248    static int ENOTTYValue = ENOTTY;
+         errno.c   249    #endif
+         errno.c   250    
+         errno.c   251    #ifdef ENXIO
+         errno.c   252    static int ENXIOValue = ENXIO;
+         errno.c   253    #endif
+         errno.c   254    
+         errno.c   255    #ifdef EOPNOTSUPP
+         errno.c   256    static int EOPNOTSUPPValue = EOPNOTSUPP;
+         errno.c   257    #endif
+         errno.c   258    
+         errno.c   259    #ifdef EOVERFLOW
+         errno.c   260    static int EOVERFLOWValue = EOVERFLOW;
+         errno.c   261    #endif
+         errno.c   262    
+         errno.c   263    #ifdef EOWNERDEAD
+         errno.c   264    static int EOWNERDEADValue = EOWNERDEAD;
+         errno.c   265    #endif
+         errno.c   266    
+         errno.c   267    #ifdef EPERM
+         errno.c   268    static int EPERMValue = EPERM;
+         errno.c   269    #endif
+         errno.c   270    
+         errno.c   271    #ifdef EPIPE
+         errno.c   272    static int EPIPEValue = EPIPE;
+         errno.c   273    #endif
+         errno.c   274    
+         errno.c   275    #ifdef EPROTO
+         errno.c   276    static int EPROTOValue = EPROTO;
+         errno.c   277    #endif
+         errno.c   278    
+         errno.c   279    #ifdef EPROTONOSUPPORT
+         errno.c   280    static int EPROTONOSUPPORTValue = EPROTONOSUPPORT;
+         errno.c   281    #endif
+         errno.c   282    
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:29  PAGE    6
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+         errno.c   283    #ifdef EPROTOTYPE
+         errno.c   284    static int EPROTOTYPEValue = EPROTOTYPE;
+         errno.c   285    #endif
+         errno.c   286    
+         errno.c   287    #ifdef ERANGE
+         errno.c   288    static int ERANGEValue = ERANGE;
+         errno.c   289    #endif
+         errno.c   290    
+         errno.c   291    #ifdef EROFS
+         errno.c   292    static int EROFSValue = EROFS;
+         errno.c   293    #endif
+         errno.c   294    
+         errno.c   295    #ifdef ESPIPE
+         errno.c   296    static int ESPIPEValue = ESPIPE;
+         errno.c   297    #endif
+         errno.c   298    
+         errno.c   299    #ifdef ESRCH
+         errno.c   300    static int ESRCHValue = ESRCH;
+         errno.c   301    #endif
+         errno.c   302    
+         errno.c   303    #ifdef ESTALE
+         errno.c   304    static int ESTALEValue = ESTALE;
+         errno.c   305    #endif
+         errno.c   306    
+         errno.c   307    #ifdef ETIME
+         errno.c   308    static int ETIMEValue = ETIME;
+         errno.c   309    #endif
+         errno.c   310    
+         errno.c   311    #ifdef ETIMEDOUT
+         errno.c   312    static int ETIMEDOUTValue = ETIMEDOUT;
+         errno.c   313    #endif
+         errno.c   314    
+         errno.c   315    #ifdef ETXTBSY
+         errno.c   316    static int ETXTBSYValue = ETXTBSY;
+         errno.c   317    #endif
+         errno.c   318    
+         errno.c   319    #ifdef EWOULDBLOCK
+         errno.c   320    static int EWOULDBLOCKValue = EWOULDBLOCK;
+         errno.c   321    #endif
+         errno.c   322    
+         errno.c   323    #ifdef EXDEV
+         errno.c   324    static int EXDEVValue = EXDEV;
+         errno.c   325    #endif
+         errno.c   326    
+         errno.c   327    
+         errno.c   328    /* creates various system-dependent definitions */
+         errno.c   329    void StdErrnoSetupFunc(void)
+P   00000000              _StdErrnoSetupFunc:              ; function: StdErrnoSetupFunc
+                                                           ; frame size=24
+    00000000 2FE6                   MOV.L       R14,@-R15
+         errno.c   330    {
+         errno.c   331        /* defines */
+         errno.c   332    #ifdef EACCES
+         errno.c   333        VariableDefinePlatformVar(NULL, "EACCES", &IntType, (union AnyValue *)&EACCESValue, FALSE);
+         errno.c   334    #endif
+         errno.c   335    
+         errno.c   336    #ifdef EADDRINUSE
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:29  PAGE    7
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+         errno.c   337        VariableDefinePlatformVar(NULL, "EADDRINUSE", &IntType, (union AnyValue *)&EADDRINUSEValue, FALSE);
+         errno.c   338    #endif
+         errno.c   339    
+         errno.c   340    #ifdef EADDRNOTAVAIL
+         errno.c   341        VariableDefinePlatformVar(NULL, "EADDRNOTAVAIL", &IntType, (union AnyValue *)&EADDRNOTAVAILValue, FALS
+                         +E);
+         errno.c   342    #endif
+         errno.c   343    
+         errno.c   344    #ifdef EAFNOSUPPORT
+         errno.c   345        VariableDefinePlatformVar(NULL, "EAFNOSUPPORT", &IntType, (union AnyValue *)&EAFNOSUPPORTValue, FALSE)
+                         +;
+         errno.c   346    #endif
+         errno.c   347    
+         errno.c   348    #ifdef EAGAIN
+         errno.c   349        VariableDefinePlatformVar(NULL, "EAGAIN", &IntType, (union AnyValue *)&EAGAINValue, FALSE);
+         errno.c   350    #endif
+         errno.c   351    
+         errno.c   352    #ifdef EALREADY
+         errno.c   353        VariableDefinePlatformVar(NULL, "EALREADY", &IntType, (union AnyValue *)&EALREADYValue, FALSE);
+         errno.c   354    #endif
+         errno.c   355    
+         errno.c   356    #ifdef EBADF
+         errno.c   357        VariableDefinePlatformVar(NULL, "EBADF", &IntType, (union AnyValue *)&EBADFValue, FALSE);
+    00000002 E300                   MOV         #0,R3
+    00000004 D711                   MOV.L       L508+6,R7  ; __$EBADFValue
+    00000006 4F22                   STS.L       PR,@-R15
+    00000008 DE0F                   MOV.L       L508+2,R14 ; _VariableDefinePlatformVar
+    0000000A 2F36                   MOV.L       R3,@-R15
+    0000000C D610                   MOV.L       L508+10,R6 ; _IntType
+    0000000E D511                   MOV.L       L508+14,R5 ; L497
+    00000010 4E0B                   JSR         @R14
+    00000012 6433                   MOV         R3,R4
+         errno.c   358    #endif
+         errno.c   359    
+         errno.c   360    #ifdef EBADMSG
+         errno.c   361        VariableDefinePlatformVar(NULL, "EBADMSG", &IntType, (union AnyValue *)&EBADMSGValue, FALSE);
+         errno.c   362    #endif
+         errno.c   363    
+         errno.c   364    #ifdef EBUSY
+         errno.c   365        VariableDefinePlatformVar(NULL, "EBUSY", &IntType, (union AnyValue *)&EBUSYValue, FALSE);
+         errno.c   366    #endif
+         errno.c   367    
+         errno.c   368    #ifdef ECANCELED
+         errno.c   369        VariableDefinePlatformVar(NULL, "ECANCELED", &IntType, (union AnyValue *)&ECANCELEDValue, FALSE);
+         errno.c   370    #endif
+         errno.c   371    
+         errno.c   372    #ifdef ECHILD
+         errno.c   373        VariableDefinePlatformVar(NULL, "ECHILD", &IntType, (union AnyValue *)&ECHILDValue, FALSE);
+         errno.c   374    #endif
+         errno.c   375    
+         errno.c   376    #ifdef ECONNABORTED
+         errno.c   377        VariableDefinePlatformVar(NULL, "ECONNABORTED", &IntType, (union AnyValue *)&ECONNABORTEDValue, FALSE)
+                         +;
+         errno.c   378    #endif
+         errno.c   379    
+         errno.c   380    #ifdef ECONNREFUSED
+         errno.c   381        VariableDefinePlatformVar(NULL, "ECONNREFUSED", &IntType, (union AnyValue *)&ECONNREFUSEDValue, FALSE)
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:29  PAGE    8
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+                         +;
+         errno.c   382    #endif
+         errno.c   383    
+         errno.c   384    #ifdef ECONNRESET
+         errno.c   385        VariableDefinePlatformVar(NULL, "ECONNRESET", &IntType, (union AnyValue *)&ECONNRESETValue, FALSE);
+         errno.c   386    #endif
+         errno.c   387    
+         errno.c   388    #ifdef EDEADLK
+         errno.c   389        VariableDefinePlatformVar(NULL, "EDEADLK", &IntType, (union AnyValue *)&EDEADLKValue, FALSE);
+         errno.c   390    #endif
+         errno.c   391    
+         errno.c   392    #ifdef EDESTADDRREQ
+         errno.c   393        VariableDefinePlatformVar(NULL, "EDESTADDRREQ", &IntType, (union AnyValue *)&EDESTADDRREQValue, FALSE)
+                         +;
+         errno.c   394    #endif
+         errno.c   395    
+         errno.c   396    #ifdef EDOM
+         errno.c   397        VariableDefinePlatformVar(NULL, "EDOM", &IntType, (union AnyValue *)&EDOMValue, FALSE);
+    00000014 D710                   MOV.L       L508+18,R7 ; __$EDOMValue
+    00000016 E200                   MOV         #0,R2
+    00000018 D60D                   MOV.L       L508+10,R6 ; _IntType
+    0000001A 2F26                   MOV.L       R2,@-R15
+    0000001C D50F                   MOV.L       L508+22,R5 ; L498
+    0000001E 4E0B                   JSR         @R14
+    00000020 6423                   MOV         R2,R4
+         errno.c   398    #endif
+         errno.c   399    
+         errno.c   400    #ifdef EDQUOT
+         errno.c   401        VariableDefinePlatformVar(NULL, "EDQUOT", &IntType, (union AnyValue *)&EDQUOTValue, FALSE);
+         errno.c   402    #endif
+         errno.c   403    
+         errno.c   404    #ifdef EEXIST
+         errno.c   405        VariableDefinePlatformVar(NULL, "EEXIST", &IntType, (union AnyValue *)&EEXISTValue, FALSE);
+         errno.c   406    #endif
+         errno.c   407    
+         errno.c   408    #ifdef EFAULT
+         errno.c   409        VariableDefinePlatformVar(NULL, "EFAULT", &IntType, (union AnyValue *)&EFAULTValue, FALSE);
+         errno.c   410    #endif
+         errno.c   411    
+         errno.c   412    #ifdef EFBIG
+         errno.c   413        VariableDefinePlatformVar(NULL, "EFBIG", &IntType, (union AnyValue *)&EFBIGValue, FALSE);
+         errno.c   414    #endif
+         errno.c   415    
+         errno.c   416    #ifdef EHOSTUNREACH
+         errno.c   417        VariableDefinePlatformVar(NULL, "EHOSTUNREACH", &IntType, (union AnyValue *)&EHOSTUNREACHValue, FALSE)
+                         +;
+         errno.c   418    #endif
+         errno.c   419    
+         errno.c   420    #ifdef EIDRM
+         errno.c   421        VariableDefinePlatformVar(NULL, "EIDRM", &IntType, (union AnyValue *)&EIDRMValue, FALSE);
+         errno.c   422    #endif
+         errno.c   423    
+         errno.c   424    #ifdef EILSEQ
+         errno.c   425        VariableDefinePlatformVar(NULL, "EILSEQ", &IntType, (union AnyValue *)&EILSEQValue, FALSE);
+         errno.c   426    #endif
+         errno.c   427    
+         errno.c   428    #ifdef EINPROGRESS
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:29  PAGE    9
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+         errno.c   429        VariableDefinePlatformVar(NULL, "EINPROGRESS", &IntType, (union AnyValue *)&EINPROGRESSValue, FALSE);
+         errno.c   430    #endif
+         errno.c   431    
+         errno.c   432    #ifdef EINTR
+         errno.c   433        VariableDefinePlatformVar(NULL, "EINTR", &IntType, (union AnyValue *)&EINTRValue, FALSE);
+         errno.c   434    #endif
+         errno.c   435    
+         errno.c   436    #ifdef EINVAL
+         errno.c   437        VariableDefinePlatformVar(NULL, "EINVAL", &IntType, (union AnyValue *)&EINVALValue, FALSE);
+         errno.c   438    #endif
+         errno.c   439    
+         errno.c   440    #ifdef EIO
+         errno.c   441        VariableDefinePlatformVar(NULL, "EIO", &IntType, (union AnyValue *)&EIOValue, FALSE);
+         errno.c   442    #endif
+         errno.c   443    
+         errno.c   444    #ifdef EISCONN
+         errno.c   445        VariableDefinePlatformVar(NULL, "EISCONN", &IntType, (union AnyValue *)&EISCONNValue, FALSE);
+         errno.c   446    #endif
+         errno.c   447    
+         errno.c   448    #ifdef EISDIR
+         errno.c   449        VariableDefinePlatformVar(NULL, "EISDIR", &IntType, (union AnyValue *)&EISDIRValue, FALSE);
+         errno.c   450    #endif
+         errno.c   451    
+         errno.c   452    #ifdef ELOOP
+         errno.c   453        VariableDefinePlatformVar(NULL, "ELOOP", &IntType, (union AnyValue *)&ELOOPValue, FALSE);
+         errno.c   454    #endif
+         errno.c   455    
+         errno.c   456    #ifdef EMFILE
+         errno.c   457        VariableDefinePlatformVar(NULL, "EMFILE", &IntType, (union AnyValue *)&EMFILEValue, FALSE);
+         errno.c   458    #endif
+         errno.c   459    
+         errno.c   460    #ifdef EMLINK
+         errno.c   461        VariableDefinePlatformVar(NULL, "EMLINK", &IntType, (union AnyValue *)&EMLINKValue, FALSE);
+         errno.c   462    #endif
+         errno.c   463    
+         errno.c   464    #ifdef EMSGSIZE
+         errno.c   465        VariableDefinePlatformVar(NULL, "EMSGSIZE", &IntType, (union AnyValue *)&EMSGSIZEValue, FALSE);
+         errno.c   466    #endif
+         errno.c   467    
+         errno.c   468    #ifdef EMULTIHOP
+         errno.c   469        VariableDefinePlatformVar(NULL, "EMULTIHOP", &IntType, (union AnyValue *)&EMULTIHOPValue, FALSE);
+         errno.c   470    #endif
+         errno.c   471    
+         errno.c   472    #ifdef ENAMETOOLONG
+         errno.c   473        VariableDefinePlatformVar(NULL, "ENAMETOOLONG", &IntType, (union AnyValue *)&ENAMETOOLONGValue, FALSE)
+                         +;
+         errno.c   474    #endif
+         errno.c   475    
+         errno.c   476    #ifdef ENETDOWN
+         errno.c   477        VariableDefinePlatformVar(NULL, "ENETDOWN", &IntType, (union AnyValue *)&ENETDOWNValue, FALSE);
+         errno.c   478    #endif
+         errno.c   479    
+         errno.c   480    #ifdef ENETRESET
+         errno.c   481        VariableDefinePlatformVar(NULL, "ENETRESET", &IntType, (union AnyValue *)&ENETRESETValue, FALSE);
+         errno.c   482    #endif
+         errno.c   483    
+         errno.c   484    #ifdef ENETUNREACH
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:29  PAGE   10
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+         errno.c   485        VariableDefinePlatformVar(NULL, "ENETUNREACH", &IntType, (union AnyValue *)&ENETUNREACHValue, FALSE);
+         errno.c   486    #endif
+         errno.c   487    
+         errno.c   488    #ifdef ENFILE
+         errno.c   489        VariableDefinePlatformVar(NULL, "ENFILE", &IntType, (union AnyValue *)&ENFILEValue, FALSE);
+         errno.c   490    #endif
+         errno.c   491    
+         errno.c   492    #ifdef ENOBUFS
+         errno.c   493        VariableDefinePlatformVar(NULL, "ENOBUFS", &IntType, (union AnyValue *)&ENOBUFSValue, FALSE);
+         errno.c   494    #endif
+         errno.c   495    
+         errno.c   496    #ifdef ENODATA
+         errno.c   497        VariableDefinePlatformVar(NULL, "ENODATA", &IntType, (union AnyValue *)&ENODATAValue, FALSE);
+         errno.c   498    #endif
+         errno.c   499    
+         errno.c   500    #ifdef ENODEV
+         errno.c   501        VariableDefinePlatformVar(NULL, "ENODEV", &IntType, (union AnyValue *)&ENODEVValue, FALSE);
+         errno.c   502    #endif
+         errno.c   503    
+         errno.c   504    #ifdef ENOENT
+         errno.c   505        VariableDefinePlatformVar(NULL, "ENOENT", &IntType, (union AnyValue *)&ENOENTValue, FALSE);
+         errno.c   506    #endif
+         errno.c   507    
+         errno.c   508    #ifdef ENOEXEC
+         errno.c   509        VariableDefinePlatformVar(NULL, "ENOEXEC", &IntType, (union AnyValue *)&ENOEXECValue, FALSE);
+         errno.c   510    #endif
+         errno.c   511    
+         errno.c   512    #ifdef ENOLCK
+         errno.c   513        VariableDefinePlatformVar(NULL, "ENOLCK", &IntType, (union AnyValue *)&ENOLCKValue, FALSE);
+         errno.c   514    #endif
+         errno.c   515    
+         errno.c   516    #ifdef ENOLINK
+         errno.c   517        VariableDefinePlatformVar(NULL, "ENOLINK", &IntType, (union AnyValue *)&ENOLINKValue, FALSE);
+         errno.c   518    #endif
+         errno.c   519    
+         errno.c   520    #ifdef ENOMEM
+         errno.c   521        VariableDefinePlatformVar(NULL, "ENOMEM", &IntType, (union AnyValue *)&ENOMEMValue, FALSE);
+         errno.c   522    #endif
+         errno.c   523    
+         errno.c   524    #ifdef ENOMSG
+         errno.c   525        VariableDefinePlatformVar(NULL, "ENOMSG", &IntType, (union AnyValue *)&ENOMSGValue, FALSE);
+         errno.c   526    #endif
+         errno.c   527    
+         errno.c   528    #ifdef ENOPROTOOPT
+         errno.c   529        VariableDefinePlatformVar(NULL, "ENOPROTOOPT", &IntType, (union AnyValue *)&ENOPROTOOPTValue, FALSE);
+         errno.c   530    #endif
+         errno.c   531    
+         errno.c   532    #ifdef ENOSPC
+         errno.c   533        VariableDefinePlatformVar(NULL, "ENOSPC", &IntType, (union AnyValue *)&ENOSPCValue, FALSE);
+         errno.c   534    #endif
+         errno.c   535    
+         errno.c   536    #ifdef ENOSR
+         errno.c   537        VariableDefinePlatformVar(NULL, "ENOSR", &IntType, (union AnyValue *)&ENOSRValue, FALSE);
+         errno.c   538    #endif
+         errno.c   539    
+         errno.c   540    #ifdef ENOSTR
+         errno.c   541        VariableDefinePlatformVar(NULL, "ENOSTR", &IntType, (union AnyValue *)&ENOSTRValue, FALSE);
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:29  PAGE   11
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+         errno.c   542    #endif
+         errno.c   543    
+         errno.c   544    #ifdef ENOSYS
+         errno.c   545        VariableDefinePlatformVar(NULL, "ENOSYS", &IntType, (union AnyValue *)&ENOSYSValue, FALSE);
+         errno.c   546    #endif
+         errno.c   547    
+         errno.c   548    #ifdef ENOTCONN
+         errno.c   549        VariableDefinePlatformVar(NULL, "ENOTCONN", &IntType, (union AnyValue *)&ENOTCONNValue, FALSE);
+         errno.c   550    #endif
+         errno.c   551    
+         errno.c   552    #ifdef ENOTDIR
+         errno.c   553        VariableDefinePlatformVar(NULL, "ENOTDIR", &IntType, (union AnyValue *)&ENOTDIRValue, FALSE);
+         errno.c   554    #endif
+         errno.c   555    
+         errno.c   556    #ifdef ENOTEMPTY
+         errno.c   557        VariableDefinePlatformVar(NULL, "ENOTEMPTY", &IntType, (union AnyValue *)&ENOTEMPTYValue, FALSE);
+         errno.c   558    #endif
+         errno.c   559    
+         errno.c   560    #ifdef ENOTRECOVERABLE
+         errno.c   561        VariableDefinePlatformVar(NULL, "ENOTRECOVERABLE", &IntType, (union AnyValue *)&ENOTRECOVERABLEValue, 
+                         +FALSE);
+         errno.c   562    #endif
+         errno.c   563    
+         errno.c   564    #ifdef ENOTSOCK
+         errno.c   565        VariableDefinePlatformVar(NULL, "ENOTSOCK", &IntType, (union AnyValue *)&ENOTSOCKValue, FALSE);
+         errno.c   566    #endif
+         errno.c   567    
+         errno.c   568    #ifdef ENOTSUP
+         errno.c   569        VariableDefinePlatformVar(NULL, "ENOTSUP", &IntType, (union AnyValue *)&ENOTSUPValue, FALSE);
+         errno.c   570    #endif
+         errno.c   571    
+         errno.c   572    #ifdef ENOTTY
+         errno.c   573        VariableDefinePlatformVar(NULL, "ENOTTY", &IntType, (union AnyValue *)&ENOTTYValue, FALSE);
+         errno.c   574    #endif
+         errno.c   575    
+         errno.c   576    #ifdef ENXIO
+         errno.c   577        VariableDefinePlatformVar(NULL, "ENXIO", &IntType, (union AnyValue *)&ENXIOValue, FALSE);
+         errno.c   578    #endif
+         errno.c   579    
+         errno.c   580    #ifdef EOPNOTSUPP
+         errno.c   581        VariableDefinePlatformVar(NULL, "EOPNOTSUPP", &IntType, (union AnyValue *)&EOPNOTSUPPValue, FALSE);
+         errno.c   582    #endif
+         errno.c   583    
+         errno.c   584    #ifdef EOVERFLOW
+         errno.c   585        VariableDefinePlatformVar(NULL, "EOVERFLOW", &IntType, (union AnyValue *)&EOVERFLOWValue, FALSE);
+         errno.c   586    #endif
+         errno.c   587    
+         errno.c   588    #ifdef EOWNERDEAD
+         errno.c   589        VariableDefinePlatformVar(NULL, "EOWNERDEAD", &IntType, (union AnyValue *)&EOWNERDEADValue, FALSE);
+         errno.c   590    #endif
+         errno.c   591    
+         errno.c   592    #ifdef EPERM
+         errno.c   593        VariableDefinePlatformVar(NULL, "EPERM", &IntType, (union AnyValue *)&EPERMValue, FALSE);
+         errno.c   594    #endif
+         errno.c   595    
+         errno.c   596    #ifdef EPIPE
+         errno.c   597        VariableDefinePlatformVar(NULL, "EPIPE", &IntType, (union AnyValue *)&EPIPEValue, FALSE);
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:29  PAGE   12
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+         errno.c   598    #endif
+         errno.c   599    
+         errno.c   600    #ifdef EPROTO
+         errno.c   601        VariableDefinePlatformVar(NULL, "EPROTO", &IntType, (union AnyValue *)&EPROTOValue, FALSE);
+         errno.c   602    #endif
+         errno.c   603    
+         errno.c   604    #ifdef EPROTONOSUPPORT
+         errno.c   605        VariableDefinePlatformVar(NULL, "EPROTONOSUPPORT", &IntType, (union AnyValue *)&EPROTONOSUPPORTValue, 
+                         +FALSE);
+         errno.c   606    #endif
+         errno.c   607    
+         errno.c   608    #ifdef EPROTOTYPE
+         errno.c   609        VariableDefinePlatformVar(NULL, "EPROTOTYPE", &IntType, (union AnyValue *)&EPROTOTYPEValue, FALSE);
+         errno.c   610    #endif
+         errno.c   611    
+         errno.c   612    #ifdef ERANGE
+         errno.c   613        VariableDefinePlatformVar(NULL, "ERANGE", &IntType, (union AnyValue *)&ERANGEValue, FALSE);
+    00000022 E300                   MOV         #0,R3
+    00000024 D70E                   MOV.L       L508+26,R7 ; __$ERANGEValue
+    00000026 2F36                   MOV.L       R3,@-R15
+    00000028 D609                   MOV.L       L508+10,R6 ; _IntType
+    0000002A D50E                   MOV.L       L508+30,R5 ; L499
+    0000002C 4E0B                   JSR         @R14
+    0000002E 6433                   MOV         R3,R4
+         errno.c   614    #endif
+         errno.c   615    
+         errno.c   616    #ifdef EROFS
+         errno.c   617        VariableDefinePlatformVar(NULL, "EROFS", &IntType, (union AnyValue *)&EROFSValue, FALSE);
+         errno.c   618    #endif
+         errno.c   619    
+         errno.c   620    #ifdef ESPIPE
+         errno.c   621        VariableDefinePlatformVar(NULL, "ESPIPE", &IntType, (union AnyValue *)&ESPIPEValue, FALSE);
+         errno.c   622    #endif
+         errno.c   623    
+         errno.c   624    #ifdef ESRCH
+         errno.c   625        VariableDefinePlatformVar(NULL, "ESRCH", &IntType, (union AnyValue *)&ESRCHValue, FALSE);
+         errno.c   626    #endif
+         errno.c   627    
+         errno.c   628    #ifdef ESTALE
+         errno.c   629        VariableDefinePlatformVar(NULL, "ESTALE", &IntType, (union AnyValue *)&ESTALEValue, FALSE);
+         errno.c   630    #endif
+         errno.c   631    
+         errno.c   632    #ifdef ETIME
+         errno.c   633        VariableDefinePlatformVar(NULL, "ETIME", &IntType, (union AnyValue *)&ETIMEValue, FALSE);
+         errno.c   634    #endif
+         errno.c   635    
+         errno.c   636    #ifdef ETIMEDOUT
+         errno.c   637        VariableDefinePlatformVar(NULL, "ETIMEDOUT", &IntType, (union AnyValue *)&ETIMEDOUTValue, FALSE);
+         errno.c   638    #endif
+         errno.c   639    
+         errno.c   640    #ifdef ETXTBSY
+         errno.c   641        VariableDefinePlatformVar(NULL, "ETXTBSY", &IntType, (union AnyValue *)&ETXTBSYValue, FALSE);
+         errno.c   642    #endif
+         errno.c   643    
+         errno.c   644    #ifdef EWOULDBLOCK
+         errno.c   645        VariableDefinePlatformVar(NULL, "EWOULDBLOCK", &IntType, (union AnyValue *)&EWOULDBLOCKValue, FALSE);
+         errno.c   646    #endif
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:29  PAGE   13
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+         errno.c   647    
+         errno.c   648    #ifdef EXDEV
+         errno.c   649        VariableDefinePlatformVar(NULL, "EXDEV", &IntType, (union AnyValue *)&EXDEVValue, FALSE);
+         errno.c   650    #endif
+         errno.c   651    
+         errno.c   652        VariableDefinePlatformVar(NULL, "errno", &IntType, (union AnyValue *)&errno, TRUE);
+    00000030 D70D                   MOV.L       L508+34,R7 ; __errno
+    00000032 E201                   MOV         #1,R2
+    00000034 D606                   MOV.L       L508+10,R6 ; _IntType
+    00000036 2F26                   MOV.L       R2,@-R15
+    00000038 D50C                   MOV.L       L508+38,R5 ; L500
+    0000003A 4E0B                   JSR         @R14
+    0000003C E400                   MOV         #0,R4
+         errno.c   653    }
+    0000003E 7F10                   ADD         #16,R15
+    00000040 4F26                   LDS.L       @R15+,PR
+    00000042 000B                   RTS
+    00000044 6EF6                   MOV.L       @R15+,R14
+    00000046              L508:                             
+    00000046 0000                   .DATA.W     0
+    00000048 <00000000>             .DATA.L     _VariableDefinePlatformVar
+    0000004C <00000000>             .DATA.L     __$EBADFValue
+    00000050 <00000000>             .DATA.L     _IntType
+    00000054 <00000000>             .DATA.L     L497
+    00000058 <00000000>             .DATA.L     __$EDOMValue
+    0000005C <00000000>             .DATA.L     L498
+    00000060 <00000000>             .DATA.L     __$ERANGEValue
+    00000064 <00000000>             .DATA.L     L499
+    00000068 <00000000>             .DATA.L     __errno
+    0000006C <00000000>             .DATA.L     L500
+         errno.c   654    
+         errno.c   655    #endif /* !BUILTIN_MINI_STDLIB */
+D   00000000              __$EBADFValue:                   ; static: EBADFValue
+    00000000 00000516               .DATA.L     H'00000516
+    00000004              __$EDOMValue:                    ; static: EDOMValue
+    00000004 0000044D               .DATA.L     H'0000044D
+    00000008              __$ERANGEValue:                  ; static: ERANGEValue
+    00000008 0000044C               .DATA.L     H'0000044C
+C   00000000              L497:
+    00000000 4542414446             .SDATA      "EBADF"
+    00000005 00                     .DATA.B     H'00
+    00000006 00000002               .RES.W      1
+    00000008              L498:
+    00000008 45444F4D               .SDATA      "EDOM"
+    0000000C 00                     .DATA.B     H'00
+    0000000D 00000001               .RES.B      1
+    0000000E 00000002               .RES.W      1
+    00000010              L499:
+    00000010 4552414E47             .SDATA      "ERANGE"
+             45           
+    00000016 00                     .DATA.B     H'00
+    00000017 00000001               .RES.B      1
+    00000018              L500:
+    00000018 6572726E6F             .SDATA      "errno"
+    0000001D 00                     .DATA.B     H'00
+
+
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:29  PAGE    1
+
+
+******** STATISTICS INFORMATION ********
+
+
+********** ERROR INFORMATION ***********
+
+NUMBER OF ERRORS:           0
+NUMBER OF WARNINGS:         0
+
+
+
+
+******* SOURCE LINE INFORMATION ********
+
+COMPILED SOURCE LINE:      654
+
+
+
+******* SECTION SIZE INFORMATION *******
+
+PROGRAM  SECTION (P):                               00000070 Byte(s)
+CONSTANT SECTION (C):                               0000001E Byte(s)
+DATA     SECTION (D):                               0000000C Byte(s)
+BSS      SECTION (B):                               00000000 Byte(s)
+
+ TOTAL PROGRAM SIZE: 0000009A Byte(s)
+
+
+
+********** LABEL INFORMATION ***********
+
+NUMBER OF EXTERNAL REFERENCE SYMBOLS:            3
+NUMBER OF EXTERNAL DEFINITION SYMBOLS:           1
+NUMBER OF INTERNAL/EXTERNAL SYMBOLS:             9
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*** COMMAND PARAMETER ***
+
+
+  -subcommand=C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\hmk34C.tmp 
+

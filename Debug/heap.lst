@@ -1,0 +1,533 @@
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:21  PAGE    1
+
+************ OBJECT LISTING ************
+
+FILE NAME: E:\Anderain\fx-9860\dPicoc\heap.c
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+          heap.c     1    /* stack grows up from the bottom and heap grows down from the top of heap space */
+          heap.c     2    #include "interpreter.h"
+          heap.c     3    
+          heap.c     4    #define FREELIST_BUCKETS 8                          /* freelists for 4, 8, 12 ... 32 byte allocs */
+          heap.c     5    #define SPLIT_MEM_THRESHOLD 16                      /* don't split memory which is close in size */
+          heap.c     6    
+          heap.c     7    static unsigned char *HeapMemory = NULL;            /* stack memory since our heap is malloc()ed */
+          heap.c     8    static void *HeapBottom = NULL;                     /* the bottom of the (downward-growing) heap */
+          heap.c     9    static void *StackFrame = NULL;                     /* the current stack frame */
+          heap.c    10    void *HeapStackTop = NULL;                          /* the top of the stack */
+          heap.c    11    
+          heap.c    12    static struct AllocNode *FreeListBucket[FREELIST_BUCKETS];      /* we keep a pool of freelist buckets to r
+                         +educe fragmentation */
+          heap.c    13    static struct AllocNode *FreeListBig;                           /* free memory which doesn't fit in a buck
+                         +et */
+          heap.c    14    
+          heap.c    15    
+          heap.c    16    /* initialise the stack and heap storage */
+          heap.c    17    void HeapInit(int StackOrHeapSize)
+P   00000000              _HeapInit:                       ; function: HeapInit
+                                                           ; frame size=20
+    00000000 2FE6                   MOV.L       R14,@-R15
+    00000002 2FD6                   MOV.L       R13,@-R15
+    00000004 2FC6                   MOV.L       R12,@-R15
+          heap.c    18    {
+          heap.c    19        int Count;
+          heap.c    20        int AlignOffset = 0;
+    00000006 ED00                   MOV         #0,R13
+          heap.c    21        
+          heap.c    22        HeapMemory = malloc(StackOrHeapSize);
+    00000008 D351                   MOV.L       L544+6,R3  ; _malloc
+    0000000A 4F22                   STS.L       PR,@-R15
+    0000000C DC4F                   MOV.L       L544+2,R12 ; __$HeapMemory
+    0000000E 7FFC                   ADD         #-4,R15
+    00000010 2F42                   MOV.L       R4,@R15
+    00000012 430B                   JSR         @R3
+    00000014 6ED3                   MOV         R13,R14
+    00000016 2C02                   MOV.L       R0,@R12
+          heap.c    23    
+          heap.c    24        while (((unsigned long)&HeapMemory[AlignOffset] & (sizeof(ALIGN_TYPE)-1)) != 0)
+    00000018 A001                   BRA         L530
+    0000001A E403                   MOV         #3,R4
+    0000001C              L531:                             
+          heap.c    25            AlignOffset++;
+    0000001C 7E01                   ADD         #1,R14
+    0000001E              L530:                             
+    0000001E 63C2                   MOV.L       @R12,R3
+    00000020 33EC                   ADD         R14,R3
+    00000022 2348                   TST         R4,R3
+    00000024 8BFA                   BF          L531
+          heap.c    26            
+          heap.c    27        StackFrame = &HeapMemory[AlignOffset];
+    00000026 D54B                   MOV.L       L544+10,R5 ; __$StackFrame
+    00000028 64C2                   MOV.L       @R12,R4
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:21  PAGE    2
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    0000002A 34EC                   ADD         R14,R4
+    0000002C 2542                   MOV.L       R4,@R5
+          heap.c    28        HeapStackTop = &HeapMemory[AlignOffset];
+    0000002E D34A                   MOV.L       L544+14,R3 ; _HeapStackTop
+    00000030 D64C                   MOV.L       L544+26,R6 ; __$FreeListBucket
+    00000032 2342                   MOV.L       R4,@R3
+          heap.c    29        *(void **)StackFrame = NULL;
+    00000034 6252                   MOV.L       @R5,R2
+    00000036 6463                   MOV         R6,R4
+    00000038 22D2                   MOV.L       R13,@R2
+    0000003A 6563                   MOV         R6,R5
+          heap.c    30        HeapBottom = &HeapMemory[StackOrHeapSize-sizeof(ALIGN_TYPE)+AlignOffset];
+    0000003C 61F2                   MOV.L       @R15,R1
+    0000003E 7520                   ADD         #32,R5
+    00000040 62C2                   MOV.L       @R12,R2
+    00000042 3E1C                   ADD         R1,R14
+    00000044 D145                   MOV.L       L544+18,R1 ; __$HeapBottom
+    00000046 3E2C                   ADD         R2,R14
+          heap.c    31        FreeListBig = NULL;
+    00000048 D245                   MOV.L       L544+22,R2 ; __$FreeListBig
+    0000004A 7EFC                   ADD         #-4,R14
+    0000004C 21E2                   MOV.L       R14,@R1
+    0000004E 22D2                   MOV.L       R13,@R2
+          heap.c    32        for (Count = 0; Count < FREELIST_BUCKETS; Count++)
+    00000050              L532:                             
+          heap.c    33            FreeListBucket[Count] = NULL;
+    00000050 24D2                   MOV.L       R13,@R4
+    00000052 7404                   ADD         #4,R4
+    00000054 3452                   CMP/HS      R5,R4
+    00000056 8BFB                   BF          L532
+          heap.c    34    }
+    00000058 7F04                   ADD         #4,R15
+    0000005A 4F26                   LDS.L       @R15+,PR
+    0000005C 6CF6                   MOV.L       @R15+,R12
+    0000005E 6DF6                   MOV.L       @R15+,R13
+    00000060 000B                   RTS
+    00000062 6EF6                   MOV.L       @R15+,R14
+          heap.c    35    
+          heap.c    36    void HeapCleanup()
+    00000064              _HeapCleanup:                    ; function: HeapCleanup
+                                                           ; frame size=0
+          heap.c    37    {
+          heap.c    38        free(HeapMemory);
+    00000064 D339                   MOV.L       L544+2,R3  ; __$HeapMemory
+    00000066 D240                   MOV.L       L544+30,R2 ; _free
+    00000068 422B                   JMP         @R2
+    0000006A 6432                   MOV.L       @R3,R4
+          heap.c    39    }
+          heap.c    40    
+          heap.c    41    /* allocate some space on the stack, in the current stack frame
+          heap.c    42     * clears memory. can return NULL if out of stack space */
+          heap.c    43    void *HeapAllocStack(int Size)
+    0000006C              _HeapAllocStack:                 ; function: HeapAllocStack
+                                                           ; frame size=12
+    0000006C 2FE6                   MOV.L       R14,@-R15
+          heap.c    44    {
+          heap.c    45        char *NewMem = HeapStackTop;
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:21  PAGE    3
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+          heap.c    46        char *NewTop = (char *)HeapStackTop + MEM_ALIGN(Size);
+    0000006E E3FC                   MOV         #-4,R3
+          heap.c    47            //printf("HeapAllocStack(%ld) at 0x%lx\n", (unsigned long)MEM_ALIGN(Size), (unsigned long)HeapStac
+                         +kTop);
+          heap.c    48            //WaitKey();
+          heap.c    49        if (NewTop > (char *)HeapBottom)
+    00000070 D13A                   MOV.L       L544+18,R1 ; __$HeapBottom
+    00000072 4F22                   STS.L       PR,@-R15
+    00000074 D538                   MOV.L       L544+14,R5 ; _HeapStackTop
+    00000076 7FFC                   ADD         #-4,R15
+    00000078 2F42                   MOV.L       R4,@R15
+    0000007A 7403                   ADD         #3,R4
+    0000007C 6212                   MOV.L       @R1,R2
+    0000007E 2439                   AND         R3,R4
+    00000080 6E52                   MOV.L       @R5,R14
+    00000082 34EC                   ADD         R14,R4
+    00000084 3426                   CMP/HI      R2,R4
+    00000086 8B04                   BF          L533
+          heap.c    50            return NULL;
+    00000088 E000                   MOV         #0,R0
+    0000008A 7F04                   ADD         #4,R15
+    0000008C 4F26                   LDS.L       @R15+,PR
+    0000008E 000B                   RTS
+    00000090 6EF6                   MOV.L       @R15+,R14
+    00000092              L533:                             
+          heap.c    51            //printf("sss");
+          heap.c    52            //WaitKey();
+          heap.c    53        HeapStackTop = (void *)NewTop;
+    00000092 2542                   MOV.L       R4,@R5
+          heap.c    54        memset((void *)NewMem, '\0', Size);
+    00000094 66F2                   MOV.L       @R15,R6
+    00000096 E500                   MOV         #0,R5
+    00000098 D334                   MOV.L       L544+34,R3 ; _memset
+    0000009A 430B                   JSR         @R3
+    0000009C 64E3                   MOV         R14,R4
+          heap.c    55        return NewMem;
+    0000009E 60E3                   MOV         R14,R0
+          heap.c    56    }
+    000000A0              L534:                             
+    000000A0 7F04                   ADD         #4,R15
+    000000A2 4F26                   LDS.L       @R15+,PR
+    000000A4 000B                   RTS
+    000000A6 6EF6                   MOV.L       @R15+,R14
+          heap.c    57    
+          heap.c    58    /* allocate some space on the stack, in the current stack frame */
+          heap.c    59    void HeapUnpopStack(int Size)
+    000000A8              _HeapUnpopStack:                 ; function: HeapUnpopStack
+                                                           ; frame size=0
+          heap.c    60    {
+          heap.c    61        HeapStackTop = (void *)((char *)HeapStackTop + MEM_ALIGN(Size));
+    000000A8 D52B                   MOV.L       L544+14,R5 ; _HeapStackTop
+    000000AA 7403                   ADD         #3,R4
+    000000AC 6252                   MOV.L       @R5,R2
+    000000AE E3FC                   MOV         #-4,R3
+    000000B0 2439                   AND         R3,R4
+    000000B2 342C                   ADD         R2,R4
+          heap.c    62    }
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:21  PAGE    4
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000000B4 000B                   RTS
+    000000B6 2542                   MOV.L       R4,@R5
+          heap.c    63    
+          heap.c    64    /* free some space at the top of the stack */
+          heap.c    65    int HeapPopStack(void *Addr, int Size)
+    000000B8              _HeapPopStack:                   ; function: HeapPopStack
+                                                           ; frame size=12
+    000000B8 2FE6                   MOV.L       R14,@-R15
+          heap.c    66    {
+          heap.c    67        int ToLose = MEM_ALIGN(Size);
+    000000BA E3FC                   MOV         #-4,R3
+    000000BC D023                   MOV.L       L544+2,R0  ; __$HeapMemory
+    000000BE 4F22                   STS.L       PR,@-R15
+    000000C0 DE25                   MOV.L       L544+14,R14; _HeapStackTop
+    000000C2 7FFC                   ADD         #-4,R15
+    000000C4 2F42                   MOV.L       R4,@R15
+    000000C6 6453                   MOV         R5,R4
+    000000C8 6202                   MOV.L       @R0,R2
+    000000CA 7403                   ADD         #3,R4
+    000000CC 65E2                   MOV.L       @R14,R5
+    000000CE 2439                   AND         R3,R4
+    000000D0 6153                   MOV         R5,R1
+    000000D2 3128                   SUB         R2,R1
+    000000D4 3417                   CMP/GT      R1,R4
+    000000D6 8B04                   BF          L535
+          heap.c    68        if (ToLose > ((char *)HeapStackTop - (char *)&HeapMemory[0]))
+          heap.c    69            return FALSE;
+    000000D8 E000                   MOV         #0,R0
+    000000DA 7F04                   ADD         #4,R15
+    000000DC 4F26                   LDS.L       @R15+,PR
+    000000DE 000B                   RTS
+    000000E0 6EF6                   MOV.L       @R15+,R14
+    000000E2              L535:                             
+          heap.c    70        
+          heap.c    71        HeapStackTop = (void *)((char *)HeapStackTop - ToLose);
+    000000E2 3548                   SUB         R4,R5
+    000000E4 2E52                   MOV.L       R5,@R14
+          heap.c    72        assert(Addr == NULL || HeapStackTop == Addr);
+    000000E6 62F2                   MOV.L       @R15,R2
+    000000E8 2228                   TST         R2,R2
+    000000EA 8906                   BT          L539
+    000000EC 63F2                   MOV.L       @R15,R3
+    000000EE 62E2                   MOV.L       @R14,R2
+    000000F0 3230                   CMP/EQ      R3,R2
+    000000F2 8902                   BT          L539
+    000000F4 D31E                   MOV.L       L544+38,R3 ; _abort
+    000000F6 430B                   JSR         @R3
+    000000F8 0009                   NOP
+    000000FA              L539:                             
+          heap.c    73        
+          heap.c    74        return TRUE;
+    000000FA E001                   MOV         #1,R0
+          heap.c    75    }
+    000000FC              L536:                             
+    000000FC 7F04                   ADD         #4,R15
+    000000FE 4F26                   LDS.L       @R15+,PR
+    00000100 000B                   RTS
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:21  PAGE    5
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000102 6EF6                   MOV.L       @R15+,R14
+          heap.c    76    
+          heap.c    77    /* push a new stack frame on to the stack */
+          heap.c    78    void HeapPushStackFrame()
+    00000104              _HeapPushStackFrame:             ; function: HeapPushStackFrame
+                                                           ; frame size=0
+          heap.c    79    {
+          heap.c    80        *(void **)HeapStackTop = StackFrame;
+    00000104 D513                   MOV.L       L544+10,R5 ; __$StackFrame
+    00000106 D414                   MOV.L       L544+14,R4 ; _HeapStackTop
+    00000108 6252                   MOV.L       @R5,R2
+    0000010A 6342                   MOV.L       @R4,R3
+    0000010C 2322                   MOV.L       R2,@R3
+          heap.c    81        StackFrame = HeapStackTop;
+    0000010E 6342                   MOV.L       @R4,R3
+    00000110 2532                   MOV.L       R3,@R5
+          heap.c    82        HeapStackTop = (void *)((char *)HeapStackTop + MEM_ALIGN(sizeof(ALIGN_TYPE)));
+    00000112 6242                   MOV.L       @R4,R2
+    00000114 7204                   ADD         #4,R2
+          heap.c    83    }
+    00000116 000B                   RTS
+    00000118 2422                   MOV.L       R2,@R4
+          heap.c    84    
+          heap.c    85    /* pop the current stack frame, freeing all memory in the frame. can return NULL */
+          heap.c    86    int HeapPopStackFrame()
+    0000011A              _HeapPopStackFrame:              ; function: HeapPopStackFrame
+                                                           ; frame size=0
+    0000011A D50E                   MOV.L       L544+10,R5 ; __$StackFrame
+    0000011C 6452                   MOV.L       @R5,R4
+    0000011E 6342                   MOV.L       @R4,R3
+    00000120 2338                   TST         R3,R3
+    00000122 8906                   BT          L540
+          heap.c    87    {
+          heap.c    88        if (*(void **)StackFrame != NULL)
+          heap.c    89        {
+          heap.c    90            HeapStackTop = StackFrame;
+    00000124 D30C                   MOV.L       L544+14,R3 ; _HeapStackTop
+    00000126 2342                   MOV.L       R4,@R3
+          heap.c    91            StackFrame = *(void **)StackFrame;
+    00000128 6252                   MOV.L       @R5,R2
+    0000012A 6122                   MOV.L       @R2,R1
+    0000012C 2512                   MOV.L       R1,@R5
+          heap.c    92            return TRUE;
+    0000012E 000B                   RTS
+    00000130 E001                   MOV         #1,R0
+    00000132              L540:                             
+          heap.c    93        }
+          heap.c    94        else
+          heap.c    95            return FALSE;
+    00000132 E000                   MOV         #0,R0
+          heap.c    96    }
+    00000134              L541:                             
+    00000134 000B                   RTS
+    00000136 0009                   NOP
+          heap.c    97    
+          heap.c    98    /* allocate some dynamically allocated memory. memory is cleared. can return NULL if out of memory */
+          heap.c    99    void *HeapAllocMem(int Size)
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:21  PAGE    6
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000138              _HeapAllocMem:                   ; function: HeapAllocMem
+                                                           ; frame size=4
+          heap.c   100    {
+          heap.c   101        return calloc(Size, 1);
+    00000138 D30E                   MOV.L       L544+42,R3 ; _calloc
+    0000013A 7FFC                   ADD         #-4,R15
+    0000013C 2F42                   MOV.L       R4,@R15
+    0000013E E501                   MOV         #1,R5
+    00000140 432B                   JMP         @R3
+    00000142 7F04                   ADD         #4,R15
+          heap.c   102    }
+          heap.c   103    
+          heap.c   104    /* free some dynamically allocated memory */
+          heap.c   105    void HeapFreeMem(void *Mem)
+    00000144              _HeapFreeMem:                    ; function: HeapFreeMem
+                                                           ; frame size=0
+          heap.c   106    {
+          heap.c   107        free(Mem);
+    00000144 D308                   MOV.L       L544+30,R3 ; _free
+    00000146 432B                   JMP         @R3
+    00000148 0009                   NOP
+    0000014A              L544:                             
+    0000014A 0000                   .DATA.W     0
+    0000014C <00000000>             .DATA.L     __$HeapMemory
+    00000150 <00000000>             .DATA.L     _malloc
+    00000154 <00000000>             .DATA.L     __$StackFrame
+    00000158 <00000000>             .DATA.L     _HeapStackTop
+    0000015C <00000000>             .DATA.L     __$HeapBottom
+    00000160 <00000000>             .DATA.L     __$FreeListBig
+    00000164 <00000000>             .DATA.L     __$FreeListBucket
+    00000168 <00000000>             .DATA.L     _free
+    0000016C <00000000>             .DATA.L     _memset
+    00000170 <00000000>             .DATA.L     _abort
+    00000174 <00000000>             .DATA.L     _calloc
+          heap.c   108    }
+          heap.c   109    
+D   00000000              __$HeapMemory:                   ; static: HeapMemory
+    00000000 00000000               .DATA.L     H'00000000
+    00000004              __$HeapBottom:                   ; static: HeapBottom
+    00000004 00000000               .DATA.L     H'00000000
+    00000008              __$StackFrame:                   ; static: StackFrame
+    00000008 00000000               .DATA.L     H'00000000
+    0000000C              _HeapStackTop:                   ; static: HeapStackTop
+    0000000C 00000000               .DATA.L     H'00000000
+C   00000000              L513:
+    00000000 4153534552             .SDATA      "ASSERTION FAILED: Addr == NULL || HeapStackTop == Addr FILE %s,LINE %d "
+             54494F4E20   
+             4641494C45   
+             443A204164   
+             6472203D3D   
+             204E554C4C   
+             207C7C2048   
+             6561705374   
+             61636B546F   
+             70203D3D20   
+             4164647220   
+             46494C4520   
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:21  PAGE    7
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+             25732C4C49   
+             4E45202564   
+             20           
+    00000047 0A00                   .DATA.B     H'0A,H'00
+    00000049 00000001               .RES.B      1
+    0000004A 00000002               .RES.W      1
+    0000004C              L514:
+    0000004C 453A5C416E             .SDATA      "E:\Anderain\fx-9860\dPicoc\heap.c"
+             6465726169   
+             6E5C66782D   
+             393836305C   
+             645069636F   
+             635C686561   
+             702E63       
+    0000006D 00                     .DATA.B     H'00
+B   00000000              __$FreeListBucket:               ; static: FreeListBucket
+    00000000 00000020               .RES.L      8
+    00000020              __$FreeListBig:                  ; static: FreeListBig
+    00000020 00000004               .RES.L      1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:21  PAGE    1
+
+
+******** STATISTICS INFORMATION ********
+
+
+********** ERROR INFORMATION ***********
+
+NUMBER OF ERRORS:           0
+NUMBER OF WARNINGS:         0
+
+
+
+
+******* SOURCE LINE INFORMATION ********
+
+COMPILED SOURCE LINE:      109
+
+
+
+******* SECTION SIZE INFORMATION *******
+
+PROGRAM  SECTION (P):                               00000178 Byte(s)
+CONSTANT SECTION (C):                               0000006E Byte(s)
+DATA     SECTION (D):                               00000010 Byte(s)
+BSS      SECTION (B):                               00000024 Byte(s)
+
+ TOTAL PROGRAM SIZE: 0000021A Byte(s)
+
+
+
+********** LABEL INFORMATION ***********
+
+NUMBER OF EXTERNAL REFERENCE SYMBOLS:            5
+NUMBER OF EXTERNAL DEFINITION SYMBOLS:          10
+NUMBER OF INTERNAL/EXTERNAL SYMBOLS:            28
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*** COMMAND PARAMETER ***
+
+
+  -subcommand=C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\hmk341.tmp 
+

@@ -1,0 +1,1919 @@
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:26  PAGE    1
+
+************ OBJECT LISTING ************
+
+FILE NAME: E:\Anderain\fx-9860\dPicoc\variable.c
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+      variable.c     1    #include "interpreter.h"
+      variable.c     2    
+      variable.c     3    /* maximum size of a value to temporarily copy while we create a variable */
+      variable.c     4    #define MAX_TMP_COPY_BUF 256
+      variable.c     5    
+      variable.c     6    /* the table of global definitions */
+      variable.c     7    struct Table GlobalTable;
+      variable.c     8    struct TableEntry *GlobalHashTable[GLOBAL_TABLE_SIZE];
+      variable.c     9    
+      variable.c    10    /* the table of string literal values */
+      variable.c    11    struct Table StringLiteralTable;
+      variable.c    12    struct TableEntry *StringLiteralHashTable[STRING_LITERAL_TABLE_SIZE];
+      variable.c    13    
+      variable.c    14    /* the stack */
+      variable.c    15    struct StackFrame *TopStackFrame = NULL;
+      variable.c    16    
+      variable.c    17    
+      variable.c    18    /* initialise the variable system */
+      variable.c    19    void VariableInit()
+P   00000000              _VariableInit:                   ; function: VariableInit
+                                                           ; frame size=4
+    00000000 4F22                   STS.L       PR,@-R15
+      variable.c    20    {
+      variable.c    21        TableInitTable(&GlobalTable, &GlobalHashTable[0], GLOBAL_TABLE_SIZE, TRUE);
+    00000002 E701                   MOV         #1,R7
+    00000004 D55F                   MOV.L       L719+2,R5  ; _GlobalHashTable
+    00000006 D460                   MOV.L       L719+6,R4  ; _GlobalTable
+    00000008 D360                   MOV.L       L719+10,R3 ; _TableInitTable
+    0000000A 430B                   JSR         @R3
+    0000000C E661                   MOV         #97,R6
+      variable.c    22        TableInitTable(&StringLiteralTable, &StringLiteralHashTable[0], STRING_LITERAL_TABLE_SIZE, TRUE);
+    0000000E E701                   MOV         #1,R7
+    00000010 D55F                   MOV.L       L719+14,R5 ; _StringLiteralHashTable
+    00000012 D460                   MOV.L       L719+18,R4 ; _StringLiteralTable
+    00000014 D25D                   MOV.L       L719+10,R2 ; _TableInitTable
+    00000016 420B                   JSR         @R2
+    00000018 E661                   MOV         #97,R6
+      variable.c    23        TopStackFrame = NULL;
+    0000001A E300                   MOV         #0,R3
+    0000001C D25E                   MOV.L       L719+22,R2 ; _TopStackFrame
+      variable.c    24    }
+    0000001E 4F26                   LDS.L       @R15+,PR
+    00000020 000B                   RTS
+    00000022 2232                   MOV.L       R3,@R2
+      variable.c    25    
+      variable.c    26    /* deallocate the contents of a variable */
+      variable.c    27    void VariableFree(struct Value *Val)
+    00000024              _VariableFree:                   ; function: VariableFree
+                                                           ; frame size=12
+    00000024 2FE6                   MOV.L       R14,@-R15
+    00000026 6E43                   MOV         R4,R14
+    00000028 2FD6                   MOV.L       R13,@-R15
+    0000002A 4F22                   STS.L       PR,@-R15
+      variable.c    28    {
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:26  PAGE    2
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+      variable.c    29        if (Val->ValOnHeap)
+    0000002C 84EC                   MOV.B       @(12,R14),R0
+    0000002E 2008                   TST         R0,R0
+    00000030 8918                   BT          L633
+      variable.c    30        {
+      variable.c    31            /* free function bodies */
+      variable.c    32            if (Val->Typ == &FunctionType && Val->Val->FuncDef.Intrinsic == NULL && Val->Val->FuncDef.Body.Pos
+                         + != NULL)
+    00000032 DD5A                   MOV.L       L719+26,R13; _HeapFreeMem
+    00000034 D35A                   MOV.L       L719+30,R3 ; _FunctionType
+    00000036 62E2                   MOV.L       @R14,R2
+    00000038 3230                   CMP/EQ      R3,R2
+    0000003A 8B0A                   BF          L634
+    0000003C 50E1                   MOV.L       @(4,R14),R0
+    0000003E 5205                   MOV.L       @(20,R0),R2
+    00000040 2228                   TST         R2,R2
+    00000042 8B06                   BF          L634
+    00000044 52E1                   MOV.L       @(4,R14),R2
+    00000046 5126                   MOV.L       @(24,R2),R1
+    00000048 2118                   TST         R1,R1
+    0000004A 8902                   BT          L634
+      variable.c    33                HeapFreeMem((void *)Val->Val->FuncDef.Body.Pos);
+    0000004C 54E1                   MOV.L       @(4,R14),R4
+    0000004E 4D0B                   JSR         @R13
+    00000050 5446                   MOV.L       @(24,R4),R4
+    00000052              L634:                             
+      variable.c    34    
+      variable.c    35            /* free macro bodies */
+      variable.c    36            if (Val->Typ == &MacroType)
+    00000052 D354                   MOV.L       L719+34,R3 ; _MacroType
+    00000054 62E2                   MOV.L       @R14,R2
+    00000056 3230                   CMP/EQ      R3,R2
+    00000058 8B02                   BF          L635
+      variable.c    37                HeapFreeMem((void *)Val->Val->MacroDef.Body.Pos);
+    0000005A 54E1                   MOV.L       @(4,R14),R4
+    0000005C 4D0B                   JSR         @R13
+    0000005E 5442                   MOV.L       @(8,R4),R4
+    00000060              L635:                             
+      variable.c    38    
+      variable.c    39            /* free the value */
+      variable.c    40            HeapFreeMem(Val);
+    00000060 4D0B                   JSR         @R13
+    00000062 64E3                   MOV         R14,R4
+    00000064              L633:                             
+      variable.c    41        }
+      variable.c    42    }
+    00000064 4F26                   LDS.L       @R15+,PR
+    00000066 6DF6                   MOV.L       @R15+,R13
+    00000068 000B                   RTS
+    0000006A 6EF6                   MOV.L       @R15+,R14
+      variable.c    43    
+      variable.c    44    /* deallocate the global table and the string literal table */
+      variable.c    45    void VariableTableCleanup(struct Table *HashTable)
+    0000006C              _VariableTableCleanup:           ; function: VariableTableCleanup
+                                                           ; frame size=24
+    0000006C 2FE6                   MOV.L       R14,@-R15
+    0000006E 2FD6                   MOV.L       R13,@-R15
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:26  PAGE    3
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000070 2FC6                   MOV.L       R12,@-R15
+    00000072 2FB6                   MOV.L       R11,@-R15
+    00000074 2FA6                   MOV.L       R10,@-R15
+    00000076 6B43                   MOV         R4,R11
+    00000078 4F22                   STS.L       PR,@-R15
+      variable.c    46    {
+      variable.c    47        struct TableEntry *Entry;
+      variable.c    48        struct TableEntry *NextEntry;
+      variable.c    49        int Count;
+      variable.c    50        
+      variable.c    51        for (Count = 0; Count < HashTable->Size; Count++)
+    0000007A DA48                   MOV.L       L719+26,R10; _HeapFreeMem
+    0000007C A00E                   BRA         L636
+    0000007E ED00                   MOV         #0,R13
+    00000080              L637:                             
+      variable.c    52        {
+      variable.c    53            for (Entry = HashTable->HashTable[Count]; Entry != NULL; Entry = NextEntry)
+    00000080 50B1                   MOV.L       @(4,R11),R0
+    00000082 6ED3                   MOV         R13,R14
+    00000084 4E08                   SHLL2       R14
+    00000086 A006                   BRA         L638
+    00000088 0EEE                   MOV.L       @(R0,R14),R14
+    0000008A              L639:                             
+      variable.c    54            {
+      variable.c    55                NextEntry = Entry->Next;
+    0000008A 6CE2                   MOV.L       @R14,R12
+      variable.c    56                VariableFree(Entry->p.v.Val);
+    0000008C BFCA                   BSR         _VariableFree
+    0000008E 54E4                   MOV.L       @(16,R14),R4
+      variable.c    57                    
+      variable.c    58                /* free the hash table entry */
+      variable.c    59                HeapFreeMem(Entry);
+    00000090 4A0B                   JSR         @R10
+    00000092 64E3                   MOV         R14,R4
+    00000094 6EC3                   MOV         R12,R14
+    00000096              L638:                             
+    00000096 2EE8                   TST         R14,R14
+    00000098 8BF7                   BF          L639
+    0000009A 7D01                   ADD         #1,R13
+    0000009C              L636:                             
+    0000009C 62B1                   MOV.W       @R11,R2
+    0000009E 3D23                   CMP/GE      R2,R13
+    000000A0 8BEE                   BF          L637
+      variable.c    60            }
+      variable.c    61        }
+      variable.c    62    }
+    000000A2 4F26                   LDS.L       @R15+,PR
+    000000A4 6AF6                   MOV.L       @R15+,R10
+    000000A6 6BF6                   MOV.L       @R15+,R11
+    000000A8 6CF6                   MOV.L       @R15+,R12
+    000000AA 6DF6                   MOV.L       @R15+,R13
+    000000AC 000B                   RTS
+    000000AE 6EF6                   MOV.L       @R15+,R14
+      variable.c    63    
+      variable.c    64    void VariableCleanup()
+    000000B0              _VariableCleanup:                ; function: VariableCleanup
+                                                           ; frame size=4
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:26  PAGE    4
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000000B0 4F22                   STS.L       PR,@-R15
+      variable.c    65    {
+      variable.c    66        VariableTableCleanup(&GlobalTable);
+    000000B2 D435                   MOV.L       L719+6,R4  ; _GlobalTable
+    000000B4 BFDA                   BSR         _VariableTableCleanup
+    000000B6 0009                   NOP
+      variable.c    67        VariableTableCleanup(&StringLiteralTable);
+    000000B8 D436                   MOV.L       L719+18,R4 ; _StringLiteralTable
+    000000BA AFD7                   BRA         _VariableTableCleanup
+    000000BC 4F26                   LDS.L       @R15+,PR
+      variable.c    68    }
+      variable.c    69    
+      variable.c    70    /* allocate some memory, either on the heap or the stack and check if we've run out */
+      variable.c    71    void *VariableAlloc(struct ParseState *Parser, int Size, int OnHeap)
+    000000BE              _VariableAlloc:                  ; function: VariableAlloc
+                                                           ; frame size=20
+      variable.c    72    {
+      variable.c    73        void *NewValue;
+      variable.c    74        
+      variable.c    75        if (OnHeap)
+    000000BE 2668                   TST         R6,R6
+    000000C0 2FE6                   MOV.L       R14,@-R15
+    000000C2 4F22                   STS.L       PR,@-R15
+    000000C4 7FF8                   ADD         #-8,R15
+    000000C6 1F41                   MOV.L       R4,@(4,R15)
+    000000C8 8D05                   BT/S        L640
+    000000CA 2F52                   MOV.L       R5,@R15
+      variable.c    76            NewValue = HeapAllocMem(Size);
+    000000CC D336                   MOV.L       L719+38,R3 ; _HeapAllocMem
+    000000CE 430B                   JSR         @R3
+    000000D0 64F2                   MOV.L       @R15,R4
+    000000D2 A003                   BRA         L716
+    000000D4 0009                   NOP
+    000000D6              L640:                             
+      variable.c    77        else
+      variable.c    78            NewValue = HeapAllocStack(Size);
+    000000D6 D335                   MOV.L       L719+42,R3 ; _HeapAllocStack
+    000000D8 430B                   JSR         @R3
+    000000DA 64F2                   MOV.L       @R15,R4
+    000000DC              L716:                             
+    000000DC 6E03                   MOV         R0,R14
+      variable.c    79        
+      variable.c    80        if (NewValue == NULL)
+    000000DE 2EE8                   TST         R14,R14
+    000000E0 8B05                   BF          L642
+      variable.c    81            ProgramFail(Parser, "out of memory");
+    000000E2 D333                   MOV.L       L719+46,R3 ; L513
+    000000E4 D233                   MOV.L       L719+50,R2 ; _ProgramFail
+    000000E6 2F36                   MOV.L       R3,@-R15
+    000000E8 420B                   JSR         @R2
+    000000EA 54F2                   MOV.L       @(8,R15),R4
+    000000EC 7F04                   ADD         #4,R15
+    000000EE              L642:                             
+      variable.c    82        
+      variable.c    83    #ifdef DEBUG_HEAP
+      variable.c    84        if (!OnHeap)
+      variable.c    85            printf("pushing %d at 0x%lx\n", Size, (unsigned long)NewValue);
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:26  PAGE    5
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+      variable.c    86    #endif
+      variable.c    87            
+      variable.c    88        return NewValue;
+    000000EE 60E3                   MOV         R14,R0
+      variable.c    89    }
+    000000F0 7F08                   ADD         #8,R15
+    000000F2 4F26                   LDS.L       @R15+,PR
+    000000F4 000B                   RTS
+    000000F6 6EF6                   MOV.L       @R15+,R14
+      variable.c    90    
+      variable.c    91    /* allocate a value either on the heap or the stack using space dependent on what type we want */
+      variable.c    92    struct Value *VariableAllocValueAndData(struct ParseState *Parser, int DataSize, int IsLValue, struct Valu
+                         +e *LValueFrom, int OnHeap)
+    000000F8              _VariableAllocValueAndData:      ; function: VariableAllocValueAndData
+                                                           ; frame size=20
+    000000F8 2FE6                   MOV.L       R14,@-R15
+    000000FA 4F22                   STS.L       PR,@-R15
+    000000FC 7FF4                   ADD         #-12,R15
+    000000FE 1F52                   MOV.L       R5,@(8,R15)
+    00000100 1F61                   MOV.L       R6,@(4,R15)
+    00000102 2F72                   MOV.L       R7,@R15
+    00000104 5EF5                   MOV.L       @(20,R15),R14
+      variable.c    93    {
+      variable.c    94        struct Value *NewValue = VariableAlloc(Parser, MEM_ALIGN(sizeof(struct Value)) + DataSize, OnHeap);
+    00000106 66E3                   MOV         R14,R6
+    00000108 55F2                   MOV.L       @(8,R15),R5
+    0000010A BFD8                   BSR         _VariableAlloc
+    0000010C 7510                   ADD         #16,R5
+    0000010E 6403                   MOV         R0,R4
+      variable.c    95        NewValue->Val = (union AnyValue *)((char *)NewValue + MEM_ALIGN(sizeof(struct Value)));
+    00000110 6203                   MOV         R0,R2
+    00000112 7210                   ADD         #16,R2
+    00000114 1421                   MOV.L       R2,@(4,R4)
+      variable.c    96        NewValue->ValOnHeap = OnHeap;
+    00000116 60E3                   MOV         R14,R0
+    00000118 804C                   MOV.B       R0,@(12,R4)
+      variable.c    97        NewValue->ValOnStack = !OnHeap;
+    0000011A 2EE8                   TST         R14,R14
+    0000011C 0029                   MOVT        R0
+    0000011E 804D                   MOV.B       R0,@(13,R4)
+      variable.c    98        NewValue->IsLValue = IsLValue;
+    00000120 84F7                   MOV.B       @(7,R15),R0
+    00000122 804E                   MOV.B       R0,@(14,R4)
+      variable.c    99        NewValue->LValueFrom = LValueFrom;
+    00000124 63F2                   MOV.L       @R15,R3
+      variable.c   100        
+      variable.c   101        return NewValue;
+    00000126 6043                   MOV         R4,R0
+    00000128 1432                   MOV.L       R3,@(8,R4)
+      variable.c   102    }
+    0000012A 7F0C                   ADD         #12,R15
+    0000012C 4F26                   LDS.L       @R15+,PR
+    0000012E 000B                   RTS
+    00000130 6EF6                   MOV.L       @R15+,R14
+      variable.c   103    
+      variable.c   104    /* allocate a value given its type */
+      variable.c   105    struct Value *VariableAllocValueFromType(struct ParseState *Parser, struct ValueType *Typ, int IsLValue, s
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:26  PAGE    6
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+                         +truct Value *LValueFrom, int OnHeap)
+    00000132              _VariableAllocValueFromType:     ; function: VariableAllocValueFromType
+                                                           ; frame size=32
+    00000132 2FE6                   MOV.L       R14,@-R15
+    00000134 2FD6                   MOV.L       R13,@-R15
+    00000136 6E53                   MOV         R5,R14
+      variable.c   106    {
+      variable.c   107        int Size = TypeSize(Typ, Typ->ArraySize, FALSE);
+    00000138 D31F                   MOV.L       L719+54,R3 ; _TypeSize
+    0000013A 2FC6                   MOV.L       R12,@-R15
+    0000013C 4F22                   STS.L       PR,@-R15
+    0000013E 7FF4                   ADD         #-12,R15
+    00000140 1F41                   MOV.L       R4,@(4,R15)
+    00000142 1F62                   MOV.L       R6,@(8,R15)
+    00000144 2F72                   MOV.L       R7,@R15
+    00000146 E600                   MOV         #0,R6
+    00000148 55E1                   MOV.L       @(4,R14),R5
+    0000014A 430B                   JSR         @R3
+    0000014C 64E3                   MOV         R14,R4
+    0000014E 6D03                   MOV         R0,R13
+      variable.c   108        struct Value *NewValue = VariableAllocValueAndData(Parser, Size, IsLValue, LValueFrom, OnHeap);
+    00000150 52F7                   MOV.L       @(28,R15),R2
+    00000152 65D3                   MOV         R13,R5
+    00000154 2F26                   MOV.L       R2,@-R15
+    00000156 57F1                   MOV.L       @(4,R15),R7
+    00000158 56F3                   MOV.L       @(12,R15),R6
+    0000015A BFCD                   BSR         _VariableAllocValueAndData
+    0000015C 54F2                   MOV.L       @(8,R15),R4
+    0000015E 7F04                   ADD         #4,R15
+      variable.c   109        assert(Size > 0 || Typ == &VoidType);
+    00000160 4D15                   CMP/PL      R13
+    00000162 8D06                   BT/S        L648
+    00000164 6C03                   MOV         R0,R12
+    00000166 D315                   MOV.L       L719+58,R3 ; _VoidType
+    00000168 3E30                   CMP/EQ      R3,R14
+    0000016A 8902                   BT          L648
+    0000016C D114                   MOV.L       L719+62,R1 ; _abort
+    0000016E 410B                   JSR         @R1
+    00000170 0009                   NOP
+    00000172              L648:                             
+      variable.c   110        NewValue->Typ = Typ;
+      variable.c   111        
+      variable.c   112        return NewValue;
+    00000172 60C3                   MOV         R12,R0
+    00000174 2CE2                   MOV.L       R14,@R12
+      variable.c   113    }
+    00000176 7F0C                   ADD         #12,R15
+    00000178 4F26                   LDS.L       @R15+,PR
+    0000017A 6CF6                   MOV.L       @R15+,R12
+    0000017C 6DF6                   MOV.L       @R15+,R13
+    0000017E 000B                   RTS
+    00000180 6EF6                   MOV.L       @R15+,R14
+    00000182              L719:                             
+    00000182 0000                   .DATA.W     0
+    00000184 <00000000>             .DATA.L     _GlobalHashTable
+    00000188 <00000000>             .DATA.L     _GlobalTable
+    0000018C <00000000>             .DATA.L     _TableInitTable
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:26  PAGE    7
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000190 <00000000>             .DATA.L     _StringLiteralHashTable
+    00000194 <00000000>             .DATA.L     _StringLiteralTable
+    00000198 <00000000>             .DATA.L     _TopStackFrame
+    0000019C <00000000>             .DATA.L     _HeapFreeMem
+    000001A0 <00000000>             .DATA.L     _FunctionType
+    000001A4 <00000000>             .DATA.L     _MacroType
+    000001A8 <00000000>             .DATA.L     _HeapAllocMem
+    000001AC <00000000>             .DATA.L     _HeapAllocStack
+    000001B0 <00000000>             .DATA.L     L513
+    000001B4 <00000000>             .DATA.L     _ProgramFail
+    000001B8 <00000000>             .DATA.L     _TypeSize
+    000001BC <00000000>             .DATA.L     _VoidType
+    000001C0 <00000000>             .DATA.L     _abort
+      variable.c   114    
+      variable.c   115    /* allocate a value either on the heap or the stack and copy its value. handles overlapping data */
+      variable.c   116    struct Value *VariableAllocValueAndCopy(struct ParseState *Parser, struct Value *FromValue, int OnHeap)
+    000001C4              _VariableAllocValueAndCopy:      ; function: VariableAllocValueAndCopy
+                                                           ; frame size=288
+    000001C4 2FE6                   MOV.L       R14,@-R15
+    000001C6 6E53                   MOV         R5,R14
+    000001C8 2FD6                   MOV.L       R13,@-R15
+      variable.c   117    {
+      variable.c   118        struct ValueType *DType = FromValue->Typ;
+      variable.c   119        struct Value *NewValue;
+      variable.c   120        char TmpBuf[MAX_TMP_COPY_BUF];
+      variable.c   121        int CopySize = TypeSizeValue(FromValue, TRUE);
+    000001CA E501                   MOV         #1,R5
+    000001CC 908F                   MOV.W       L720,R0    ; H'FEF0
+    000001CE 4F22                   STS.L       PR,@-R15
+    000001D0 3F0C                   ADD         R0,R15
+    000001D2 2F42                   MOV.L       R4,@R15
+    000001D4 1F61                   MOV.L       R6,@(4,R15)
+    000001D6 63E2                   MOV.L       @R14,R3
+    000001D8 1F32                   MOV.L       R3,@(8,R15)
+    000001DA D346                   MOV.L       L720+6,R3  ; _TypeSizeValue
+    000001DC 430B                   JSR         @R3
+    000001DE 64E3                   MOV         R14,R4
+      variable.c   122    
+      variable.c   123        assert(CopySize <= MAX_TMP_COPY_BUF);
+    000001E0 9286                   MOV.W       L720+2,R2  ; H'0100
+    000001E2 6D03                   MOV         R0,R13
+    000001E4 3D27                   CMP/GT      R2,R13
+    000001E6 8B02                   BF          L651
+    000001E8 D143                   MOV.L       L720+10,R1 ; _abort
+    000001EA 410B                   JSR         @R1
+    000001EC 0009                   NOP
+    000001EE              L651:                             
+      variable.c   124        memcpy((void *)&TmpBuf[0], (void *)FromValue->Val, CopySize);
+    000001EE 66D3                   MOV         R13,R6
+    000001F0 55E1                   MOV.L       @(4,R14),R5
+    000001F2 64F3                   MOV         R15,R4
+    000001F4 D341                   MOV.L       L720+14,R3 ; _memcpy
+    000001F6 7410                   ADD         #16,R4
+    000001F8 430B                   JSR         @R3
+    000001FA 1F43                   MOV.L       R4,@(12,R15)
+      variable.c   125        NewValue = VariableAllocValueAndData(Parser, CopySize, FromValue->IsLValue, FromValue->LValueFrom, OnH
+                         +eap);
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:26  PAGE    8
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000001FC 52F1                   MOV.L       @(4,R15),R2
+    000001FE 65D3                   MOV         R13,R5
+    00000200 2F26                   MOV.L       R2,@-R15
+    00000202 57E2                   MOV.L       @(8,R14),R7
+    00000204 84EE                   MOV.B       @(14,R14),R0
+    00000206 6603                   MOV         R0,R6
+    00000208 BF76                   BSR         _VariableAllocValueAndData
+    0000020A 54F1                   MOV.L       @(4,R15),R4
+      variable.c   126        NewValue->Typ = DType;
+    0000020C 52F3                   MOV.L       @(12,R15),R2
+      variable.c   127        memcpy((void *)NewValue->Val, (void *)&TmpBuf[0], CopySize);
+    0000020E 66D3                   MOV         R13,R6
+    00000210 D33A                   MOV.L       L720+14,R3 ; _memcpy
+    00000212 6E03                   MOV         R0,R14
+    00000214 2E22                   MOV.L       R2,@R14
+    00000216 55F4                   MOV.L       @(16,R15),R5
+    00000218 430B                   JSR         @R3
+    0000021A 54E1                   MOV.L       @(4,R14),R4
+      variable.c   128        
+      variable.c   129        return NewValue;
+      variable.c   130    }
+    0000021C 9169                   MOV.W       L720+4,R1  ; H'0114
+    0000021E 60E3                   MOV         R14,R0
+    00000220 3F1C                   ADD         R1,R15
+    00000222 4F26                   LDS.L       @R15+,PR
+    00000224 6DF6                   MOV.L       @R15+,R13
+    00000226 000B                   RTS
+    00000228 6EF6                   MOV.L       @R15+,R14
+      variable.c   131    
+      variable.c   132    /* allocate a value either on the heap or the stack from an existing AnyValue and type */
+      variable.c   133    struct Value *VariableAllocValueFromExistingData(struct ParseState *Parser, struct ValueType *Typ, union A
+                         +nyValue *FromValue, int IsLValue, struct Value *LValueFrom)
+    0000022A              _VariableAllocValueFromExistingData:
+                                                           ; function: VariableAllocValueFromExistingData
+                                                           ; frame size=16
+    0000022A 4F22                   STS.L       PR,@-R15
+    0000022C 7FF4                   ADD         #-12,R15
+    0000022E 1F52                   MOV.L       R5,@(8,R15)
+    00000230 2F62                   MOV.L       R6,@R15
+      variable.c   134    {
+      variable.c   135        struct Value *NewValue = VariableAlloc(Parser, sizeof(struct Value), FALSE);
+    00000232 E600                   MOV         #0,R6
+    00000234 1F71                   MOV.L       R7,@(4,R15)
+    00000236 BF42                   BSR         _VariableAlloc
+    00000238 E510                   MOV         #16,R5
+    0000023A 6403                   MOV         R0,R4
+      variable.c   136        NewValue->Typ = Typ;
+    0000023C 52F2                   MOV.L       @(8,R15),R2
+      variable.c   137        NewValue->Val = FromValue;
+      variable.c   138        NewValue->ValOnHeap = FALSE;
+    0000023E E000                   MOV         #0,R0
+    00000240 2422                   MOV.L       R2,@R4
+    00000242 63F2                   MOV.L       @R15,R3
+    00000244 1431                   MOV.L       R3,@(4,R4)
+    00000246 804C                   MOV.B       R0,@(12,R4)
+      variable.c   139        NewValue->ValOnStack = FALSE;
+    00000248 804D                   MOV.B       R0,@(13,R4)
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:26  PAGE    9
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+      variable.c   140        NewValue->IsLValue = IsLValue;
+    0000024A 84F7                   MOV.B       @(7,R15),R0
+    0000024C 804E                   MOV.B       R0,@(14,R4)
+      variable.c   141        NewValue->LValueFrom = LValueFrom;
+    0000024E 53F4                   MOV.L       @(16,R15),R3
+    00000250 1432                   MOV.L       R3,@(8,R4)
+      variable.c   142        
+      variable.c   143        return NewValue;
+      variable.c   144    }
+    00000252 7F0C                   ADD         #12,R15
+    00000254 4F26                   LDS.L       @R15+,PR
+    00000256 000B                   RTS
+    00000258 6043                   MOV         R4,R0
+      variable.c   145    
+      variable.c   146    /* allocate a value either on the heap or the stack from an existing Value, sharing the value */
+      variable.c   147    struct Value *VariableAllocValueShared(struct ParseState *Parser, struct Value *FromValue)
+    0000025A              _VariableAllocValueShared:       ; function: VariableAllocValueShared
+                                                           ; frame size=16
+    0000025A 2FE6                   MOV.L       R14,@-R15
+    0000025C 4F22                   STS.L       PR,@-R15
+    0000025E 6E53                   MOV         R5,R14
+    00000260 7FFC                   ADD         #-4,R15
+      variable.c   148    {
+      variable.c   149        return VariableAllocValueFromExistingData(Parser, FromValue->Typ, FromValue->Val, FromValue->IsLValue,
+                         + FromValue->IsLValue ? FromValue : NULL);
+    00000262 84EE                   MOV.B       @(14,R14),R0
+    00000264 2008                   TST         R0,R0
+    00000266 8D02                   BT/S        L654
+    00000268 2F00                   MOV.B       R0,@R15
+    0000026A A002                   BRA         L655
+    0000026C 2FE6                   MOV.L       R14,@-R15
+    0000026E              L654:                             
+    0000026E E200                   MOV         #0,R2
+    00000270 2F26                   MOV.L       R2,@-R15
+    00000272              L655:                             
+    00000272 84F4                   MOV.B       @(4,R15),R0
+    00000274 56E1                   MOV.L       @(4,R14),R6
+    00000276 6703                   MOV         R0,R7
+    00000278 BFD7                   BSR         _VariableAllocValueFromExistingData
+    0000027A 65E2                   MOV.L       @R14,R5
+      variable.c   150    }
+    0000027C 7F08                   ADD         #8,R15
+    0000027E 4F26                   LDS.L       @R15+,PR
+    00000280 000B                   RTS
+    00000282 6EF6                   MOV.L       @R15+,R14
+      variable.c   151    
+      variable.c   152    /* define a variable. Ident must be registered */
+      variable.c   153    struct Value *VariableDefine(struct ParseState *Parser, char *Ident, struct Value *InitValue, struct Value
+                         +Type *Typ, int MakeWritable)
+    00000284              _VariableDefine:                 ; function: VariableDefine
+                                                           ; frame size=36
+    00000284 2FE6                   MOV.L       R14,@-R15
+    00000286 2FD6                   MOV.L       R13,@-R15
+    00000288 2FC6                   MOV.L       R12,@-R15
+    0000028A 4F22                   STS.L       PR,@-R15
+      variable.c   154    {
+      variable.c   155        struct Value *AssignValue;
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:26  PAGE   10
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+      variable.c   156        
+      variable.c   157        if (InitValue != NULL)
+    0000028C DC1C                   MOV.L       L720+18,R12; _TopStackFrame
+    0000028E 7FF4                   ADD         #-12,R15
+    00000290 2F52                   MOV.L       R5,@R15
+    00000292 1F61                   MOV.L       R6,@(4,R15)
+    00000294 1F72                   MOV.L       R7,@(8,R15)
+    00000296 53F1                   MOV.L       @(4,R15),R3
+    00000298 2338                   TST         R3,R3
+    0000029A 8D08                   BT/S        L657
+    0000029C 6E43                   MOV         R4,R14
+      variable.c   158            AssignValue = VariableAllocValueAndCopy(Parser, InitValue, TopStackFrame == NULL);
+    0000029E 66C2                   MOV.L       @R12,R6
+    000002A0 55F1                   MOV.L       @(4,R15),R5
+    000002A2 2668                   TST         R6,R6
+    000002A4 0629                   MOVT        R6
+    000002A6 BF8D                   BSR         _VariableAllocValueAndCopy
+    000002A8 64E3                   MOV         R14,R4
+    000002AA A00A                   BRA         L717
+    000002AC 0009                   NOP
+    000002AE              L657:                             
+      variable.c   159        else
+      variable.c   160            AssignValue = VariableAllocValueFromType(Parser, Typ, MakeWritable, NULL, TopStackFrame == NULL);
+    000002AE E700                   MOV         #0,R7
+    000002B0 60C2                   MOV.L       @R12,R0
+    000002B2 2008                   TST         R0,R0
+    000002B4 0029                   MOVT        R0
+    000002B6 2F06                   MOV.L       R0,@-R15
+    000002B8 56F8                   MOV.L       @(32,R15),R6
+    000002BA 55F3                   MOV.L       @(12,R15),R5
+    000002BC BF39                   BSR         _VariableAllocValueFromType
+    000002BE 64E3                   MOV         R14,R4
+    000002C0 7F04                   ADD         #4,R15
+    000002C2              L717:                             
+    000002C2 6D03                   MOV         R0,R13
+      variable.c   161        
+      variable.c   162        AssignValue->IsLValue = MakeWritable;
+    000002C4 50F7                   MOV.L       @(28,R15),R0
+      variable.c   163            
+      variable.c   164        if (!TableSet((TopStackFrame == NULL) ? &GlobalTable : &TopStackFrame->LocalTable, Ident, AssignValue,
+                         + Parser ? ((char *)Parser->FileName) : NULL, Parser ? Parser->Line : 0, Parser ? Parser->CharacterPos : 0)
+                         +)
+    000002C6 2EE8                   TST         R14,R14
+    000002C8 8D03                   BT/S        L662
+    000002CA 80DE                   MOV.B       R0,@(14,R13)
+    000002CC 85E5                   MOV.W       @(10,R14),R0
+    000002CE A002                   BRA         L666
+    000002D0 2F06                   MOV.L       R0,@-R15
+    000002D2              L662:                             
+    000002D2 E300                   MOV         #0,R3
+    000002D4 2F36                   MOV.L       R3,@-R15
+    000002D6              L666:                             
+    000002D6 2EE8                   TST         R14,R14
+    000002D8 8902                   BT          L663
+    000002DA 85E4                   MOV.W       @(8,R14),R0
+    000002DC A002                   BRA         L667
+    000002DE 2F06                   MOV.L       R0,@-R15
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:26  PAGE   11
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000002E0              L663:                             
+    000002E0 E300                   MOV         #0,R3
+    000002E2 2F36                   MOV.L       R3,@-R15
+    000002E4              L667:                             
+    000002E4 2EE8                   TST         R14,R14
+    000002E6 8D0D                   BT/S        L664
+    000002E8 66D3                   MOV         R13,R6
+    000002EA A00C                   BRA         L668
+    000002EC 57E1                   MOV.L       @(4,R14),R7
+    000002EE              L720:                             
+    000002EE FEF0                   .DATA.W     H'FEF0
+    000002F0 0100                   .DATA.W     H'0100
+    000002F2 0114                   .DATA.W     H'0114
+    000002F4 <00000000>             .DATA.L     _TypeSizeValue
+    000002F8 <00000000>             .DATA.L     _abort
+    000002FC <00000000>             .DATA.L     _memcpy
+    00000300 <00000000>             .DATA.L     _TopStackFrame
+    00000304              L664:                             
+    00000304 E700                   MOV         #0,R7
+    00000306              L668:                             
+    00000306 63C2                   MOV.L       @R12,R3
+    00000308 2338                   TST         R3,R3
+    0000030A 8F03                   BF/S        L665
+    0000030C 55F2                   MOV.L       @(8,R15),R5
+    0000030E D44E                   MOV.L       L721+10,R4 ; _GlobalTable
+    00000310 A002                   BRA         L669
+    00000312 0009                   NOP
+    00000314              L665:                             
+    00000314 64C2                   MOV.L       @R12,R4
+    00000316 7430                   ADD         #48,R4
+    00000318              L669:                             
+    00000318 D24C                   MOV.L       L721+14,R2 ; _TableSet
+    0000031A 420B                   JSR         @R2
+    0000031C 0009                   NOP
+    0000031E 2008                   TST         R0,R0
+    00000320 8F08                   BF/S        L661
+    00000322 7F08                   ADD         #8,R15
+      variable.c   165            ProgramFail(Parser, "'%s' is already defined", Ident);
+    00000324 62F2                   MOV.L       @R15,R2
+    00000326 2F26                   MOV.L       R2,@-R15
+    00000328 D349                   MOV.L       L721+18,R3 ; L558
+    0000032A 2F36                   MOV.L       R3,@-R15
+    0000032C D249                   MOV.L       L721+22,R2 ; _ProgramFail
+    0000032E 420B                   JSR         @R2
+    00000330 64E3                   MOV         R14,R4
+    00000332 7F08                   ADD         #8,R15
+    00000334              L661:                             
+      variable.c   166        
+      variable.c   167        return AssignValue;
+    00000334 60D3                   MOV         R13,R0
+      variable.c   168    }
+    00000336 7F0C                   ADD         #12,R15
+    00000338 4F26                   LDS.L       @R15+,PR
+    0000033A 6CF6                   MOV.L       @R15+,R12
+    0000033C 6DF6                   MOV.L       @R15+,R13
+    0000033E 000B                   RTS
+    00000340 6EF6                   MOV.L       @R15+,R14
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:26  PAGE   12
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+      variable.c   169    
+      variable.c   170    /* define a variable. Ident must be registered. If it's a redefinition from the same declaration don't thr
+                         +ow an error */
+      variable.c   171    struct Value *VariableDefineButIgnoreIdentical(struct ParseState *Parser, char *Ident, struct ValueType *T
+                         +yp, int IsStatic, int *FirstVisit)
+    00000342              _VariableDefineButIgnoreIdentical:
+                                                           ; function: VariableDefineButIgnoreIdentical
+                                                           ; frame size=320
+      variable.c   172    {
+      variable.c   173        struct Value *ExistingValue;
+      variable.c   174        const char *DeclFileName;
+      variable.c   175        int DeclLine;
+      variable.c   176        int DeclColumn;
+      variable.c   177        
+      variable.c   178        if (IsStatic)
+    00000342 2778                   TST         R7,R7
+    00000344 2FE6                   MOV.L       R14,@-R15
+    00000346 2FD6                   MOV.L       R13,@-R15
+    00000348 2FC6                   MOV.L       R12,@-R15
+    0000034A 6D43                   MOV         R4,R13
+    0000034C 9077                   MOV.W       L721,R0    ; H'FEEC
+    0000034E 2FB6                   MOV.L       R11,@-R15
+    00000350 2FA6                   MOV.L       R10,@-R15
+    00000352 6B53                   MOV         R5,R11
+    00000354 2F96                   MOV.L       R9,@-R15
+    00000356 2F86                   MOV.L       R8,@-R15
+    00000358 4F22                   STS.L       PR,@-R15
+    0000035A 3F0C                   ADD         R0,R15
+    0000035C 1F64                   MOV.L       R6,@(16,R15)
+    0000035E 8F02                   BF/S        L722
+    00000360 EA01                   MOV         #1,R10
+    00000362 A085                   BRA         L671
+    00000364 0009                   NOP
+    00000366              L722:                             
+      variable.c   179        {
+      variable.c   180            char MangledName[LINEBUFFER_MAX];
+      variable.c   181            char *MNPos = &MangledName[0];
+    00000366 6EF3                   MOV         R15,R14
+      variable.c   182            char *MNEnd = &MangledName[LINEBUFFER_MAX-1];
+    00000368 9C6A                   MOV.W       L721+2,R12 ; H'0113
+      variable.c   183            const char *RegisteredMangledName;
+      variable.c   184            
+      variable.c   185            /* make the mangled static name (avoiding using sprintf() to minimise library impact) */
+      variable.c   186            memset((void *)&MangledName, '\0', sizeof(MangledName));
+    0000036A E500                   MOV         #0,R5
+    0000036C D23A                   MOV.L       L721+26,R2 ; _memset
+    0000036E 64F3                   MOV         R15,R4
+    00000370 9667                   MOV.W       L721+4,R6  ; H'0100
+    00000372 7E14                   ADD         #20,R14
+    00000374 3CFC                   ADD         R15,R12
+    00000376 420B                   JSR         @R2
+    00000378 7414                   ADD         #20,R4
+      variable.c   187            *MNPos++ = '/';
+    0000037A E92F                   MOV         #47,R9
+      variable.c   188            strncpy(MNPos, (char *)Parser->FileName, MNEnd - MNPos);
+    0000037C D837                   MOV.L       L721+30,R8 ; _strncpy
+    0000037E 66C3                   MOV         R12,R6
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:26  PAGE   13
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000380 2E90                   MOV.B       R9,@R14
+    00000382 7E01                   ADD         #1,R14
+    00000384 55D1                   MOV.L       @(4,R13),R5
+    00000386 36E8                   SUB         R14,R6
+    00000388 480B                   JSR         @R8
+    0000038A 64E3                   MOV         R14,R4
+      variable.c   189            MNPos += strlen(MNPos);
+    0000038C D234                   MOV.L       L721+34,R2 ; _strlen
+    0000038E 420B                   JSR         @R2
+    00000390 64E3                   MOV         R14,R4
+      variable.c   190            
+      variable.c   191            if (TopStackFrame != NULL)
+    00000392 D234                   MOV.L       L721+38,R2 ; _TopStackFrame
+    00000394 6322                   MOV.L       @R2,R3
+    00000396 2338                   TST         R3,R3
+    00000398 8D11                   BT/S        L672
+    0000039A 3E0C                   ADD         R0,R14
+      variable.c   192            {
+      variable.c   193                /* we're inside a function */
+      variable.c   194                if (MNEnd - MNPos > 0) *MNPos++ = '/';
+    0000039C 63C3                   MOV         R12,R3
+    0000039E 33E8                   SUB         R14,R3
+    000003A0 4315                   CMP/PL      R3
+    000003A2 8F02                   BF/S        L673
+      variable.c   195                strncpy(MNPos, (char *)TopStackFrame->FuncName, MNEnd - MNPos);
+    000003A4 66C3                   MOV         R12,R6
+    000003A6 2E90                   MOV.B       R9,@R14
+    000003A8 7E01                   ADD         #1,R14
+    000003AA              L673:                             
+    000003AA 36E8                   SUB         R14,R6
+    000003AC D32D                   MOV.L       L721+38,R3 ; _TopStackFrame
+    000003AE 6532                   MOV.L       @R3,R5
+    000003B0 5558                   MOV.L       @(32,R5),R5
+    000003B2 480B                   JSR         @R8
+    000003B4 64E3                   MOV         R14,R4
+      variable.c   196                MNPos += strlen(MNPos);
+    000003B6 D22A                   MOV.L       L721+34,R2 ; _strlen
+    000003B8 420B                   JSR         @R2
+    000003BA 64E3                   MOV         R14,R4
+    000003BC 3E0C                   ADD         R0,R14
+    000003BE              L672:                             
+      variable.c   197            }
+      variable.c   198                
+      variable.c   199            if (MNEnd - MNPos > 0) *MNPos++ = '/';
+    000003BE 63C3                   MOV         R12,R3
+    000003C0 33E8                   SUB         R14,R3
+    000003C2 4315                   CMP/PL      R3
+    000003C4 8F02                   BF/S        L674
+      variable.c   200            strncpy(MNPos, Ident, MNEnd - MNPos);
+    000003C6 66C3                   MOV         R12,R6
+    000003C8 2E90                   MOV.B       R9,@R14
+    000003CA 7E01                   ADD         #1,R14
+    000003CC              L674:                             
+    000003CC 36E8                   SUB         R14,R6
+    000003CE 65B3                   MOV         R11,R5
+    000003D0 480B                   JSR         @R8
+    000003D2 64E3                   MOV         R14,R4
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:26  PAGE   14
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+      variable.c   201            RegisteredMangledName = TableStrRegister(MangledName);
+    000003D4 D224                   MOV.L       L721+42,R2 ; _TableStrRegister
+    000003D6 64F3                   MOV         R15,R4
+    000003D8 420B                   JSR         @R2
+    000003DA 7414                   ADD         #20,R4
+      variable.c   202            
+      variable.c   203            /* is this static already defined? */
+      variable.c   204            if (!TableGet(&GlobalTable, RegisteredMangledName, &ExistingValue, &DeclFileName, &DeclLine, &Decl
+                         +Column))
+    000003DC D41A                   MOV.L       L721+10,R4 ; _GlobalTable
+    000003DE 6E03                   MOV         R0,R14
+    000003E0 63F3                   MOV         R15,R3
+    000003E2 730C                   ADD         #12,R3
+    000003E4 2F36                   MOV.L       R3,@-R15
+    000003E6 62F3                   MOV         R15,R2
+    000003E8 D320                   MOV.L       L721+46,R3 ; _TableGet
+    000003EA 720C                   ADD         #12,R2
+    000003EC 2F26                   MOV.L       R2,@-R15
+    000003EE 67F3                   MOV         R15,R7
+    000003F0 770C                   ADD         #12,R7
+    000003F2 66F3                   MOV         R15,R6
+    000003F4 7608                   ADD         #8,R6
+    000003F6 430B                   JSR         @R3
+    000003F8 65E3                   MOV         R14,R5
+    000003FA 2008                   TST         R0,R0
+    000003FC 8F15                   BF/S        L675
+    000003FE 7F08                   ADD         #8,R15
+      variable.c   205            {
+      variable.c   206                /* define the mangled-named static variable store in the global scope */
+      variable.c   207                ExistingValue = VariableAllocValueFromType(Parser, Typ, TRUE, NULL, TRUE);
+    00000400 2FA6                   MOV.L       R10,@-R15
+    00000402 E700                   MOV         #0,R7
+    00000404 55F5                   MOV.L       @(20,R15),R5
+    00000406 E601                   MOV         #1,R6
+    00000408 BE93                   BSR         _VariableAllocValueFromType
+    0000040A 64D3                   MOV         R13,R4
+    0000040C 1F01                   MOV.L       R0,@(4,R15)
+      variable.c   208                TableSet(&GlobalTable, (char *)RegisteredMangledName, ExistingValue, (char *)Parser->FileName,
+                         + Parser->Line, Parser->CharacterPos);
+    0000040E 85D5                   MOV.W       @(10,R13),R0
+    00000410 D40D                   MOV.L       L721+10,R4 ; _GlobalTable
+    00000412 2F06                   MOV.L       R0,@-R15
+    00000414 85D4                   MOV.W       @(8,R13),R0
+    00000416 2F06                   MOV.L       R0,@-R15
+    00000418 57D1                   MOV.L       @(4,R13),R7
+    0000041A 56F3                   MOV.L       @(12,R15),R6
+    0000041C D30B                   MOV.L       L721+14,R3 ; _TableSet
+    0000041E 430B                   JSR         @R3
+    00000420 65E3                   MOV         R14,R5
+    00000422 7F0C                   ADD         #12,R15
+      variable.c   209                *FirstVisit = TRUE;
+    00000424 900E                   MOV.W       L721+6,R0  ; H'0134
+    00000426 02FE                   MOV.L       @(R0,R15),R2
+    00000428 22A2                   MOV.L       R10,@R2
+    0000042A              L675:                             
+      variable.c   210            }
+      variable.c   211    
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:26  PAGE   15
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+      variable.c   212            /* static variable exists in the global scope - now make a mirroring variable in our own scope wit
+                         +h the short name */
+      variable.c   213            VariableDefinePlatformVar(Parser, Ident, ExistingValue->Typ, ExistingValue->Val, TRUE);
+    0000042A 65B3                   MOV         R11,R5
+    0000042C 2FA6                   MOV.L       R10,@-R15
+    0000042E 57F1                   MOV.L       @(4,R15),R7
+    00000430 56F1                   MOV.L       @(4,R15),R6
+    00000432 5771                   MOV.L       @(4,R7),R7
+    00000434 6662                   MOV.L       @R6,R6
+    00000436 B0B9                   BSR         _VariableDefinePlatformVar
+    00000438 64D3                   MOV         R13,R4
+    0000043A A042                   BRA         L621
+    0000043C 7F04                   ADD         #4,R15
+    0000043E              L721:                             
+    0000043E FEEC                   .DATA.W     H'FEEC
+    00000440 0113                   .DATA.W     H'0113
+    00000442 0100                   .DATA.W     H'0100
+    00000444 0134                   .DATA.W     H'0134
+    00000446 0000                   .DATA.W     0
+    00000448 <00000000>             .DATA.L     _GlobalTable
+    0000044C <00000000>             .DATA.L     _TableSet
+    00000450 <00000000>             .DATA.L     L558
+    00000454 <00000000>             .DATA.L     _ProgramFail
+    00000458 <00000000>             .DATA.L     _memset
+    0000045C <00000000>             .DATA.L     _strncpy
+    00000460 <00000000>             .DATA.L     _strlen
+    00000464 <00000000>             .DATA.L     _TopStackFrame
+    00000468 <00000000>             .DATA.L     _TableStrRegister
+    0000046C <00000000>             .DATA.L     _TableGet
+    00000470              L671:                             
+      variable.c   214            return ExistingValue;
+      variable.c   215        }
+      variable.c   216        else
+      variable.c   217        {
+      variable.c   218            if (Parser->Line != 0 && TableGet((TopStackFrame == NULL) ? &GlobalTable : &TopStackFrame->LocalTa
+                         +ble, Ident, &ExistingValue, &DeclFileName, &DeclLine, &DeclColumn)
+      variable.c   219                    && DeclFileName == Parser->FileName && DeclLine == Parser->Line && DeclColumn == Parser->C
+                         +haracterPos)
+    00000470 85D4                   MOV.W       @(8,R13),R0
+    00000472 2008                   TST         R0,R0
+    00000474 8927                   BT          L678
+    00000476 62F3                   MOV         R15,R2
+    00000478 720C                   ADD         #12,R2
+    0000047A 2F26                   MOV.L       R2,@-R15
+    0000047C 63F3                   MOV         R15,R3
+    0000047E 730C                   ADD         #12,R3
+    00000480 2F36                   MOV.L       R3,@-R15
+    00000482 67F3                   MOV         R15,R7
+    00000484 D32F                   MOV.L       L723+4,R3  ; _TopStackFrame
+    00000486 66F3                   MOV         R15,R6
+    00000488 6232                   MOV.L       @R3,R2
+    0000048A 770C                   ADD         #12,R7
+    0000048C 7608                   ADD         #8,R6
+    0000048E 2228                   TST         R2,R2
+    00000490 8F03                   BF/S        L679
+    00000492 65B3                   MOV         R11,R5
+    00000494 D42C                   MOV.L       L723+8,R4  ; _GlobalTable
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:26  PAGE   16
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000496 A002                   BRA         L680
+    00000498 0009                   NOP
+    0000049A              L679:                             
+    0000049A 6432                   MOV.L       @R3,R4
+    0000049C 7430                   ADD         #48,R4
+    0000049E              L680:                             
+    0000049E D22B                   MOV.L       L723+12,R2 ; _TableGet
+    000004A0 420B                   JSR         @R2
+    000004A2 0009                   NOP
+    000004A4 2008                   TST         R0,R0
+    000004A6 8D0E                   BT/S        L678
+    000004A8 7F08                   ADD         #8,R15
+    000004AA 52D1                   MOV.L       @(4,R13),R2
+    000004AC 53F1                   MOV.L       @(4,R15),R3
+    000004AE 3320                   CMP/EQ      R2,R3
+    000004B0 8B09                   BF          L678
+    000004B2 85D4                   MOV.W       @(8,R13),R0
+    000004B4 53F2                   MOV.L       @(8,R15),R3
+    000004B6 3300                   CMP/EQ      R0,R3
+    000004B8 8B05                   BF          L678
+    000004BA 85D5                   MOV.W       @(10,R13),R0
+    000004BC 53F3                   MOV.L       @(12,R15),R3
+    000004BE 3300                   CMP/EQ      R0,R3
+    000004C0 8B01                   BF          L678
+    000004C2              L621:
+      variable.c   220                return ExistingValue;
+    000004C2 A007                   BRA         L676
+    000004C4 60F2                   MOV.L       @R15,R0
+    000004C6              L678:                             
+      variable.c   221            else
+      variable.c   222                return VariableDefine(Parser, Ident, NULL, Typ, TRUE);
+    000004C6 E600                   MOV         #0,R6
+    000004C8 2FA6                   MOV.L       R10,@-R15
+    000004CA 65B3                   MOV         R11,R5
+    000004CC 57F5                   MOV.L       @(20,R15),R7
+    000004CE BED9                   BSR         _VariableDefine
+    000004D0 64D3                   MOV         R13,R4
+    000004D2 7F04                   ADD         #4,R15
+      variable.c   223        }
+      variable.c   224    }
+    000004D4              L676:                             
+    000004D4 9134                   MOV.W       L723,R1    ; H'0114
+    000004D6 3F1C                   ADD         R1,R15
+    000004D8 4F26                   LDS.L       @R15+,PR
+    000004DA 68F6                   MOV.L       @R15+,R8
+    000004DC 69F6                   MOV.L       @R15+,R9
+    000004DE 6AF6                   MOV.L       @R15+,R10
+    000004E0 6BF6                   MOV.L       @R15+,R11
+    000004E2 6CF6                   MOV.L       @R15+,R12
+    000004E4 6DF6                   MOV.L       @R15+,R13
+    000004E6 000B                   RTS
+    000004E8 6EF6                   MOV.L       @R15+,R14
+      variable.c   225    
+      variable.c   226    /* check if a variable with a given name is defined. Ident must be registered */
+      variable.c   227    int VariableDefined(const char *Ident)
+    000004EA              _VariableDefined:                ; function: VariableDefined
+                                                           ; frame size=20
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:26  PAGE   17
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000004EA 4F22                   STS.L       PR,@-R15
+      variable.c   228    {
+      variable.c   229        struct Value *FoundValue;
+      variable.c   230        
+      variable.c   231        if (TopStackFrame == NULL || !TableGet(&TopStackFrame->LocalTable, Ident, &FoundValue, NULL, NULL, NUL
+                         +L))
+    000004EC D215                   MOV.L       L723+4,R2  ; _TopStackFrame
+    000004EE 7FF8                   ADD         #-8,R15
+    000004F0 1F41                   MOV.L       R4,@(4,R15)
+    000004F2 6322                   MOV.L       @R2,R3
+    000004F4 2338                   TST         R3,R3
+    000004F6 890D                   BT          L683
+    000004F8 D114                   MOV.L       L723+12,R1 ; _TableGet
+    000004FA E300                   MOV         #0,R3
+    000004FC 2F36                   MOV.L       R3,@-R15
+    000004FE 6733                   MOV         R3,R7
+    00000500 2F36                   MOV.L       R3,@-R15
+    00000502 66F3                   MOV         R15,R6
+    00000504 55F3                   MOV.L       @(12,R15),R5
+    00000506 7608                   ADD         #8,R6
+    00000508 6422                   MOV.L       @R2,R4
+    0000050A 410B                   JSR         @R1
+    0000050C 7430                   ADD         #48,R4
+    0000050E 2008                   TST         R0,R0
+    00000510 8F11                   BF/S        L682
+    00000512 7F08                   ADD         #8,R15
+    00000514              L683:                             
+      variable.c   232        {
+      variable.c   233            if (!TableGet(&GlobalTable, Ident, &FoundValue, NULL, NULL, NULL))
+    00000514 D40C                   MOV.L       L723+8,R4  ; _GlobalTable
+    00000516 E200                   MOV         #0,R2
+    00000518 D30C                   MOV.L       L723+12,R3 ; _TableGet
+    0000051A 6723                   MOV         R2,R7
+    0000051C 2F26                   MOV.L       R2,@-R15
+    0000051E 2F26                   MOV.L       R2,@-R15
+    00000520 66F3                   MOV         R15,R6
+    00000522 7608                   ADD         #8,R6
+    00000524 430B                   JSR         @R3
+    00000526 55F3                   MOV.L       @(12,R15),R5
+    00000528 2008                   TST         R0,R0
+    0000052A 8F04                   BF/S        L682
+    0000052C 7F08                   ADD         #8,R15
+      variable.c   234                return FALSE;
+    0000052E 7F08                   ADD         #8,R15
+    00000530 4F26                   LDS.L       @R15+,PR
+    00000532 000B                   RTS
+    00000534 E000                   MOV         #0,R0
+    00000536              L682:                             
+      variable.c   235        }
+      variable.c   236    
+      variable.c   237        return TRUE;
+    00000536 E001                   MOV         #1,R0
+      variable.c   238    }
+    00000538              L685:                             
+    00000538 7F08                   ADD         #8,R15
+    0000053A 4F26                   LDS.L       @R15+,PR
+    0000053C 000B                   RTS
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:26  PAGE   18
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    0000053E 0009                   NOP
+    00000540              L723:                             
+    00000540 0114                   .DATA.W     H'0114
+    00000542 0000                   .DATA.W     0
+    00000544 <00000000>             .DATA.L     _TopStackFrame
+    00000548 <00000000>             .DATA.L     _GlobalTable
+    0000054C <00000000>             .DATA.L     _TableGet
+      variable.c   239    
+      variable.c   240    /* get the value of a variable. must be defined. Ident must be registered */
+      variable.c   241    void VariableGet(struct ParseState *Parser, const char *Ident, struct Value **LVal)
+    00000550              _VariableGet:                    ; function: VariableGet
+                                                           ; frame size=24
+    00000550 2FE6                   MOV.L       R14,@-R15
+    00000552 4F22                   STS.L       PR,@-R15
+      variable.c   242    {
+      variable.c   243        if (TopStackFrame == NULL || !TableGet(&TopStackFrame->LocalTable, Ident, LVal, NULL, NULL, NULL))
+    00000554 D28E                   MOV.L       L724+2,R2  ; _TopStackFrame
+    00000556 7FF8                   ADD         #-8,R15
+    00000558 1F41                   MOV.L       R4,@(4,R15)
+    0000055A 2F62                   MOV.L       R6,@R15
+    0000055C 6322                   MOV.L       @R2,R3
+    0000055E 2338                   TST         R3,R3
+    00000560 8D0D                   BT/S        L687
+    00000562 6E53                   MOV         R5,R14
+    00000564 D18B                   MOV.L       L724+6,R1  ; _TableGet
+    00000566 E300                   MOV         #0,R3
+    00000568 2F36                   MOV.L       R3,@-R15
+    0000056A 6733                   MOV         R3,R7
+    0000056C 2F36                   MOV.L       R3,@-R15
+    0000056E 65E3                   MOV         R14,R5
+    00000570 56F2                   MOV.L       @(8,R15),R6
+    00000572 6422                   MOV.L       @R2,R4
+    00000574 410B                   JSR         @R1
+    00000576 7430                   ADD         #48,R4
+    00000578 2008                   TST         R0,R0
+    0000057A 8F13                   BF/S        L686
+    0000057C 7F08                   ADD         #8,R15
+    0000057E              L687:                             
+      variable.c   244        {
+      variable.c   245            if (!TableGet(&GlobalTable, Ident, LVal, NULL, NULL, NULL))
+    0000057E E200                   MOV         #0,R2
+    00000580 D485                   MOV.L       L724+10,R4 ; _GlobalTable
+    00000582 6723                   MOV         R2,R7
+    00000584 D383                   MOV.L       L724+6,R3  ; _TableGet
+    00000586 2F26                   MOV.L       R2,@-R15
+    00000588 2F26                   MOV.L       R2,@-R15
+    0000058A 56F2                   MOV.L       @(8,R15),R6
+    0000058C 430B                   JSR         @R3
+    0000058E 65E3                   MOV         R14,R5
+    00000590 2008                   TST         R0,R0
+    00000592 8F07                   BF/S        L686
+    00000594 7F08                   ADD         #8,R15
+      variable.c   246                ProgramFail(Parser, "'%s' is undefined", Ident);
+    00000596 2FE6                   MOV.L       R14,@-R15
+    00000598 D380                   MOV.L       L724+14,R3 ; L586
+    0000059A 2F36                   MOV.L       R3,@-R15
+    0000059C D280                   MOV.L       L724+18,R2 ; _ProgramFail
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:26  PAGE   19
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    0000059E 420B                   JSR         @R2
+    000005A0 54F3                   MOV.L       @(12,R15),R4
+    000005A2 7F08                   ADD         #8,R15
+    000005A4              L686:                             
+      variable.c   247        }
+      variable.c   248    }
+    000005A4 7F08                   ADD         #8,R15
+    000005A6 4F26                   LDS.L       @R15+,PR
+    000005A8 000B                   RTS
+    000005AA 6EF6                   MOV.L       @R15+,R14
+      variable.c   249    
+      variable.c   250    /* define a global variable shared with a platform global. Ident will be registered */
+      variable.c   251    void VariableDefinePlatformVar(struct ParseState *Parser, char *Ident, struct ValueType *Typ, union AnyVal
+                         +ue *FromValue, int IsWritable)
+    000005AC              _VariableDefinePlatformVar:      ; function: VariableDefinePlatformVar
+                                                           ; frame size=36
+    000005AC 2FE6                   MOV.L       R14,@-R15
+      variable.c   252    {
+      variable.c   253        struct Value *SomeValue = VariableAllocValueAndData(NULL, 0, IsWritable, NULL, TRUE);
+    000005AE E301                   MOV         #1,R3
+    000005B0 2FD6                   MOV.L       R13,@-R15
+    000005B2 6E43                   MOV         R4,R14
+    000005B4 4F22                   STS.L       PR,@-R15
+    000005B6 7FF4                   ADD         #-12,R15
+    000005B8 2F52                   MOV.L       R5,@R15
+    000005BA 1F61                   MOV.L       R6,@(4,R15)
+    000005BC 1F72                   MOV.L       R7,@(8,R15)
+    000005BE E700                   MOV         #0,R7
+    000005C0 2F36                   MOV.L       R3,@-R15
+    000005C2 6573                   MOV         R7,R5
+    000005C4 56F7                   MOV.L       @(28,R15),R6
+    000005C6 BD97                   BSR         _VariableAllocValueAndData
+    000005C8 6473                   MOV         R7,R4
+    000005CA 7F04                   ADD         #4,R15
+      variable.c   254        SomeValue->Typ = Typ;
+    000005CC 53F1                   MOV.L       @(4,R15),R3
+      variable.c   255        SomeValue->Val = FromValue;
+      variable.c   256        
+      variable.c   257        if (!TableSet((TopStackFrame == NULL) ? &GlobalTable : &TopStackFrame->LocalTable, TableStrRegister(Id
+                         +ent), SomeValue, Parser ? Parser->FileName : NULL, Parser ? Parser->Line : 0, Parser ? Parser->CharacterPo
+                         +s : 0))
+    000005CE 2EE8                   TST         R14,R14
+    000005D0 6D03                   MOV         R0,R13
+    000005D2 2D32                   MOV.L       R3,@R13
+    000005D4 52F2                   MOV.L       @(8,R15),R2
+    000005D6 8D03                   BT/S        L690
+    000005D8 1D21                   MOV.L       R2,@(4,R13)
+    000005DA 85E5                   MOV.W       @(10,R14),R0
+    000005DC A002                   BRA         L694
+    000005DE 2F06                   MOV.L       R0,@-R15
+    000005E0              L690:                             
+    000005E0 E300                   MOV         #0,R3
+    000005E2 2F36                   MOV.L       R3,@-R15
+    000005E4              L694:                             
+    000005E4 2EE8                   TST         R14,R14
+    000005E6 8902                   BT          L691
+    000005E8 85E4                   MOV.W       @(8,R14),R0
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:26  PAGE   20
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000005EA A002                   BRA         L695
+    000005EC 2F06                   MOV.L       R0,@-R15
+    000005EE              L691:                             
+    000005EE E300                   MOV         #0,R3
+    000005F0 2F36                   MOV.L       R3,@-R15
+    000005F2              L695:                             
+    000005F2 2EE8                   TST         R14,R14
+    000005F4 8901                   BT          L692
+    000005F6 A001                   BRA         L696
+    000005F8 57E1                   MOV.L       @(4,R14),R7
+    000005FA              L692:                             
+    000005FA E700                   MOV         #0,R7
+    000005FC              L696:                             
+    000005FC 2F76                   MOV.L       R7,@-R15
+    000005FE D369                   MOV.L       L724+22,R3 ; _TableStrRegister
+    00000600 430B                   JSR         @R3
+    00000602 54F3                   MOV.L       @(12,R15),R4
+    00000604 D362                   MOV.L       L724+2,R3  ; _TopStackFrame
+    00000606 6232                   MOV.L       @R3,R2
+    00000608 2228                   TST         R2,R2
+    0000060A 8F03                   BF/S        L693
+    0000060C 6503                   MOV         R0,R5
+    0000060E D462                   MOV.L       L724+10,R4 ; _GlobalTable
+    00000610 A002                   BRA         L697
+    00000612 0009                   NOP
+    00000614              L693:                             
+    00000614 6432                   MOV.L       @R3,R4
+    00000616 7430                   ADD         #48,R4
+    00000618              L697:                             
+    00000618 D263                   MOV.L       L724+26,R2 ; _TableSet
+    0000061A 66D3                   MOV         R13,R6
+    0000061C 420B                   JSR         @R2
+    0000061E 67F6                   MOV.L       @R15+,R7
+    00000620 2008                   TST         R0,R0
+    00000622 8F08                   BF/S        L689
+    00000624 7F08                   ADD         #8,R15
+      variable.c   258            ProgramFail(Parser, "'%s' is already defined", Ident);
+    00000626 62F2                   MOV.L       @R15,R2
+    00000628 D360                   MOV.L       L724+30,R3 ; L558
+    0000062A 2F26                   MOV.L       R2,@-R15
+    0000062C 2F36                   MOV.L       R3,@-R15
+    0000062E D25C                   MOV.L       L724+18,R2 ; _ProgramFail
+    00000630 420B                   JSR         @R2
+    00000632 64E3                   MOV         R14,R4
+    00000634 7F08                   ADD         #8,R15
+    00000636              L689:                             
+      variable.c   259    }
+    00000636 7F0C                   ADD         #12,R15
+    00000638 4F26                   LDS.L       @R15+,PR
+    0000063A 6DF6                   MOV.L       @R15+,R13
+    0000063C 000B                   RTS
+    0000063E 6EF6                   MOV.L       @R15+,R14
+      variable.c   260    
+      variable.c   261    /* free and/or pop the top value off the stack. Var must be the top value on the stack! */
+      variable.c   262    void VariableStackPop(struct ParseState *Parser, struct Value *Var)
+    00000640              _VariableStackPop:               ; function: VariableStackPop
+                                                           ; frame size=16
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:26  PAGE   21
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000640 2FE6                   MOV.L       R14,@-R15
+    00000642 6E53                   MOV         R5,R14
+    00000644 4F22                   STS.L       PR,@-R15
+    00000646 7FFC                   ADD         #-4,R15
+    00000648 2F42                   MOV.L       R4,@R15
+      variable.c   263    {
+      variable.c   264        int Success;
+      variable.c   265        
+      variable.c   266    #ifdef DEBUG_HEAP
+      variable.c   267        if (Var->ValOnStack)
+      variable.c   268            printf("popping %ld at 0x%lx\n", (unsigned long)(sizeof(struct Value) + TypeSizeValue(Var, FALSE))
+                         +, (unsigned long)Var);
+      variable.c   269    #endif
+      variable.c   270            
+      variable.c   271        if (Var->ValOnHeap)
+    0000064A 84EC                   MOV.B       @(12,R14),R0
+    0000064C 2008                   TST         R0,R0
+    0000064E 8907                   BT          L698
+      variable.c   272        { 
+      variable.c   273            if (Var->Val != NULL)
+    00000650 53E1                   MOV.L       @(4,R14),R3
+    00000652 2338                   TST         R3,R3
+    00000654 890E                   BT          L622
+      variable.c   274                HeapFreeMem(Var->Val);
+    00000656 D356                   MOV.L       L724+34,R3 ; _HeapFreeMem
+    00000658 430B                   JSR         @R3
+    0000065A 54E1                   MOV.L       @(4,R14),R4
+    0000065C A00A                   BRA         L622
+    0000065E 0009                   NOP
+    00000660              L698:                             
+      variable.c   275                
+      variable.c   276            Success = HeapPopStack(Var, sizeof(struct Value));                       /* free from heap */
+      variable.c   277        }
+      variable.c   278        else if (Var->ValOnStack)
+    00000660 84ED                   MOV.B       @(13,R14),R0
+    00000662 2008                   TST         R0,R0
+    00000664 8906                   BT          L622
+      variable.c   279            Success = HeapPopStack(Var, sizeof(struct Value) + TypeSizeValue(Var, FALSE));  /* free from stack
+                         + */
+    00000666 E500                   MOV         #0,R5
+    00000668 D352                   MOV.L       L724+38,R3 ; _TypeSizeValue
+    0000066A 430B                   JSR         @R3
+    0000066C 64E3                   MOV         R14,R4
+    0000066E 6503                   MOV         R0,R5
+    00000670 A001                   BRA         L718
+    00000672 7510                   ADD         #16,R5
+    00000674              L622:
+      variable.c   280        else
+      variable.c   281            Success = HeapPopStack(Var, sizeof(struct Value));                       /* value isn't our proble
+                         +m */
+    00000674 E510                   MOV         #16,R5
+    00000676              L718:                             
+    00000676 D250                   MOV.L       L724+42,R2 ; _HeapPopStack
+    00000678 420B                   JSR         @R2
+    0000067A 64E3                   MOV         R14,R4
+    0000067C 6403                   MOV         R0,R4
+      variable.c   282            
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:26  PAGE   22
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+      variable.c   283        if (!Success)
+    0000067E 2448                   TST         R4,R4
+    00000680 8B05                   BF          L703
+      variable.c   284            ProgramFail(Parser, "stack underrun");
+    00000682 D24E                   MOV.L       L724+46,R2 ; L599
+    00000684 D346                   MOV.L       L724+18,R3 ; _ProgramFail
+    00000686 2F26                   MOV.L       R2,@-R15
+    00000688 430B                   JSR         @R3
+    0000068A 54F1                   MOV.L       @(4,R15),R4
+    0000068C 7F04                   ADD         #4,R15
+    0000068E              L703:                             
+      variable.c   285    }
+    0000068E 7F04                   ADD         #4,R15
+    00000690 4F26                   LDS.L       @R15+,PR
+    00000692 000B                   RTS
+    00000694 6EF6                   MOV.L       @R15+,R14
+      variable.c   286    
+      variable.c   287    /* add a stack frame when doing a function call */
+      variable.c   288    void VariableStackFrameAdd(struct ParseState *Parser, const char *FuncName, int NumParams)
+    00000696              _VariableStackFrameAdd:          ; function: VariableStackFrameAdd
+                                                           ; frame size=24
+    00000696 2FE6                   MOV.L       R14,@-R15
+    00000698 4F22                   STS.L       PR,@-R15
+    0000069A 7FF4                   ADD         #-12,R15
+      variable.c   289    {
+      variable.c   290        struct StackFrame *NewFrame;
+      variable.c   291        
+      variable.c   292        HeapPushStackFrame();
+    0000069C D348                   MOV.L       L724+50,R3 ; _HeapPushStackFrame
+    0000069E 2F42                   MOV.L       R4,@R15
+    000006A0 1F52                   MOV.L       R5,@(8,R15)
+    000006A2 430B                   JSR         @R3
+    000006A4 1F61                   MOV.L       R6,@(4,R15)
+      variable.c   293        NewFrame = HeapAllocStack(sizeof(struct StackFrame) + sizeof(struct Value *) * NumParams);
+    000006A6 54F1                   MOV.L       @(4,R15),R4
+    000006A8 D346                   MOV.L       L724+54,R3 ; _HeapAllocStack
+    000006AA 4408                   SHLL2       R4
+    000006AC 430B                   JSR         @R3
+    000006AE 7468                   ADD         #104,R4
+    000006B0 6E03                   MOV         R0,R14
+      variable.c   294        if (NewFrame == NULL)
+    000006B2 2EE8                   TST         R14,R14
+    000006B4 8B05                   BF          L704
+      variable.c   295            ProgramFail(Parser, "out of memory");
+    000006B6 D344                   MOV.L       L724+58,R3 ; L513
+    000006B8 D239                   MOV.L       L724+18,R2 ; _ProgramFail
+    000006BA 2F36                   MOV.L       R3,@-R15
+    000006BC 420B                   JSR         @R2
+    000006BE 54F1                   MOV.L       @(4,R15),R4
+    000006C0 7F04                   ADD         #4,R15
+    000006C2              L704:                             
+      variable.c   296            
+      variable.c   297        ParserCopy(&NewFrame->ReturnParser, Parser);
+    000006C2 65F2                   MOV.L       @R15,R5
+    000006C4 D341                   MOV.L       L724+62,R3 ; _ParserCopy
+    000006C6 430B                   JSR         @R3
+    000006C8 64E3                   MOV         R14,R4
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:26  PAGE   23
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+      variable.c   298        NewFrame->FuncName = FuncName;
+    000006CA 52F2                   MOV.L       @(8,R15),R2
+    000006CC 1E28                   MOV.L       R2,@(32,R14)
+      variable.c   299        NewFrame->Parameter = (NumParams > 0) ? ((void *)((char *)NewFrame + sizeof(struct StackFrame))) : NUL
+                         +L;
+    000006CE 51F1                   MOV.L       @(4,R15),R1
+    000006D0 4115                   CMP/PL      R1
+    000006D2 8B02                   BF          L705
+    000006D4 63E3                   MOV         R14,R3
+    000006D6 A001                   BRA         L706
+    000006D8 7368                   ADD         #104,R3
+    000006DA              L705:                             
+    000006DA E300                   MOV         #0,R3
+    000006DC              L706:                             
+    000006DC 1E3A                   MOV.L       R3,@(40,R14)
+      variable.c   300        TableInitTable(&NewFrame->LocalTable, &NewFrame->LocalHashTable[0], LOCAL_TABLE_SIZE, FALSE);
+    000006DE E700                   MOV         #0,R7
+    000006E0 D33B                   MOV.L       L724+66,R3 ; _TableInitTable
+    000006E2 E60B                   MOV         #11,R6
+    000006E4 65E3                   MOV         R14,R5
+    000006E6 7538                   ADD         #56,R5
+    000006E8 64E3                   MOV         R14,R4
+    000006EA 430B                   JSR         @R3
+    000006EC 7430                   ADD         #48,R4
+      variable.c   301        NewFrame->PreviousStackFrame = TopStackFrame;
+    000006EE E064                   MOV         #100,R0
+    000006F0 D427                   MOV.L       L724+2,R4  ; _TopStackFrame
+    000006F2 6242                   MOV.L       @R4,R2
+    000006F4 0E26                   MOV.L       R2,@(R0,R14)
+      variable.c   302        TopStackFrame = NewFrame;
+    000006F6 24E2                   MOV.L       R14,@R4
+      variable.c   303    }
+    000006F8 7F0C                   ADD         #12,R15
+    000006FA 4F26                   LDS.L       @R15+,PR
+    000006FC 000B                   RTS
+    000006FE 6EF6                   MOV.L       @R15+,R14
+      variable.c   304    
+      variable.c   305    /* remove a stack frame */
+      variable.c   306    void VariableStackFramePop(struct ParseState *Parser)
+    00000700              _VariableStackFramePop:          ; function: VariableStackFramePop
+                                                           ; frame size=16
+    00000700 2FE6                   MOV.L       R14,@-R15
+    00000702 4F22                   STS.L       PR,@-R15
+    00000704 2F46                   MOV.L       R4,@-R15
+      variable.c   307    {
+      variable.c   308        if (TopStackFrame == NULL)
+    00000706 DE22                   MOV.L       L724+2,R14 ; _TopStackFrame
+    00000708 63E2                   MOV.L       @R14,R3
+    0000070A 2338                   TST         R3,R3
+    0000070C 8B05                   BF          L707
+      variable.c   309            ProgramFail(Parser, "stack is empty - can't go back");
+    0000070E D331                   MOV.L       L724+70,R3 ; L607
+    00000710 D223                   MOV.L       L724+18,R2 ; _ProgramFail
+    00000712 2F36                   MOV.L       R3,@-R15
+    00000714 420B                   JSR         @R2
+    00000716 54F1                   MOV.L       @(4,R15),R4
+    00000718 7F04                   ADD         #4,R15
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:26  PAGE   24
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    0000071A              L707:                             
+      variable.c   310            
+      variable.c   311        ParserCopy(Parser, &TopStackFrame->ReturnParser);
+    0000071A 65E2                   MOV.L       @R14,R5
+    0000071C D32B                   MOV.L       L724+62,R3 ; _ParserCopy
+    0000071E 430B                   JSR         @R3
+    00000720 64F2                   MOV.L       @R15,R4
+      variable.c   312        TopStackFrame = TopStackFrame->PreviousStackFrame;
+    00000722 E064                   MOV         #100,R0
+    00000724 62E2                   MOV.L       @R14,R2
+    00000726 032E                   MOV.L       @(R0,R2),R3
+      variable.c   313        HeapPopStackFrame();
+    00000728 D22B                   MOV.L       L724+74,R2 ; _HeapPopStackFrame
+    0000072A 2E32                   MOV.L       R3,@R14
+    0000072C 7F04                   ADD         #4,R15
+    0000072E 4F26                   LDS.L       @R15+,PR
+    00000730 422B                   JMP         @R2
+    00000732 6EF6                   MOV.L       @R15+,R14
+      variable.c   314    }
+      variable.c   315    
+      variable.c   316    /* get a string literal. assumes that Ident is already registered. NULL if not found */
+      variable.c   317    struct Value *VariableStringLiteralGet(char *Ident)
+    00000734              _VariableStringLiteralGet:       ; function: VariableStringLiteralGet
+                                                           ; frame size=24
+    00000734 2FE6                   MOV.L       R14,@-R15
+      variable.c   318    {
+      variable.c   319        struct Value *LVal = NULL;
+    00000736 EE00                   MOV         #0,R14
+      variable.c   320    
+      variable.c   321        if (TableGet(&StringLiteralTable, Ident, &LVal, NULL, NULL, NULL))
+    00000738 D316                   MOV.L       L724+6,R3  ; _TableGet
+    0000073A 67E3                   MOV         R14,R7
+    0000073C 4F22                   STS.L       PR,@-R15
+    0000073E 7FF8                   ADD         #-8,R15
+    00000740 1F41                   MOV.L       R4,@(4,R15)
+    00000742 2FE2                   MOV.L       R14,@R15
+    00000744 2FE6                   MOV.L       R14,@-R15
+    00000746 2FE6                   MOV.L       R14,@-R15
+    00000748 D424                   MOV.L       L724+78,R4 ; _StringLiteralTable
+    0000074A 66F3                   MOV         R15,R6
+    0000074C 7608                   ADD         #8,R6
+    0000074E 430B                   JSR         @R3
+    00000750 55F3                   MOV.L       @(12,R15),R5
+    00000752 2008                   TST         R0,R0
+    00000754 8D05                   BT/S        L708
+    00000756 7F08                   ADD         #8,R15
+      variable.c   322            return LVal;
+    00000758 60F2                   MOV.L       @R15,R0
+    0000075A 7F08                   ADD         #8,R15
+    0000075C 4F26                   LDS.L       @R15+,PR
+    0000075E 000B                   RTS
+    00000760 6EF6                   MOV.L       @R15+,R14
+    00000762              L708:                             
+      variable.c   323        else
+      variable.c   324            return NULL;
+    00000762 E000                   MOV         #0,R0
+      variable.c   325    }
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:26  PAGE   25
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000764              L709:                             
+    00000764 7F08                   ADD         #8,R15
+    00000766 4F26                   LDS.L       @R15+,PR
+    00000768 000B                   RTS
+    0000076A 6EF6                   MOV.L       @R15+,R14
+      variable.c   326    
+      variable.c   327    /* define a string literal. assumes that Ident is already registered */
+      variable.c   328    void VariableStringLiteralDefine(char *Ident, struct Value *Val)
+    0000076C              _VariableStringLiteralDefine:    ; function: VariableStringLiteralDefine
+                                                           ; frame size=20
+    0000076C 4F22                   STS.L       PR,@-R15
+      variable.c   329    {
+      variable.c   330        TableSet(&StringLiteralTable, Ident, Val, NULL, 0, 0);
+    0000076E E300                   MOV         #0,R3
+    00000770 D20D                   MOV.L       L724+26,R2 ; _TableSet
+    00000772 7FF8                   ADD         #-8,R15
+    00000774 2F42                   MOV.L       R4,@R15
+    00000776 6733                   MOV         R3,R7
+    00000778 1F51                   MOV.L       R5,@(4,R15)
+    0000077A 2F36                   MOV.L       R3,@-R15
+    0000077C 2F36                   MOV.L       R3,@-R15
+    0000077E 56F3                   MOV.L       @(12,R15),R6
+    00000780 D416                   MOV.L       L724+78,R4 ; _StringLiteralTable
+    00000782 420B                   JSR         @R2
+    00000784 55F2                   MOV.L       @(8,R15),R5
+      variable.c   331    }
+    00000786 7F10                   ADD         #16,R15
+    00000788 4F26                   LDS.L       @R15+,PR
+    0000078A 000B                   RTS
+    0000078C 0009                   NOP
+    0000078E              L724:                             
+    0000078E 0000                   .DATA.W     0
+    00000790 <00000000>             .DATA.L     _TopStackFrame
+    00000794 <00000000>             .DATA.L     _TableGet
+    00000798 <00000000>             .DATA.L     _GlobalTable
+    0000079C <00000000>             .DATA.L     L586
+    000007A0 <00000000>             .DATA.L     _ProgramFail
+    000007A4 <00000000>             .DATA.L     _TableStrRegister
+    000007A8 <00000000>             .DATA.L     _TableSet
+    000007AC <00000000>             .DATA.L     L558
+    000007B0 <00000000>             .DATA.L     _HeapFreeMem
+    000007B4 <00000000>             .DATA.L     _TypeSizeValue
+    000007B8 <00000000>             .DATA.L     _HeapPopStack
+    000007BC <00000000>             .DATA.L     L599
+    000007C0 <00000000>             .DATA.L     _HeapPushStackFrame
+    000007C4 <00000000>             .DATA.L     _HeapAllocStack
+    000007C8 <00000000>             .DATA.L     L513
+    000007CC <00000000>             .DATA.L     _ParserCopy
+    000007D0 <00000000>             .DATA.L     _TableInitTable
+    000007D4 <00000000>             .DATA.L     L607
+    000007D8 <00000000>             .DATA.L     _HeapPopStackFrame
+    000007DC <00000000>             .DATA.L     _StringLiteralTable
+      variable.c   332    
+      variable.c   333    /* check a pointer for validity and dereference it for use */
+      variable.c   334    void *VariableDereferencePointer(struct ParseState *Parser, struct Value *PointerValue, struct Value **Der
+                         +efVal, int *DerefOffset, struct ValueType **DerefType, int *DerefIsLValue)
+    000007E0              _VariableDereferencePointer:     ; function: VariableDereferencePointer
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:26  PAGE   26
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+                                                           ; frame size=0
+      variable.c   335    {
+      variable.c   336        if (DerefVal != NULL)
+    000007E0 2668                   TST         R6,R6
+    000007E2 8D01                   BT/S        L711
+    000007E4 E400                   MOV         #0,R4
+      variable.c   337            *DerefVal = NULL;
+    000007E6 2642                   MOV.L       R4,@R6
+    000007E8              L711:                             
+      variable.c   338            
+      variable.c   339        if (DerefType != NULL)
+    000007E8 62F2                   MOV.L       @R15,R2
+    000007EA 2228                   TST         R2,R2
+    000007EC 8903                   BT          L712
+      variable.c   340            *DerefType = PointerValue->Typ->FromType;
+    000007EE 63F2                   MOV.L       @R15,R3
+    000007F0 6252                   MOV.L       @R5,R2
+    000007F2 5125                   MOV.L       @(20,R2),R1
+    000007F4 2312                   MOV.L       R1,@R3
+    000007F6              L712:                             
+      variable.c   341            
+      variable.c   342        if (DerefOffset != NULL)
+    000007F6 2778                   TST         R7,R7
+    000007F8 8900                   BT          L713
+      variable.c   343            *DerefOffset = 0;
+    000007FA 2742                   MOV.L       R4,@R7
+    000007FC              L713:                             
+      variable.c   344            
+      variable.c   345        if (DerefIsLValue != NULL)
+    000007FC 52F1                   MOV.L       @(4,R15),R2
+    000007FE 2228                   TST         R2,R2
+    00000800 8902                   BT          L714
+      variable.c   346            *DerefIsLValue = TRUE;
+    00000802 E201                   MOV         #1,R2
+    00000804 53F1                   MOV.L       @(4,R15),R3
+    00000806 2322                   MOV.L       R2,@R3
+    00000808              L714:                             
+      variable.c   347    
+      variable.c   348        return PointerValue->Val->Pointer;
+    00000808 5051                   MOV.L       @(4,R5),R0
+      variable.c   349    }
+    0000080A 000B                   RTS
+    0000080C 6002                   MOV.L       @R0,R0
+      variable.c   350    
+D   00000000              _TopStackFrame:                  ; static: TopStackFrame
+    00000000 00000000               .DATA.L     H'00000000
+C   00000000              L513:
+    00000000 6F7574206F             .SDATA      "out of memory"
+             66206D656D   
+             6F7279       
+    0000000D 00                     .DATA.B     H'00
+    0000000E 00000002               .RES.W      1
+    00000010              L529:
+    00000010 4153534552             .SDATA      "ASSERTION FAILED: Size > 0 || Typ == &VoidType FILE %s,LINE %d "
+             54494F4E20   
+             4641494C45   
+             443A205369   
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:26  PAGE   27
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+             7A65203E20   
+             30207C7C20   
+             547970203D   
+             3D2026566F   
+             6964547970   
+             652046494C   
+             452025732C   
+             4C494E4520   
+             256420       
+    0000004F 0A00                   .DATA.B     H'0A,H'00
+    00000051 00000001               .RES.B      1
+    00000052 00000002               .RES.W      1
+    00000054              L530:
+    00000054 453A5C416E             .SDATA      "E:\Anderain\fx-9860\dPicoc\variable.c"
+             6465726169   
+             6E5C66782D   
+             393836305C   
+             645069636F   
+             635C766172   
+             6961626C65   
+             2E63         
+    00000079 00                     .DATA.B     H'00
+    0000007A 00000002               .RES.W      1
+    0000007C              L540:
+    0000007C 4153534552             .SDATA      "ASSERTION FAILED: CopySize <= MAX_TMP_COPY_BUF FILE %s,LINE %d "
+             54494F4E20   
+             4641494C45   
+             443A20436F   
+             707953697A   
+             65203C3D20   
+             4D41585F54   
+             4D505F434F   
+             50595F4255   
+             462046494C   
+             452025732C   
+             4C494E4520   
+             256420       
+    000000BB 0A00                   .DATA.B     H'0A,H'00
+    000000BD 00000001               .RES.B      1
+    000000BE 00000002               .RES.W      1
+    000000C0              L558:
+    000000C0 2725732720             .SDATA      "'%s' is already defined"
+             697320616C   
+             7265616479   
+             2064656669   
+             6E6564       
+    000000D7 00                     .DATA.B     H'00
+    000000D8              L586:
+    000000D8 2725732720             .SDATA      "'%s' is undefined"
+             697320756E   
+             646566696E   
+             6564         
+    000000E9 00                     .DATA.B     H'00
+    000000EA 00000002               .RES.W      1
+    000000EC              L599:
+    000000EC 737461636B             .SDATA      "stack underrun"
+             20756E6465   
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:26  PAGE   28
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+             7272756E     
+    000000FA 00                     .DATA.B     H'00
+    000000FB 00000001               .RES.B      1
+    000000FC              L607:
+    000000FC 737461636B             .SDATA      "stack is empty - can't go back"
+             2069732065   
+             6D70747920   
+             2D2063616E   
+             277420676F   
+             206261636B   
+    0000011A 00                     .DATA.B     H'00
+B   00000000              _GlobalTable:                    ; static: GlobalTable
+    00000000 00000008               .RES.L      2
+    00000008              _GlobalHashTable:                ; static: GlobalHashTable
+    00000008 00000184               .RES.L      97
+    0000018C              _StringLiteralTable:             ; static: StringLiteralTable
+    0000018C 00000008               .RES.L      2
+    00000194              _StringLiteralHashTable:         ; static: StringLiteralHashTable
+    00000194 00000184               .RES.L      97
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:26  PAGE    1
+
+
+******** STATISTICS INFORMATION ********
+
+
+********** ERROR INFORMATION ***********
+
+NUMBER OF ERRORS:           0
+NUMBER OF WARNINGS:         0
+
+
+
+
+******* SOURCE LINE INFORMATION ********
+
+COMPILED SOURCE LINE:      350
+
+
+
+******* SECTION SIZE INFORMATION *******
+
+PROGRAM  SECTION (P):                               0000080E Byte(s)
+CONSTANT SECTION (C):                               0000011B Byte(s)
+DATA     SECTION (D):                               00000004 Byte(s)
+BSS      SECTION (B):                               00000318 Byte(s)
+
+ TOTAL PROGRAM SIZE: 00000C45 Byte(s)
+
+
+
+********** LABEL INFORMATION ***********
+
+NUMBER OF EXTERNAL REFERENCE SYMBOLS:           22
+NUMBER OF EXTERNAL DEFINITION SYMBOLS:          26
+NUMBER OF INTERNAL/EXTERNAL SYMBOLS:           125
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*** COMMAND PARAMETER ***
+
+
+  -subcommand=C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\hmk348.tmp 
+

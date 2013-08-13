@@ -1,0 +1,1259 @@
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:24  PAGE    1
+
+************ OBJECT LISTING ************
+
+FILE NAME: E:\Anderain\fx-9860\dPicoc\platform.c
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+      platform.c     1    #include "picoc.h"
+      platform.c     2    #include "interpreter.h"
+      platform.c     3    
+      platform.c     4    /* the value passed to exit() */
+      platform.c     5    int PicocExitValue = 0;
+      platform.c     6    
+      platform.c     7    /* initialise everything */
+      platform.c     8    void PicocInitialise(int StackSize)
+P   00000000              _PicocInitialise:                ; function: PicocInitialise
+                                                           ; frame size=4
+    00000000 4F22                   STS.L       PR,@-R15
+      platform.c     9    {
+      platform.c    10            HeapInit(StackSize);            //printf("heap init\n");
+    00000002 D38E                   MOV.L       L654,R3    ; _HeapInit
+    00000004 430B                   JSR         @R3
+    00000006 0009                   NOP
+      platform.c    11        TableInit();                                //printf("table init\n");
+    00000008 D28D                   MOV.L       L654+4,R2  ; _TableInit
+    0000000A 420B                   JSR         @R2
+    0000000C 0009                   NOP
+      platform.c    12        VariableInit();                             //printf("varible init\n");
+    0000000E D38D                   MOV.L       L654+8,R3  ; _VariableInit
+    00000010 430B                   JSR         @R3
+    00000012 0009                   NOP
+      platform.c    13        LexInit();                                  //printf("lex init\n");
+    00000014 D28C                   MOV.L       L654+12,R2 ; _LexInit
+    00000016 420B                   JSR         @R2
+    00000018 0009                   NOP
+      platform.c    14        TypeInit();                                 //printf("type init\n");
+    0000001A D38C                   MOV.L       L654+16,R3 ; _TypeInit
+    0000001C 430B                   JSR         @R3
+    0000001E 0009                   NOP
+      platform.c    15        IncludeInit();                              //printf("include init\n");
+    00000020 D28B                   MOV.L       L654+20,R2 ; _IncludeInit
+    00000022 420B                   JSR         @R2
+    00000024 0009                   NOP
+      platform.c    16        LibraryInit();                              //printf("library init\n");
+    00000026 D38B                   MOV.L       L654+24,R3 ; _LibraryInit
+    00000028 432B                   JMP         @R3
+    0000002A 4F26                   LDS.L       @R15+,PR
+      platform.c    17    }
+      platform.c    18    
+      platform.c    19    /* free memory */
+      platform.c    20    void PicocCleanup()
+    0000002C              _PicocCleanup:                   ; function: PicocCleanup
+                                                           ; frame size=4
+    0000002C 4F22                   STS.L       PR,@-R15
+      platform.c    21    {
+      platform.c    22        PlatformCleanup();
+    0000002E D38A                   MOV.L       L654+28,R3 ; _PlatformCleanup
+    00000030 430B                   JSR         @R3
+    00000032 0009                   NOP
+      platform.c    23        IncludeCleanup();
+    00000034 D289                   MOV.L       L654+32,R2 ; _IncludeCleanup
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:24  PAGE    2
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000036 420B                   JSR         @R2
+    00000038 0009                   NOP
+      platform.c    24        ParseCleanup();
+    0000003A D389                   MOV.L       L654+36,R3 ; _ParseCleanup
+    0000003C 430B                   JSR         @R3
+    0000003E 0009                   NOP
+      platform.c    25        LexCleanup();
+    00000040 D288                   MOV.L       L654+40,R2 ; _LexCleanup
+    00000042 420B                   JSR         @R2
+    00000044 0009                   NOP
+      platform.c    26        VariableCleanup();
+    00000046 D388                   MOV.L       L654+44,R3 ; _VariableCleanup
+    00000048 430B                   JSR         @R3
+    0000004A 0009                   NOP
+      platform.c    27        TypeCleanup();
+    0000004C D287                   MOV.L       L654+48,R2 ; _TypeCleanup
+    0000004E 420B                   JSR         @R2
+    00000050 0009                   NOP
+      platform.c    28        TableStrFree();
+    00000052 D387                   MOV.L       L654+52,R3 ; _TableStrFree
+    00000054 430B                   JSR         @R3
+    00000056 0009                   NOP
+      platform.c    29        HeapCleanup();
+    00000058 D286                   MOV.L       L654+56,R2 ; _HeapCleanup
+    0000005A 422B                   JMP         @R2
+    0000005C 4F26                   LDS.L       @R15+,PR
+      platform.c    30    }
+      platform.c    31    
+      platform.c    32    /* platform-dependent code for running programs */
+      platform.c    33    
+      platform.c    34    #define CALL_MAIN_NO_ARGS_RETURN_VOID "main();"
+      platform.c    35    #define CALL_MAIN_WITH_ARGS_RETURN_VOID "main(__argc,__argv);"
+      platform.c    36    #define CALL_MAIN_NO_ARGS_RETURN_INT "__exit_value = main();"
+      platform.c    37    #define CALL_MAIN_WITH_ARGS_RETURN_INT "__exit_value = main(__argc,__argv);"
+      platform.c    38    
+      platform.c    39    void PicocCallMain(int argc, char **argv)
+    0000005E              _PicocCallMain:                  ; function: PicocCallMain
+                                                           ; frame size=44
+      platform.c    40    {
+      platform.c    41        /* check if the program wants arguments */
+      platform.c    42        struct Value *FuncValue = NULL;
+    0000005E E300                   MOV         #0,R3
+    00000060 2FE6                   MOV.L       R14,@-R15
+    00000062 2FD6                   MOV.L       R13,@-R15
+    00000064 2FC6                   MOV.L       R12,@-R15
+    00000066 2FB6                   MOV.L       R11,@-R15
+    00000068 4F22                   STS.L       PR,@-R15
+    0000006A 7FF4                   ADD         #-12,R15
+    0000006C 1F42                   MOV.L       R4,@(8,R15)
+    0000006E 1F51                   MOV.L       R5,@(4,R15)
+    00000070 2F32                   MOV.L       R3,@R15
+      platform.c    43    
+      platform.c    44        if (!VariableDefined(TableStrRegister("main")))
+    00000072 D481                   MOV.L       L654+60,R4 ; L509
+    00000074 D381                   MOV.L       L654+64,R3 ; _TableStrRegister
+    00000076 430B                   JSR         @R3
+    00000078 0009                   NOP
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:24  PAGE    3
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    0000007A D281                   MOV.L       L654+68,R2 ; _VariableDefined
+    0000007C 420B                   JSR         @R2
+    0000007E 6403                   MOV         R0,R4
+    00000080 2008                   TST         R0,R0
+    00000082 8B04                   BF          L598
+      platform.c    45            ProgramFail(NULL, "main() is not defined");
+    00000084 D27F                   MOV.L       L654+72,R2 ; L510
+    00000086 2F26                   MOV.L       R2,@-R15
+    00000088 B09C                   BSR         _ProgramFail
+    0000008A E400                   MOV         #0,R4
+    0000008C 7F04                   ADD         #4,R15
+    0000008E              L598:                             
+      platform.c    46            
+      platform.c    47        VariableGet(NULL, TableStrRegister("main"), &FuncValue);
+    0000008E 66F3                   MOV         R15,R6
+    00000090 D479                   MOV.L       L654+60,R4 ; L509
+    00000092 D27A                   MOV.L       L654+64,R2 ; _TableStrRegister
+    00000094 420B                   JSR         @R2
+    00000096 2F66                   MOV.L       R6,@-R15
+    00000098 D37B                   MOV.L       L654+76,R3 ; _VariableGet
+    0000009A 6503                   MOV         R0,R5
+    0000009C E400                   MOV         #0,R4
+    0000009E 430B                   JSR         @R3
+    000000A0 66F6                   MOV.L       @R15+,R6
+      platform.c    48        if (FuncValue->Typ->Base != TypeFunction)
+    000000A2 60F2                   MOV.L       @R15,R0
+    000000A4 6002                   MOV.L       @R0,R0
+    000000A6 6002                   MOV.L       @R0,R0
+    000000A8 8809                   CMP/EQ      #9,R0
+    000000AA 8904                   BT          L599
+      platform.c    49            ProgramFail(NULL, "main is not a function - can't call it");
+    000000AC D277                   MOV.L       L654+80,R2 ; L511
+    000000AE 2F26                   MOV.L       R2,@-R15
+    000000B0 B088                   BSR         _ProgramFail
+    000000B2 E400                   MOV         #0,R4
+    000000B4 7F04                   ADD         #4,R15
+    000000B6              L599:                             
+      platform.c    50    
+      platform.c    51        if (FuncValue->Val->FuncDef.NumParams != 0)
+    000000B6 DB76                   MOV.L       L654+84,R11; _VariableDefinePlatformVar
+    000000B8 62F2                   MOV.L       @R15,R2
+    000000BA 5321                   MOV.L       @(4,R2),R3
+    000000BC 5131                   MOV.L       @(4,R3),R1
+    000000BE 2118                   TST         R1,R1
+    000000C0 8911                   BT          L600
+      platform.c    52        {
+      platform.c    53            /* define the arguments */
+      platform.c    54            VariableDefinePlatformVar(NULL, "__argc", &IntType, (union AnyValue *)&argc, FALSE);
+    000000C2 E100                   MOV         #0,R1
+    000000C4 D673                   MOV.L       L654+88,R6 ; _IntType
+    000000C6 2F16                   MOV.L       R1,@-R15
+    000000C8 D573                   MOV.L       L654+92,R5 ; L513
+    000000CA 67F3                   MOV         R15,R7
+    000000CC 770C                   ADD         #12,R7
+    000000CE 4B0B                   JSR         @R11
+    000000D0 6413                   MOV         R1,R4
+      platform.c    55            VariableDefinePlatformVar(NULL, "__argv", CharPtrPtrType, (union AnyValue *)&argv, FALSE);
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:24  PAGE    4
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000000D2 E300                   MOV         #0,R3
+    000000D4 D271                   MOV.L       L654+96,R2 ; _CharPtrPtrType
+    000000D6 2F36                   MOV.L       R3,@-R15
+    000000D8 6622                   MOV.L       @R2,R6
+    000000DA 67F3                   MOV         R15,R7
+    000000DC D570                   MOV.L       L654+100,R5; L514
+    000000DE 770C                   ADD         #12,R7
+    000000E0 4B0B                   JSR         @R11
+    000000E2 6433                   MOV         R3,R4
+    000000E4 7F08                   ADD         #8,R15
+    000000E6              L600:                             
+      platform.c    56        }
+      platform.c    57    
+      platform.c    58        if (FuncValue->Val->FuncDef.ReturnType == &VoidType)
+    000000E6 DC6F                   MOV.L       L654+104,R12; _strlen
+    000000E8 DD6F                   MOV.L       L654+108,R13; L516
+    000000EA DE70                   MOV.L       L654+112,R14; _PicocParse
+    000000EC 63F2                   MOV.L       @R15,R3
+    000000EE 5231                   MOV.L       @(4,R3),R2
+    000000F0 D16F                   MOV.L       L654+116,R1; _VoidType
+    000000F2 6022                   MOV.L       @R2,R0
+    000000F4 3010                   CMP/EQ      R1,R0
+    000000F6 8B1C                   BF          L601
+      platform.c    59        {
+      platform.c    60            if (FuncValue->Val->FuncDef.NumParams == 0)
+    000000F8 62F2                   MOV.L       @R15,R2
+    000000FA 5321                   MOV.L       @(4,R2),R3
+    000000FC 5031                   MOV.L       @(4,R3),R0
+    000000FE 2008                   TST         R0,R0
+    00000100 8B09                   BF          L602
+      platform.c    61                PicocParse("startup", CALL_MAIN_NO_ARGS_RETURN_VOID, strlen(CALL_MAIN_NO_ARGS_RETURN_VOID), TR
+                         +UE, TRUE, FALSE);
+    00000102 E000                   MOV         #0,R0
+    00000104 D46B                   MOV.L       L654+120,R4; L517
+    00000106 E301                   MOV         #1,R3
+    00000108 2F06                   MOV.L       R0,@-R15
+    0000010A 2F36                   MOV.L       R3,@-R15
+    0000010C 4C0B                   JSR         @R12
+    0000010E 2F36                   MOV.L       R3,@-R15
+    00000110 D568                   MOV.L       L654+120,R5; L517
+    00000112 A009                   BRA         L649
+    00000114 6603                   MOV         R0,R6
+    00000116              L602:                             
+      platform.c    62            else
+      platform.c    63                PicocParse("startup", CALL_MAIN_WITH_ARGS_RETURN_VOID, strlen(CALL_MAIN_WITH_ARGS_RETURN_VOID)
+                         +, TRUE, TRUE, FALSE);
+    00000116 E000                   MOV         #0,R0
+    00000118 D467                   MOV.L       L654+124,R4; L518
+    0000011A E301                   MOV         #1,R3
+    0000011C 2F06                   MOV.L       R0,@-R15
+    0000011E 2F36                   MOV.L       R3,@-R15
+    00000120 4C0B                   JSR         @R12
+    00000122 2F36                   MOV.L       R3,@-R15
+    00000124 D564                   MOV.L       L654+124,R5; L518
+    00000126 6603                   MOV         R0,R6
+    00000128              L649:                             
+    00000128 64D3                   MOV         R13,R4
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:24  PAGE    5
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    0000012A 4E0B                   JSR         @R14
+    0000012C 67F6                   MOV.L       @R15+,R7
+    0000012E A024                   BRA         L604
+    00000130 7F08                   ADD         #8,R15
+    00000132              L601:                             
+      platform.c    64        }
+      platform.c    65        else
+      platform.c    66        {
+      platform.c    67            VariableDefinePlatformVar(NULL, "__exit_value", &IntType, (union AnyValue *)&PicocExitValue, TRUE)
+                         +;
+    00000132 E001                   MOV         #1,R0
+    00000134 D761                   MOV.L       L654+128,R7; _PicocExitValue
+    00000136 2F06                   MOV.L       R0,@-R15
+    00000138 D656                   MOV.L       L654+88,R6 ; _IntType
+    0000013A D561                   MOV.L       L654+132,R5; L520
+    0000013C 4B0B                   JSR         @R11
+    0000013E E400                   MOV         #0,R4
+    00000140 7F04                   ADD         #4,R15
+      platform.c    68        
+      platform.c    69            if (FuncValue->Val->FuncDef.NumParams == 0)
+    00000142 63F2                   MOV.L       @R15,R3
+    00000144 5231                   MOV.L       @(4,R3),R2
+    00000146 5121                   MOV.L       @(4,R2),R1
+    00000148 2118                   TST         R1,R1
+    0000014A 8B09                   BF          L605
+      platform.c    70                PicocParse("startup", CALL_MAIN_NO_ARGS_RETURN_INT, strlen(CALL_MAIN_NO_ARGS_RETURN_INT), TRUE
+                         +, TRUE, FALSE);
+    0000014C D45D                   MOV.L       L654+136,R4; L521
+    0000014E E100                   MOV         #0,R1
+    00000150 2F16                   MOV.L       R1,@-R15
+    00000152 E301                   MOV         #1,R3
+    00000154 2F36                   MOV.L       R3,@-R15
+    00000156 4C0B                   JSR         @R12
+    00000158 2F36                   MOV.L       R3,@-R15
+    0000015A D55A                   MOV.L       L654+136,R5; L521
+    0000015C A009                   BRA         L650
+    0000015E 6603                   MOV         R0,R6
+    00000160              L605:                             
+      platform.c    71            else
+      platform.c    72                PicocParse("startup", CALL_MAIN_WITH_ARGS_RETURN_INT, strlen(CALL_MAIN_WITH_ARGS_RETURN_INT), 
+                         +TRUE, TRUE, FALSE);
+    00000160 D459                   MOV.L       L654+140,R4; L522
+    00000162 E100                   MOV         #0,R1
+    00000164 2F16                   MOV.L       R1,@-R15
+    00000166 E301                   MOV         #1,R3
+    00000168 2F36                   MOV.L       R3,@-R15
+    0000016A 4C0B                   JSR         @R12
+    0000016C 2F36                   MOV.L       R3,@-R15
+    0000016E 6603                   MOV         R0,R6
+    00000170 D555                   MOV.L       L654+140,R5; L522
+    00000172              L650:                             
+    00000172 64D3                   MOV         R13,R4
+    00000174 4E0B                   JSR         @R14
+    00000176 67F6                   MOV.L       @R15+,R7
+    00000178 7F08                   ADD         #8,R15
+    0000017A              L604:                             
+      platform.c    73        }
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:24  PAGE    6
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+      platform.c    74    }
+    0000017A 7F0C                   ADD         #12,R15
+    0000017C 4F26                   LDS.L       @R15+,PR
+    0000017E 6BF6                   MOV.L       @R15+,R11
+    00000180 6CF6                   MOV.L       @R15+,R12
+    00000182 6DF6                   MOV.L       @R15+,R13
+    00000184 000B                   RTS
+    00000186 6EF6                   MOV.L       @R15+,R14
+      platform.c    75    
+      platform.c    76    void PrintSourceTextErrorLine(const char *FileName, const char *SourceText, int Line, int CharacterPos)
+    00000188              _PrintSourceTextErrorLine:       ; function: PrintSourceTextErrorLine
+                                                           ; frame size=28
+    00000188 4F22                   STS.L       PR,@-R15
+      platform.c    77    {
+      platform.c    78        PlatformPrintf("%s:%d:", FileName, Line, CharacterPos);
+    0000018A 6373                   MOV         R7,R3
+    0000018C D34F                   MOV.L       L654+144,R3; L529
+    0000018E 7FF8                   ADD         #-8,R15
+    00000190 2F62                   MOV.L       R6,@R15
+    00000192 1F71                   MOV.L       R7,@(4,R15)
+    00000194 2F76                   MOV.L       R7,@-R15
+    00000196 52F1                   MOV.L       @(4,R15),R2
+    00000198 2F26                   MOV.L       R2,@-R15
+    0000019A 2F46                   MOV.L       R4,@-R15
+    0000019C B0DC                   BSR         _PlatformPrintf
+    0000019E 2F36                   MOV.L       R3,@-R15
+      platform.c    79    }
+    000001A0 7F18                   ADD         #24,R15
+    000001A2 4F26                   LDS.L       @R15+,PR
+    000001A4 000B                   RTS
+    000001A6 0009                   NOP
+      platform.c    80    
+      platform.c    81    
+      platform.c    82    /* display the source line and line number to identify an error */
+      platform.c    83    void PlatformErrorPrefix(struct ParseState *Parser)
+    000001A8              _PlatformErrorPrefix:            ; function: PlatformErrorPrefix
+                                                           ; frame size=4
+    000001A8 2FE6                   MOV.L       R14,@-R15
+    000001AA 6E43                   MOV         R4,R14
+      platform.c    84    {
+      platform.c    85        if (Parser != NULL)
+    000001AC 2EE8                   TST         R14,R14
+    000001AE 8907                   BT          L607
+      platform.c    86            PrintSourceTextErrorLine(Parser->FileName, Parser->SourceText, Parser->Line, Parser->CharacterPos)
+                         +;
+    000001B0 85E5                   MOV.W       @(10,R14),R0
+    000001B2 6703                   MOV         R0,R7
+    000001B4 85E4                   MOV.W       @(8,R14),R0
+    000001B6 6603                   MOV         R0,R6
+    000001B8 55E7                   MOV.L       @(28,R14),R5
+    000001BA 54E1                   MOV.L       @(4,R14),R4
+    000001BC AFE4                   BRA         _PrintSourceTextErrorLine
+    000001BE 6EF6                   MOV.L       @R15+,R14
+    000001C0              L607:                             
+      platform.c    87    }
+    000001C0 000B                   RTS
+    000001C2 6EF6                   MOV.L       @R15+,R14
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:24  PAGE    7
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+      platform.c    88    
+      platform.c    89    /* exit with a message */
+      platform.c    90    void ProgramFail(struct ParseState *Parser, const char *Message, ...)
+    000001C4              _ProgramFail:                    ; function: ProgramFail
+                                                           ; frame size=8
+    000001C4 4F22                   STS.L       PR,@-R15
+      platform.c    91    {
+      platform.c    92        va_list Args;
+      platform.c    93    
+      platform.c    94        PlatformErrorPrefix(Parser);
+    000001C6 BFEF                   BSR         _PlatformErrorPrefix
+    000001C8 0009                   NOP
+      platform.c    95        va_start(Args, Message);
+    000001CA 60F3                   MOV         R15,R0
+    000001CC 7004                   ADD         #4,R0
+    000001CE 7004                   ADD         #4,R0
+    000001D0 E503                   MOV         #3,R5
+    000001D2 2508                   TST         R0,R5
+    000001D4 8903                   BT          L608
+    000001D6 65F3                   MOV         R15,R5
+    000001D8 7504                   ADD         #4,R5
+    000001DA A003                   BRA         L609
+    000001DC 7508                   ADD         #8,R5
+    000001DE              L608:                             
+    000001DE 65F3                   MOV         R15,R5
+    000001E0 7504                   ADD         #4,R5
+    000001E2 7504                   ADD         #4,R5
+    000001E4              L609:                             
+      platform.c    96        PlatformVPrintf(Message, Args);
+    000001E4 B0CB                   BSR         _PlatformVPrintf
+    000001E6 54F1                   MOV.L       @(4,R15),R4
+      platform.c    97        va_end(Args);
+      platform.c    98        PlatformPrintf("\n");
+    000001E8 D239                   MOV.L       L654+148,R2; L536
+    000001EA B0B5                   BSR         _PlatformPrintf
+    000001EC 2F26                   MOV.L       R2,@-R15
+    000001EE 7F04                   ADD         #4,R15
+      platform.c    99        PlatformExit(1);
+    000001F0 D238                   MOV.L       L654+152,R2; _PlatformExit
+    000001F2 420B                   JSR         @R2
+    000001F4 E401                   MOV         #1,R4
+      platform.c   100    }
+    000001F6 4F26                   LDS.L       @R15+,PR
+    000001F8 000B                   RTS
+    000001FA 0009                   NOP
+      platform.c   101    
+      platform.c   102    /* like ProgramFail() but gives descriptive error messages for assignment */
+      platform.c   103    void AssignFail(struct ParseState *Parser, const char *Format, struct ValueType *Type1, struct ValueType *
+                         +Type2, int Num1, int Num2, const char *FuncName, int ParamNo)
+    000001FC              _AssignFail:                     ; function: AssignFail
+                                                           ; frame size=32
+    000001FC 2FE6                   MOV.L       R14,@-R15
+    000001FE 4F22                   STS.L       PR,@-R15
+    00000200 7FF4                   ADD         #-12,R15
+    00000202 1F51                   MOV.L       R5,@(4,R15)
+    00000204 2F62                   MOV.L       R6,@R15
+    00000206 1F72                   MOV.L       R7,@(8,R15)
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:24  PAGE    8
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+      platform.c   104    {
+      platform.c   105        PlatformErrorPrefix(Parser);
+    00000208 BFCE                   BSR         _PlatformErrorPrefix
+    0000020A 5EF7                   MOV.L       @(28,R15),R14
+      platform.c   106        PlatformPrintf("can't %s ", (FuncName == NULL) ? "assign" : "set");   
+    0000020C 2EE8                   TST         R14,R14
+    0000020E 8B03                   BF          L610
+    00000210 D331                   MOV.L       L654+156,R3; L547
+    00000212 2F36                   MOV.L       R3,@-R15
+    00000214 A002                   BRA         L611
+    00000216 0009                   NOP
+    00000218              L610:                             
+    00000218 D230                   MOV.L       L654+160,R2; L548
+    0000021A 2F26                   MOV.L       R2,@-R15
+    0000021C              L611:                             
+    0000021C D130                   MOV.L       L654+164,R1; L546
+    0000021E B09B                   BSR         _PlatformPrintf
+    00000220 2F16                   MOV.L       R1,@-R15
+    00000222 7F08                   ADD         #8,R15
+      platform.c   107            
+      platform.c   108        if (Type1 != NULL)
+    00000224 62F2                   MOV.L       @R15,R2
+    00000226 2228                   TST         R2,R2
+    00000228 895C                   BT          L612
+      platform.c   109            PlatformPrintf(Format, Type1, Type2);
+    0000022A 53F2                   MOV.L       @(8,R15),R3
+    0000022C 2F36                   MOV.L       R3,@-R15
+    0000022E 52F1                   MOV.L       @(4,R15),R2
+    00000230 2F26                   MOV.L       R2,@-R15
+    00000232 53F3                   MOV.L       @(12,R15),R3
+    00000234 B090                   BSR         _PlatformPrintf
+    00000236 2F36                   MOV.L       R3,@-R15
+    00000238 A05B                   BRA         L651
+    0000023A 0009                   NOP
+    0000023C              L654:                             
+    0000023C <00000000>             .DATA.L     _HeapInit
+    00000240 <00000000>             .DATA.L     _TableInit
+    00000244 <00000000>             .DATA.L     _VariableInit
+    00000248 <00000000>             .DATA.L     _LexInit
+    0000024C <00000000>             .DATA.L     _TypeInit
+    00000250 <00000000>             .DATA.L     _IncludeInit
+    00000254 <00000000>             .DATA.L     _LibraryInit
+    00000258 <00000000>             .DATA.L     _PlatformCleanup
+    0000025C <00000000>             .DATA.L     _IncludeCleanup
+    00000260 <00000000>             .DATA.L     _ParseCleanup
+    00000264 <00000000>             .DATA.L     _LexCleanup
+    00000268 <00000000>             .DATA.L     _VariableCleanup
+    0000026C <00000000>             .DATA.L     _TypeCleanup
+    00000270 <00000000>             .DATA.L     _TableStrFree
+    00000274 <00000000>             .DATA.L     _HeapCleanup
+    00000278 <00000000>             .DATA.L     L509
+    0000027C <00000000>             .DATA.L     _TableStrRegister
+    00000280 <00000000>             .DATA.L     _VariableDefined
+    00000284 <00000000>             .DATA.L     L510
+    00000288 <00000000>             .DATA.L     _VariableGet
+    0000028C <00000000>             .DATA.L     L511
+    00000290 <00000000>             .DATA.L     _VariableDefinePlatformVar
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:24  PAGE    9
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000294 <00000000>             .DATA.L     _IntType
+    00000298 <00000000>             .DATA.L     L513
+    0000029C <00000000>             .DATA.L     _CharPtrPtrType
+    000002A0 <00000000>             .DATA.L     L514
+    000002A4 <00000000>             .DATA.L     _strlen
+    000002A8 <00000000>             .DATA.L     L516
+    000002AC <00000000>             .DATA.L     _PicocParse
+    000002B0 <00000000>             .DATA.L     _VoidType
+    000002B4 <00000000>             .DATA.L     L517
+    000002B8 <00000000>             .DATA.L     L518
+    000002BC <00000000>             .DATA.L     _PicocExitValue
+    000002C0 <00000000>             .DATA.L     L520
+    000002C4 <00000000>             .DATA.L     L521
+    000002C8 <00000000>             .DATA.L     L522
+    000002CC <00000000>             .DATA.L     L529
+    000002D0 <00000000>             .DATA.L     L536
+    000002D4 <00000000>             .DATA.L     _PlatformExit
+    000002D8 <00000000>             .DATA.L     L547
+    000002DC <00000000>             .DATA.L     L548
+    000002E0 <00000000>             .DATA.L     L546
+    000002E4              L612:                             
+      platform.c   110        else
+      platform.c   111            PlatformPrintf(Format, Num1, Num2);
+    000002E4 52F6                   MOV.L       @(24,R15),R2
+    000002E6 2F26                   MOV.L       R2,@-R15
+    000002E8 53F6                   MOV.L       @(24,R15),R3
+    000002EA 2F36                   MOV.L       R3,@-R15
+    000002EC 52F3                   MOV.L       @(12,R15),R2
+    000002EE B033                   BSR         _PlatformPrintf
+    000002F0 2F26                   MOV.L       R2,@-R15
+    000002F2              L651:                             
+      platform.c   112        
+      platform.c   113        if (FuncName != NULL)
+    000002F2 2EE8                   TST         R14,R14
+    000002F4 8D07                   BT/S        L614
+    000002F6 7F0C                   ADD         #12,R15
+      platform.c   114            PlatformPrintf(" in argument %d of call to %s()", ParamNo, FuncName);
+    000002F8 2FE6                   MOV.L       R14,@-R15
+    000002FA 53F9                   MOV.L       @(36,R15),R3
+    000002FC D275                   MOV.L       L655+2,R2  ; L549
+    000002FE 2F36                   MOV.L       R3,@-R15
+    00000300 B02A                   BSR         _PlatformPrintf
+    00000302 2F26                   MOV.L       R2,@-R15
+    00000304 7F0C                   ADD         #12,R15
+    00000306              L614:                             
+      platform.c   115            
+      platform.c   116        ProgramFail(NULL, "");
+    00000306 D174                   MOV.L       L655+6,R1  ; L550
+    00000308 2F16                   MOV.L       R1,@-R15
+    0000030A BF5B                   BSR         _ProgramFail
+    0000030C E400                   MOV         #0,R4
+      platform.c   117    }
+    0000030E 7F10                   ADD         #16,R15
+    00000310 4F26                   LDS.L       @R15+,PR
+    00000312 000B                   RTS
+    00000314 6EF6                   MOV.L       @R15+,R14
+      platform.c   118    
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:24  PAGE   10
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+      platform.c   119    /* exit lexing with a message */
+      platform.c   120    void LexFail(struct LexState *Lexer, const char *Message, ...)
+    00000316              _LexFail:                        ; function: LexFail
+                                                           ; frame size=12
+    00000316 2FE6                   MOV.L       R14,@-R15
+    00000318 4F22                   STS.L       PR,@-R15
+    0000031A 6E43                   MOV         R4,R14
+      platform.c   121    {
+      platform.c   122        va_list Args;
+      platform.c   123    
+      platform.c   124        PrintSourceTextErrorLine(Lexer->FileName, Lexer->SourceText, Lexer->Line, Lexer->CharacterPos);
+    0000031C 57E4                   MOV.L       @(16,R14),R7
+    0000031E 56E3                   MOV.L       @(12,R14),R6
+    00000320 55E5                   MOV.L       @(20,R14),R5
+    00000322 BF31                   BSR         _PrintSourceTextErrorLine
+    00000324 54E2                   MOV.L       @(8,R14),R4
+      platform.c   125        va_start(Args, Message);
+    00000326 60F3                   MOV         R15,R0
+    00000328 7008                   ADD         #8,R0
+    0000032A 7004                   ADD         #4,R0
+    0000032C E503                   MOV         #3,R5
+    0000032E 2508                   TST         R0,R5
+    00000330 8903                   BT          L615
+    00000332 65F3                   MOV         R15,R5
+    00000334 7508                   ADD         #8,R5
+    00000336 A003                   BRA         L616
+    00000338 7508                   ADD         #8,R5
+    0000033A              L615:                             
+    0000033A 65F3                   MOV         R15,R5
+    0000033C 7508                   ADD         #8,R5
+    0000033E 7504                   ADD         #4,R5
+    00000340              L616:                             
+      platform.c   126        PlatformVPrintf(Message, Args);
+    00000340 B01D                   BSR         _PlatformVPrintf
+    00000342 54F2                   MOV.L       @(8,R15),R4
+      platform.c   127        va_end(Args);
+      platform.c   128        PlatformPrintf("\n");
+    00000344 D265                   MOV.L       L655+10,R2 ; L536
+    00000346 B007                   BSR         _PlatformPrintf
+    00000348 2F26                   MOV.L       R2,@-R15
+    0000034A 7F04                   ADD         #4,R15
+      platform.c   129        PlatformExit(1);
+    0000034C D264                   MOV.L       L655+14,R2 ; _PlatformExit
+    0000034E 420B                   JSR         @R2
+    00000350 E401                   MOV         #1,R4
+      platform.c   130    }
+    00000352 4F26                   LDS.L       @R15+,PR
+    00000354 000B                   RTS
+    00000356 6EF6                   MOV.L       @R15+,R14
+      platform.c   131    
+      platform.c   132    /* printf for compiler error reporting */
+      platform.c   133    void PlatformPrintf(const char *Format, ...)
+    00000358              _PlatformPrintf:                 ; function: PlatformPrintf
+                                                           ; frame size=4
+    00000358 4F22                   STS.L       PR,@-R15
+      platform.c   134    {
+      platform.c   135        va_list Args;
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:24  PAGE   11
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+      platform.c   136        
+      platform.c   137        va_start(Args, Format);
+    0000035A E503                   MOV         #3,R5
+    0000035C 60F3                   MOV         R15,R0
+    0000035E 7004                   ADD         #4,R0
+    00000360 7004                   ADD         #4,R0
+    00000362 2508                   TST         R0,R5
+    00000364 8903                   BT          L617
+    00000366 65F3                   MOV         R15,R5
+    00000368 7504                   ADD         #4,R5
+    0000036A A003                   BRA         L618
+    0000036C 7508                   ADD         #8,R5
+    0000036E              L617:                             
+    0000036E 65F3                   MOV         R15,R5
+    00000370 7504                   ADD         #4,R5
+    00000372 7504                   ADD         #4,R5
+    00000374              L618:                             
+      platform.c   138        PlatformVPrintf(Format, Args);
+    00000374 B003                   BSR         _PlatformVPrintf
+    00000376 54F1                   MOV.L       @(4,R15),R4
+      platform.c   139        va_end(Args);
+      platform.c   140    }
+    00000378 4F26                   LDS.L       @R15+,PR
+    0000037A 000B                   RTS
+    0000037C 0009                   NOP
+      platform.c   141    
+      platform.c   142    void PlatformVPrintf(const char *Format, va_list Args)
+    0000037E              _PlatformVPrintf:                ; function: PlatformVPrintf
+                                                           ; frame size=48
+    0000037E 2FE6                   MOV.L       R14,@-R15
+    00000380 2FD6                   MOV.L       R13,@-R15
+    00000382 6E53                   MOV         R5,R14
+    00000384 2FC6                   MOV.L       R12,@-R15
+      platform.c   143    {
+      platform.c   144        const char *FPos;
+      platform.c   145        
+      platform.c   146        for (FPos = Format; *FPos != '\0'; FPos++)
+    00000386 ED03                   MOV         #3,R13
+    00000388 2FB6                   MOV.L       R11,@-R15
+    0000038A 2FA6                   MOV.L       R10,@-R15
+    0000038C 2F96                   MOV.L       R9,@-R15
+    0000038E 2F86                   MOV.L       R8,@-R15
+    00000390 4F22                   STS.L       PR,@-R15
+    00000392 7FF8                   ADD         #-8,R15
+    00000394 D853                   MOV.L       L655+18,R8 ; _PrintType
+    00000396 D954                   MOV.L       L655+22,R9 ; _PrintStr
+    00000398 DA54                   MOV.L       L655+26,R10; _PrintFP
+    0000039A DB55                   MOV.L       L655+30,R11; _PrintCh
+    0000039C A08A                   BRA         L619
+    0000039E 6C43                   MOV         R4,R12
+    000003A0              L620:                             
+      platform.c   147        {
+      platform.c   148            if (*FPos == '%')
+    000003A0 60C0                   MOV.B       @R12,R0
+    000003A2 8825                   CMP/EQ      #37,R0
+    000003A4 8901                   BT          L656
+    000003A6 A081                   BRA         L621
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:24  PAGE   12
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000003A8 0009                   NOP
+    000003AA              L656:                             
+      platform.c   149            {
+      platform.c   150                FPos++;
+    000003AA 7C01                   ADD         #1,R12
+      platform.c   151                switch (*FPos)
+    000003AC 60C0                   MOV.B       @R12,R0
+    000003AE 8873                   CMP/EQ      #115,R0
+    000003B0 890D                   BT          L590
+    000003B2 8864                   CMP/EQ      #100,R0
+    000003B4 8920                   BT          L591
+    000003B6 8863                   CMP/EQ      #99,R0
+    000003B8 8934                   BT          L592
+    000003BA 8874                   CMP/EQ      #116,R0
+    000003BC 8945                   BT          L593
+    000003BE 8866                   CMP/EQ      #102,R0
+    000003C0 8958                   BT          L594
+    000003C2 8825                   CMP/EQ      #37,R0
+    000003C4 896E                   BT          L595
+    000003C6 8800                   CMP/EQ      #0,R0
+    000003C8 896E                   BT          L596
+    000003CA A072                   BRA         L643
+    000003CC 0009                   NOP
+    000003CE              L590:                            ; case label 
+      platform.c   152                {
+      platform.c   153                case 's': PrintStr(va_arg(Args, char *)); break;
+    000003CE 64E3                   MOV         R14,R4
+    000003D0 7404                   ADD         #4,R4
+    000003D2 24D8                   TST         R13,R4
+    000003D4 8D02                   BT/S        L623
+    000003D6 2F42                   MOV.L       R4,@R15
+    000003D8 A001                   BRA         L625
+    000003DA 7E08                   ADD         #8,R14
+    000003DC              L623:                             
+    000003DC 6EF2                   MOV.L       @R15,R14
+    000003DE              L625:                             
+    000003DE 64E3                   MOV         R14,R4
+    000003E0 74FC                   ADD         #-4,R4
+    000003E2 24D8                   TST         R13,R4
+    000003E4 8D03                   BT/S        L624
+    000003E6 1F41                   MOV.L       R4,@(4,R15)
+    000003E8 64E3                   MOV         R14,R4
+    000003EA A001                   BRA         L626
+    000003EC 74F8                   ADD         #-8,R4
+    000003EE              L624:                             
+    000003EE 54F1                   MOV.L       @(4,R15),R4
+    000003F0              L626:                             
+    000003F0 490B                   JSR         @R9
+    000003F2 6442                   MOV.L       @R4,R4
+    000003F4 A05D                   BRA         L643
+    000003F6 0009                   NOP
+    000003F8              L591:                            ; case label 
+      platform.c   154                case 'd': PrintSimpleInt(va_arg(Args, int)); break;
+    000003F8 64E3                   MOV         R14,R4
+    000003FA 7404                   ADD         #4,R4
+    000003FC 24D8                   TST         R13,R4
+    000003FE 8D02                   BT/S        L627
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:24  PAGE   13
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000400 1F41                   MOV.L       R4,@(4,R15)
+    00000402 A001                   BRA         L629
+    00000404 7E08                   ADD         #8,R14
+    00000406              L627:                             
+    00000406 5EF1                   MOV.L       @(4,R15),R14
+    00000408              L629:                             
+    00000408 64E3                   MOV         R14,R4
+    0000040A 74FC                   ADD         #-4,R4
+    0000040C 24D8                   TST         R13,R4
+    0000040E 8D03                   BT/S        L628
+    00000410 2F42                   MOV.L       R4,@R15
+    00000412 64E3                   MOV         R14,R4
+    00000414 A001                   BRA         L630
+    00000416 74F8                   ADD         #-8,R4
+    00000418              L628:                             
+    00000418 64F2                   MOV.L       @R15,R4
+    0000041A              L630:                             
+    0000041A D236                   MOV.L       L655+34,R2 ; _PrintSimpleInt
+    0000041C 420B                   JSR         @R2
+    0000041E 6442                   MOV.L       @R4,R4
+    00000420 A047                   BRA         L643
+    00000422 0009                   NOP
+    00000424              L592:                            ; case label 
+      platform.c   155                case 'c': PrintCh(va_arg(Args, int)); break;
+    00000424 64E3                   MOV         R14,R4
+    00000426 7404                   ADD         #4,R4
+    00000428 24D8                   TST         R13,R4
+    0000042A 8D02                   BT/S        L631
+    0000042C 2F42                   MOV.L       R4,@R15
+    0000042E A001                   BRA         L633
+    00000430 7E08                   ADD         #8,R14
+    00000432              L631:                             
+    00000432 6EF2                   MOV.L       @R15,R14
+    00000434              L633:                             
+    00000434 64E3                   MOV         R14,R4
+    00000436 74FC                   ADD         #-4,R4
+    00000438 24D8                   TST         R13,R4
+    0000043A 8D03                   BT/S        L632
+    0000043C 1F41                   MOV.L       R4,@(4,R15)
+    0000043E 64E3                   MOV         R14,R4
+    00000440 A001                   BRA         L634
+    00000442 74F8                   ADD         #-8,R4
+    00000444              L632:                             
+    00000444 54F1                   MOV.L       @(4,R15),R4
+    00000446              L634:                             
+    00000446 A032                   BRA         L653
+    00000448 6442                   MOV.L       @R4,R4
+    0000044A              L593:                            ; case label 
+      platform.c   156                case 't': PrintType(va_arg(Args, struct ValueType *)); break;
+    0000044A 64E3                   MOV         R14,R4
+    0000044C 7404                   ADD         #4,R4
+    0000044E 24D8                   TST         R13,R4
+    00000450 8D02                   BT/S        L635
+    00000452 1F41                   MOV.L       R4,@(4,R15)
+    00000454 A001                   BRA         L637
+    00000456 7E08                   ADD         #8,R14
+    00000458              L635:                             
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:24  PAGE   14
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    00000458 5EF1                   MOV.L       @(4,R15),R14
+    0000045A              L637:                             
+    0000045A 64E3                   MOV         R14,R4
+    0000045C 74FC                   ADD         #-4,R4
+    0000045E 24D8                   TST         R13,R4
+    00000460 8D03                   BT/S        L636
+    00000462 2F42                   MOV.L       R4,@R15
+    00000464 64E3                   MOV         R14,R4
+    00000466 A001                   BRA         L638
+    00000468 74F8                   ADD         #-8,R4
+    0000046A              L636:                             
+    0000046A 64F2                   MOV.L       @R15,R4
+    0000046C              L638:                             
+    0000046C 480B                   JSR         @R8
+    0000046E 6442                   MOV.L       @R4,R4
+    00000470 A01F                   BRA         L643
+    00000472 0009                   NOP
+    00000474              L594:                            ; case label 
+      platform.c   157    #ifndef NO_FP
+      platform.c   158                case 'f': PrintFP(va_arg(Args, double)); break;
+    00000474 63E3                   MOV         R14,R3
+    00000476 7308                   ADD         #8,R3
+    00000478 23D8                   TST         R13,R3
+    0000047A 8D02                   BT/S        L639
+    0000047C 1F31                   MOV.L       R3,@(4,R15)
+    0000047E A001                   BRA         L641
+    00000480 7E0C                   ADD         #12,R14
+    00000482              L639:                             
+    00000482 5EF1                   MOV.L       @(4,R15),R14
+    00000484              L641:                             
+    00000484 63E3                   MOV         R14,R3
+    00000486 73F8                   ADD         #-8,R3
+    00000488 23D8                   TST         R13,R3
+    0000048A 8D03                   BT/S        L640
+    0000048C 2F32                   MOV.L       R3,@R15
+    0000048E 62E3                   MOV         R14,R2
+    00000490 A001                   BRA         L642
+    00000492 72F4                   ADD         #-12,R2
+    00000494              L640:                             
+    00000494 62F2                   MOV.L       @R15,R2
+    00000496              L642:                             
+    00000496 5121                   MOV.L       @(4,R2),R1
+    00000498 2F16                   MOV.L       R1,@-R15
+    0000049A 6122                   MOV.L       @R2,R1
+    0000049C 4A0B                   JSR         @R10
+    0000049E 2F16                   MOV.L       R1,@-R15
+    000004A0 A007                   BRA         L643
+    000004A2 7F08                   ADD         #8,R15
+    000004A4              L595:                            ; case label 
+      platform.c   159    #endif
+      platform.c   160                case '%': PrintCh('%'); break;
+    000004A4 A003                   BRA         L653
+    000004A6 E425                   MOV         #37,R4
+    000004A8              L596:                            ; case label 
+      platform.c   161                case '\0': FPos--; break;
+    000004A8 A003                   BRA         L643
+    000004AA 7CFF                   ADD         #-1,R12
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:24  PAGE   15
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    000004AC              L621:                             
+      platform.c   162                }
+      platform.c   163            }
+      platform.c   164            else
+      platform.c   165                PrintCh(*FPos);
+    000004AC 64C0                   MOV.B       @R12,R4
+    000004AE              L653:                             
+    000004AE 4B0B                   JSR         @R11
+    000004B0 0009                   NOP
+    000004B2              L643:                             
+    000004B2 7C01                   ADD         #1,R12
+    000004B4              L619:                             
+    000004B4 63C0                   MOV.B       @R12,R3
+    000004B6 2338                   TST         R3,R3
+    000004B8 8901                   BT          L657
+    000004BA AF71                   BRA         L620
+    000004BC 0009                   NOP
+    000004BE              L657:                             
+      platform.c   166        }
+      platform.c   167    }
+    000004BE 7F08                   ADD         #8,R15
+    000004C0 4F26                   LDS.L       @R15+,PR
+    000004C2 68F6                   MOV.L       @R15+,R8
+    000004C4 69F6                   MOV.L       @R15+,R9
+    000004C6 6AF6                   MOV.L       @R15+,R10
+    000004C8 6BF6                   MOV.L       @R15+,R11
+    000004CA 6CF6                   MOV.L       @R15+,R12
+    000004CC 6DF6                   MOV.L       @R15+,R13
+    000004CE 000B                   RTS
+    000004D0 6EF6                   MOV.L       @R15+,R14
+    000004D2              L655:                             
+    000004D2 0000                   .DATA.W     0
+    000004D4 <00000000>             .DATA.L     L549
+    000004D8 <00000000>             .DATA.L     L550
+    000004DC <00000000>             .DATA.L     L536
+    000004E0 <00000000>             .DATA.L     _PlatformExit
+    000004E4 <00000000>             .DATA.L     _PrintType
+    000004E8 <00000000>             .DATA.L     _PrintStr
+    000004EC <00000000>             .DATA.L     _PrintFP
+    000004F0 <00000000>             .DATA.L     _PrintCh
+    000004F4 <00000000>             .DATA.L     _PrintSimpleInt
+      platform.c   168    
+      platform.c   169    /* make a new temporary name. takes a static buffer of char [7] as a parameter. should be initialised to "
+                         +XX0000"
+      platform.c   170     * where XX can be any characters */
+      platform.c   171    char *PlatformMakeTempName(char *TempNameBuffer)
+    000004F8              _PlatformMakeTempName:           ; function: PlatformMakeTempName
+                                                           ; frame size=4
+    000004F8 2FC6                   MOV.L       R12,@-R15
+    000004FA 6543                   MOV         R4,R5
+    000004FC 7505                   ADD         #5,R5
+    000004FE 6C53                   MOV         R5,R12
+    00000500 7C01                   ADD         #1,R12
+    00000502 6143                   MOV         R4,R1
+    00000504 7101                   ADD         #1,R1
+      platform.c   172    {
+      platform.c   173        int CPos = 5;
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:24  PAGE   16
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+      platform.c   174        
+      platform.c   175        while (CPos > 1)
+    00000506 3516                   CMP/HI      R1,R5
+    00000508 8F0E                   BF/S        L571
+    0000050A 6653                   MOV         R5,R6
+    0000050C E039                   MOV         #57,R0
+    0000050E E730                   MOV         #48,R7
+    00000510              L645:                             
+      platform.c   176        {
+      platform.c   177            if (TempNameBuffer[CPos] < '9')
+    00000510 6250                   MOV.B       @R5,R2
+    00000512 3203                   CMP/GE      R0,R2
+    00000514 8903                   BT          L646
+      platform.c   178            {
+      platform.c   179                TempNameBuffer[CPos]++;
+    00000516 6260                   MOV.B       @R6,R2
+    00000518 7201                   ADD         #1,R2
+    0000051A A005                   BRA         L571
+    0000051C 2620                   MOV.B       R2,@R6
+    0000051E              L646:                             
+      platform.c   180                return TableStrRegister(TempNameBuffer);
+      platform.c   181            }
+      platform.c   182            else
+      platform.c   183            {
+      platform.c   184                TempNameBuffer[CPos] = '0';
+      platform.c   185                CPos--;
+    0000051E 75FF                   ADD         #-1,R5
+    00000520 2C74                   MOV.B       R7,@-R12
+    00000522 3516                   CMP/HI      R1,R5
+    00000524 8DF4                   BT/S        L645
+    00000526 76FF                   ADD         #-1,R6
+    00000528              L571:
+      platform.c   186            }
+      platform.c   187        }
+      platform.c   188    
+      platform.c   189        return TableStrRegister(TempNameBuffer);
+    00000528 D201                   MOV.L       L658+2,R2  ; _TableStrRegister
+    0000052A 422B                   JMP         @R2
+    0000052C 6CF6                   MOV.L       @R15+,R12
+    0000052E              L658:                             
+    0000052E 0000                   .DATA.W     0
+    00000530 <00000000>             .DATA.L     _TableStrRegister
+      platform.c   190    }
+D   00000000              _PicocExitValue:                 ; static: PicocExitValue
+    00000000 00000000               .DATA.L     H'00000000
+C   00000000              L509:
+    00000000 6D61696E               .SDATA      "main"
+    00000004 00                     .DATA.B     H'00
+    00000005 00000001               .RES.B      1
+    00000006 00000002               .RES.W      1
+    00000008              L510:
+    00000008 6D61696E28             .SDATA      "main() is not defined"
+             2920697320   
+             6E6F742064   
+             6566696E65   
+             64           
+    0000001D 00                     .DATA.B     H'00
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:24  PAGE   17
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+    0000001E 00000002               .RES.W      1
+    00000020              L511:
+    00000020 6D61696E20             .SDATA      "main is not a function - can't call it"
+             6973206E6F   
+             7420612066   
+             756E637469   
+             6F6E202D20   
+             63616E2774   
+             2063616C6C   
+             206974       
+    00000046 00                     .DATA.B     H'00
+    00000047 00000001               .RES.B      1
+    00000048              L513:
+    00000048 5F5F617267             .SDATA      "__argc"
+             63           
+    0000004E 00                     .DATA.B     H'00
+    0000004F 00000001               .RES.B      1
+    00000050              L514:
+    00000050 5F5F617267             .SDATA      "__argv"
+             76           
+    00000056 00                     .DATA.B     H'00
+    00000057 00000001               .RES.B      1
+    00000058              L516:
+    00000058 7374617274             .SDATA      "startup"
+             7570         
+    0000005F 00                     .DATA.B     H'00
+    00000060              L517:
+    00000060 6D61696E28             .SDATA      "main();"
+             293B         
+    00000067 00                     .DATA.B     H'00
+    00000068              L518:
+    00000068 6D61696E28             .SDATA      "main(__argc,__argv);"
+             5F5F617267   
+             632C5F5F61   
+             726776293B   
+    0000007C 00                     .DATA.B     H'00
+    0000007D 00000001               .RES.B      1
+    0000007E 00000002               .RES.W      1
+    00000080              L520:
+    00000080 5F5F657869             .SDATA      "__exit_value"
+             745F76616C   
+             7565         
+    0000008C 00                     .DATA.B     H'00
+    0000008D 00000001               .RES.B      1
+    0000008E 00000002               .RES.W      1
+    00000090              L521:
+    00000090 5F5F657869             .SDATA      "__exit_value = main();"
+             745F76616C   
+             7565203D20   
+             6D61696E28   
+             293B         
+    000000A6 00                     .DATA.B     H'00
+    000000A7 00000001               .RES.B      1
+    000000A8              L522:
+    000000A8 5F5F657869             .SDATA      "__exit_value = main(__argc,__argv);"
+             745F76616C   
+             7565203D20   
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:24  PAGE   18
+
+
+SCT OFFSET   CODE       C LABEL     INSTRUCTION OPERAND    COMMENT
+
+             6D61696E28   
+             5F5F617267   
+             632C5F5F61   
+             726776293B   
+    000000CB 00                     .DATA.B     H'00
+    000000CC              L529:
+    000000CC 25733A2564             .SDATA      "%s:%d:"
+             3A           
+    000000D2 00                     .DATA.B     H'00
+    000000D3 00000001               .RES.B      1
+    000000D4              L536:
+    000000D4 0A00                   .DATA.B     H'0A,H'00
+    000000D6 00000002               .RES.W      1
+    000000D8              L546:
+    000000D8 63616E2774             .SDATA      "can't %s "
+             20257320     
+    000000E1 00                     .DATA.B     H'00
+    000000E2 00000002               .RES.W      1
+    000000E4              L547:
+    000000E4 6173736967             .SDATA      "assign"
+             6E           
+    000000EA 00                     .DATA.B     H'00
+    000000EB 00000001               .RES.B      1
+    000000EC              L548:
+    000000EC 736574                 .SDATA      "set"
+    000000EF 00                     .DATA.B     H'00
+    000000F0              L549:
+    000000F0 20696E2061             .SDATA      " in argument %d of call to %s()"
+             7267756D65   
+             6E74202564   
+             206F662063   
+             616C6C2074   
+             6F20257328   
+             29           
+    0000010F 00                     .DATA.B     H'00
+    00000110              L550:
+    00000110 00                     .DATA.B     H'00
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SH SERIES C/C++ Compiler (Ver. 6.0C)                                                                 05-May-2013 20:25:24  PAGE    1
+
+
+******** STATISTICS INFORMATION ********
+
+
+********** ERROR INFORMATION ***********
+
+NUMBER OF ERRORS:           0
+NUMBER OF WARNINGS:         0
+
+
+
+
+******* SOURCE LINE INFORMATION ********
+
+COMPILED SOURCE LINE:      190
+
+
+
+******* SECTION SIZE INFORMATION *******
+
+PROGRAM  SECTION (P):                               00000534 Byte(s)
+CONSTANT SECTION (C):                               00000111 Byte(s)
+DATA     SECTION (D):                               00000004 Byte(s)
+BSS      SECTION (B):                               00000000 Byte(s)
+
+ TOTAL PROGRAM SIZE: 00000649 Byte(s)
+
+
+
+********** LABEL INFORMATION ***********
+
+NUMBER OF EXTERNAL REFERENCE SYMBOLS:           30
+NUMBER OF EXTERNAL DEFINITION SYMBOLS:          12
+NUMBER OF INTERNAL/EXTERNAL SYMBOLS:           121
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*** COMMAND PARAMETER ***
+
+
+  -subcommand=C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\hmk345.tmp 
+
